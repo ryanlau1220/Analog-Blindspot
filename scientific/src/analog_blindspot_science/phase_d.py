@@ -74,16 +74,33 @@ def ingest(path: Path, tile: dict) -> dict:
 
 
 def crs_is_regcan95_utm28(crs) -> tuple[bool, str]:
+    """UTM zone 28N on REGCAN95 or ETRS89.
+
+    CNIG names the Canary files REGCAN95, but tiles can be tagged ETRS89 / UTM 28N
+    (EPSG:25828). Both are ITRF-aligned and PROJ applies no shift between them
+    (REGCAN95 -> ETRS89 is a no-op "ballpark" operation); the caller records the tag.
+    """
     c = CRS.from_wkt(crs.to_wkt())
     epsg = c.to_epsg(min_confidence=70)
     if epsg == 4083:
         return True, "EPSG:4083 REGCAN95 / UTM zone 28N"
+    if epsg == 25828:
+        return True, "EPSG:25828 ETRS89 / UTM zone 28N (file tag; CNIG names the product REGCAN95)"
     name = c.name.upper()
     utm28 = c.is_projected and "28N" in name.replace(" ", "")
     regcan = "REGCAN" in (c.datum.name if c.datum else "").upper() or "REGCAN" in name
     if utm28 and regcan:
         return True, f"{c.name} (equivalent to EPSG:4083)"
     return False, f"{c.name} (EPSG {epsg})"
+
+
+def align_to_pixel_edges(roi: earth.Roi, tr: Affine, res: float) -> earth.Roi:
+    """Shift ``roi`` (by < 1 pixel) so its edges coincide with the raster's pixel edges."""
+    dx = (tr.c - roi.left) % res
+    dy = (tr.f - roi.top) % res
+    dx = dx - res if dx > res / 2 else dx
+    dy = dy - res if dy > res / 2 else dy
+    return earth.Roi(roi.left + dx, roi.bottom + dy, roi.right + dx, roi.top + dy)
 
 
 def merged_roi(paths: list[Path], roi: earth.Roi, res: float) -> tuple[np.ndarray, Affine, object, float]:
@@ -188,14 +205,42 @@ def main() -> int:
     crs_str = f"EPSG:{epsg}"
     rc = cfg["roi"]
     res = cfg["product"]["native_res_m"]
-    roi = earth.snapped_roi(rc["center_lon"], rc["center_lat"], rc["size_m"], rc["snap_m"], crs=crs_wkt)
+    if "left" in rc:
+        roi = earth.Roi(rc["left"], rc["top"] - rc["size_m"], rc["left"] + rc["size_m"], rc["top"])
+    else:
+        roi = earth.snapped_roi(rc["center_lon"], rc["center_lat"], rc["size_m"], rc["snap_m"], crs=crs_wkt)
+    with rasterio.open(first) as ds:
+        area_or_point = ds.tags().get("AREA_OR_POINT")
+        roi = align_to_pixel_edges(roi, ds.transform, res)
+    notes = []
+    if epsg != cfg["product"]["expected_epsg"]:
+        notes.append(
+            f"File CRS tag is EPSG:{epsg}, not EPSG:{cfg['product']['expected_epsg']} (REGCAN95) as the file "
+            "name and CNIG page state. PROJ treats REGCAN95 and ETRS89 as identical (no-op transformation); "
+            "landmarks (NGBE, EPSG:4258) are in ETRS89, so the file tag is used as-is."
+        )
+    if area_or_point == "Point":
+        notes.append(
+            "GeoTIFF is PixelIsPoint: elevation posts sit on whole even metres, pixel edges on odd metres. "
+            "The ROI is shifted onto the tile's pixel edges so no resampling is needed."
+        )
     z, tr, crs, nod = merged_roi([raw / t["filename"] for t in present], roi, res)
     valid = valid_mask(z, nod)
+    sea = valid & (np.nan_to_num(z, nan=1e9) <= cfg["landmark_check"]["background_min_elev_m"])
+    notes.append(
+        f"{sea.mean() * 100:.1f}% of the ROI is valid data at or below "
+        f"{cfg['landmark_check']['background_min_elev_m']:g} m: a flat sea surface the DTM keeps as data. "
+        "It is excluded from background relief points."
+    )
     gate.check(
         "lanzarote:roi_valid_pixels",
         valid.mean() >= rc["min_valid_fraction"],
         f"{valid.mean() * 100:.2f}% valid in {rc['size_m']:g} m ROI {roi}"
-        + (f"; ROI may need optional tiles not present: {absent_optional}" if absent_optional else ""),
+        + (
+            f"; ROI may need optional tiles not present: {absent_optional}"
+            if absent_optional and valid.mean() < rc["min_valid_fraction"]
+            else ""
+        ),
     )
 
     lms_all = earth.load_landmarks(CONFIG_DIR / rc["landmark_file"], crs=crs_wkt)
@@ -243,7 +288,8 @@ def main() -> int:
         for lm in lms:
             lr = earth.local_relief(zl, vl, trl, lm["utm_x"], lm["utm_y"], radius)
             lm_rel[lm["name"]] = None if lr["relief_m"] is None else round(lr["relief_m"], 3)
-        base = earth.relief_baseline(zl, vl, trl, radius, BG_POINTS, seed=BG_SEED, min_valid=0.9)
+        land = vl & (np.nan_to_num(zl, nan=-1e9) > cfg["landmark_check"]["background_min_elev_m"])
+        base = earth.relief_baseline(zl, land, trl, radius, BG_POINTS, seed=BG_SEED, min_valid=0.9)
         vals = [v for v in lm_rel.values() if v is not None]
         sl = slope_deg(zl, r)
         rows.append(
@@ -309,6 +355,7 @@ def main() -> int:
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
         "pipeline_version": cfg["pipeline_version"],
         "gate": {"status": "pass" if gate.passed else "fail", "checks": gate.checks},
+        "notes": notes,
         "dataset": {
             "id": cfg["product_id"],
             "role": "earth_candidate_2",
@@ -347,7 +394,13 @@ def main() -> int:
             ],
             "landmark_source": "IGN NGBE, scientific/config/" + rc["landmark_file"],
             "landmark_check_radius_m": radius,
-            "background": {"points": BG_POINTS, "seed": BG_SEED, "min_valid_fraction": 0.9},
+            "background": {
+                "points": BG_POINTS,
+                "seed": BG_SEED,
+                "min_valid_fraction": 0.9,
+                "land_min_elev_m": cfg["landmark_check"]["background_min_elev_m"],
+                "note": "disks must be >= 90 % land (above the threshold); sea-surface pixels are excluded",
+            },
             "resolution_levels": rows,
         },
         "derived_assets": derived,

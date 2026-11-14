@@ -53,8 +53,8 @@ describe("scenes", () => {
     expect(b.cutaway.enabled).toBe(true);
     expect(b.cutaway.position).toBeCloseTo((moon?.landmarks[0]?.y_m ?? 0) / (moon?.extent_m ?? 1));
     const e = stateAt(3, (scenes[3]?.steps.length ?? 1) - 1);
-    const earth = index.sites.find((s) => s.id === "earth");
-    expect(earth?.variants.find((v) => v.id === e.variantId)?.observed).toBe(false);
+    const endSite = index.sites.find((s) => s.id === e.site);
+    expect(endSite?.variants.find((v) => v.id === e.variantId)?.observed).toBe(false);
   });
 
   it("quotes numbers from the exported facts, not typed-in values", () => {
@@ -72,11 +72,24 @@ describe("scenes", () => {
 
   it("presents unverified candidates as unverified", () => {
     const byId = Object.fromEntries(index.candidates.map((c) => [c.id, c.status]));
-    expect(byId).toEqual({
-      lava_beds: "validated",
-      lanzarote: "not_verified",
-      harrat_khaybar: "not_verified",
-    });
+    expect(byId.lava_beds).toBe("validated");
+    expect(byId.harrat_khaybar).toBe("not_verified");
+    // Lanzarote is "validated" only when its site (Phase D gate passed) is exported, and vice versa.
+    const hasSite = index.sites.some((x) => x.id === "lanzarote");
+    expect(byId.lanzarote).toBe(hasSite ? "validated" : "not_verified");
+  });
+
+  it("visits Lanzarote in chapters 3 and 4 only when its data is validated", () => {
+    const hasSite = index.sites.some((x) => x.id === "lanzarote");
+    const visits = (i: number) => (scenes[i]?.steps ?? []).some((_, j) => stateAt(i, j).site === "lanzarote");
+    expect(visits(2)).toBe(hasSite);
+    expect(visits(3)).toBe(hasSite);
+    if (hasSite) {
+      const last = stateAt(3, (scenes[3]?.steps.length ?? 1) - 1);
+      const lanz = index.sites.find((x) => x.id === "lanzarote");
+      expect(lanz?.variants.find((v) => v.id === last.variantId)?.observed).toBe(false);
+      expect(scenes[3]?.body.join(" ")).toMatch(/Lanzarote/);
+    }
   });
 });
 

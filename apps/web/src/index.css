@@ -10,3 +10,17 @@ body,
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    height: auto;
+    background: white;
+  }
+}

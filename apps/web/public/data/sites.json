@@ -1,7 +1,7 @@
 {
   "asset_version": "phase-b-1",
   "manifest_generated_utc": "2026-11-14T06:46:16+00:00",
-  "manifest_sha256": "d6c5e39a7644aac26883167dfc7c2be5f708eadcaf48b56acadcac91144c4fe0",
+  "manifest_sha256": "442f0b89a17090c669af790321ae25ecbcf90ed54c59d0aebc142712be8bbfd7",
   "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
   "sites": [
     {
@@ -19,7 +19,11 @@
         "landing_page": "https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_MARIUSPIT01",
         "license": "Public domain (LROC PDS-delivered data products)",
         "credit": "NASA/GSFC/Arizona State University",
-        "citation": "Henriksen, M.R., et al. (2017). Extracting accurate and precise topography from LROC narrow angle camera stereo observations. Icarus 283: 122-137. https://doi.org/10.1016/j.icarus.2016.05.012"
+        "citation": "Henriksen, M.R., et al. (2017). Extracting accurate and precise topography from LROC narrow angle camera stereo observations. Icarus 283: 122-137. https://doi.org/10.1016/j.icarus.2016.05.012",
+        "citations": [
+          "Henriksen, M.R., et al. (2017). Extracting accurate and precise topography from LROC narrow angle camera stereo observations. Icarus 283: 122-137. https://doi.org/10.1016/j.icarus.2016.05.012",
+          "Robinson, M.S., et al. (2010). Lunar Reconnaissance Orbiter Camera (LROC) Instrument Overview. Space Science Reviews 150: 81-124."
+        ]
       },
       "variants": [
         {
@@ -125,7 +129,10 @@
         "landing_page": "https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.102024.32610.1",
         "license": "CC BY 4.0",
         "credit": null,
-        "citation": "Williams, E. (2024). Lidar Survey of Lava Tubes, CA 2023. National Center for Airborne Laser Mapping (NCALM). Distributed by OpenTopography. https://doi.org/10.5069/G9ST7N19. Accessed 2026-11-14"
+        "citation": "Williams, E. (2024). Lidar Survey of Lava Tubes, CA 2023. National Center for Airborne Laser Mapping (NCALM). Distributed by OpenTopography. https://doi.org/10.5069/G9ST7N19. Accessed 2026-11-14",
+        "citations": [
+          "Williams, E. (2024). Lidar Survey of Lava Tubes, CA 2023. National Center for Airborne Laser Mapping (NCALM). Distributed by OpenTopography. https://doi.org/10.5069/G9ST7N19. Accessed 2026-11-14"
+        ]
       },
       "variants": [
         {
@@ -430,6 +437,300 @@
         ],
         "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark."
       }
+    },
+    {
+      "id": "lanzarote",
+      "body": "Earth",
+      "name": "Malpa\u00eds de La Corona, Lanzarote",
+      "extent_m": 3000.0,
+      "crs": "EPSG:25828 (REGCAN95 / UTM zone 28N)",
+      "vertical": "Orthometric (CNIG product description); geoid model not stated on the download page",
+      "provenance": {
+        "dataset_id": "cnig_mdt02_lanzarote",
+        "title": "MDT02 - 2\u00aa cobertura (PNOA-LiDAR), Modelo Digital del Terreno 2 m",
+        "product_id": "MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "doi": null,
+        "landing_page": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475",
+        "license": "Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required",
+        "credit": "Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es",
+        "citation": "MDT02-cob2 2015-2021 CC-BY 4.0 scne.es",
+        "citations": [
+          "MDT02-cob2 2015-2021 CC-BY 4.0 scne.es",
+          "Licence: Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required (http://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf)"
+        ]
+      },
+      "variants": [
+        {
+          "id": "2m",
+          "resolution_m": 2.0,
+          "observed": true,
+          "label": "Observed: CNIG PNOA-LiDAR MDT02 bare-earth DTM, 2 m",
+          "display": {
+            "grid": 257,
+            "cell_m": 11.673151750972762,
+            "geometry": "coverage-weighted average of the 2 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "dbb3e2c6cbd803bdbe2e046b334206789964c99f70072952b9a9942de5193a3b"
+          },
+          "elevation": {
+            "min_m": -0.44848769903182983,
+            "max_m": 150.82962036132812,
+            "nan_count": 218
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 1500,
+            "m_per_px": 2.0,
+            "bytes": 2363732,
+            "filter": "linear",
+            "basis": "Horn gradients of the 2 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_2m.tif",
+            "sha256": "50b70a2c72c9e7f89bbc6c981036b9c5556b41db2f619022f3626f18ece5dac5"
+          }
+        },
+        {
+          "id": "4m",
+          "resolution_m": 4.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 4 m (block mean of the 2 m MDT02). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 11.673151750972762,
+            "geometry": "coverage-weighted average of the 4 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "7acdc187d3741880fc85575a58a051c44aa21250dd94f32d7356b56f756d6733"
+          },
+          "elevation": {
+            "min_m": -0.4450194537639618,
+            "max_m": 150.82972717285156,
+            "nan_count": 217
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 750,
+            "m_per_px": 4.0,
+            "bytes": 536120,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 4 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_4m.tif",
+            "sha256": "073830594e0fb3adf355bf927624f48c4ce3ca6e27b852d0289c634b90b403f5"
+          }
+        },
+        {
+          "id": "10m",
+          "resolution_m": 10.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 10 m (block mean of the 2 m MDT02). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 11.673151750972762,
+            "geometry": "coverage-weighted average of the 10 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "43b0295391d1901be66c9c0bc67d5343de6cfd535a5d5a6dc1755d3f88ca5f61"
+          },
+          "elevation": {
+            "min_m": -0.42978185415267944,
+            "max_m": 150.82574462890625,
+            "nan_count": 217
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 300,
+            "m_per_px": 10.0,
+            "bytes": 77604,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 10 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_10m.tif",
+            "sha256": "833e16a539ea918826de76822391fcf1fd6a29e1c3843e3ca895d67e88da164f"
+          }
+        },
+        {
+          "id": "30m",
+          "resolution_m": 30.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 30 m (block mean of the 2 m MDT02). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 11.673151750972762,
+            "geometry": "coverage-weighted average of the 30 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "aaf1150b36042450111b57ea68518a539769f30aaf07d6040e1943cf3bdfc1db"
+          },
+          "elevation": {
+            "min_m": -0.3621777892112732,
+            "max_m": 150.5877227783203,
+            "nan_count": 225
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 100,
+            "m_per_px": 30.0,
+            "bytes": 7682,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 30 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_30m.tif",
+            "sha256": "2c33783dfd34a01698eda1b011741edf86507e20792331669ed624c72f834fa4"
+          }
+        }
+      ],
+      "drape": null,
+      "landmarks": [
+        {
+          "id": "ngbe_2629323",
+          "name": "Jameo de la Gente",
+          "kind": "jameo",
+          "x_m": 88.60000159335323,
+          "y_m": 39.63250192627311,
+          "surface_elev_m": 124.88639831542969,
+          "source": "IGN NGBE feature 2629323 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        },
+        {
+          "id": "ngbe_2629326",
+          "name": "Jameo Redondo",
+          "kind": "jameo",
+          "x_m": 458.32224518829025,
+          "y_m": 163.24160979036242,
+          "surface_elev_m": 120.23222351074219,
+          "source": "IGN NGBE feature 2629326 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        },
+        {
+          "id": "ngbe_2629322",
+          "name": "Jameo Cumplido",
+          "kind": "jameo",
+          "x_m": 744.4580743594561,
+          "y_m": 247.48424453148618,
+          "surface_elev_m": 101.92646789550781,
+          "source": "IGN NGBE feature 2629322 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        },
+        {
+          "id": "ngbe_2629324",
+          "name": "Jameo de Puerta Falsa",
+          "kind": "jameo",
+          "x_m": 1067.3471616030438,
+          "y_m": 425.8885056646541,
+          "surface_elev_m": 87.24895477294922,
+          "source": "IGN NGBE feature 2629324 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        },
+        {
+          "id": "ngbe_2630216",
+          "name": "Cueva de los Verdes",
+          "kind": "jameo",
+          "x_m": 2170.9594902615063,
+          "y_m": 810.4073560214601,
+          "surface_elev_m": 55.90302658081055,
+          "source": "IGN NGBE feature 2630216 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        },
+        {
+          "id": "ngbe_2629328",
+          "name": "Jameos del Agua",
+          "kind": "jameo",
+          "x_m": 2912.0494487569667,
+          "y_m": 1172.6208673529327,
+          "surface_elev_m": 19.638137817382812,
+          "source": "IGN NGBE feature 2629328 (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+          "notes": [
+            "NGBE point from the 1:25 000 base map; position is approximate."
+          ]
+        }
+      ],
+      "subsurface": "not measured",
+      "experiment": {
+        "measure": "max - min elevation within 30 m",
+        "radius_m": 30.0,
+        "landmark_count": 6,
+        "background_points": 312,
+        "background_note": "312 land points (of 400 seeded, seed 20261114) inside the same ROI; sea surface excluded",
+        "method": "block_mean",
+        "levels": [
+          {
+            "resolution_m": 2.0,
+            "observed": true,
+            "landmark_relief_median_m": 15.385000000000002,
+            "background_relief_median_m": 5.05999755859375,
+            "slope_deg_p95": 15.756325721740723
+          },
+          {
+            "resolution_m": 4.0,
+            "observed": false,
+            "landmark_relief_median_m": 14.7875,
+            "background_relief_median_m": 4.788747787475586,
+            "slope_deg_p95": 12.842010498046875
+          },
+          {
+            "resolution_m": 10.0,
+            "observed": false,
+            "landmark_relief_median_m": 12.963000000000001,
+            "background_relief_median_m": 4.312796592712402,
+            "slope_deg_p95": 9.56122875213623
+          },
+          {
+            "resolution_m": 30.0,
+            "observed": false,
+            "landmark_relief_median_m": null,
+            "background_relief_median_m": null,
+            "slope_deg_p95": 7.043182849884033
+          },
+          {
+            "resolution_m": 60.0,
+            "observed": false,
+            "landmark_relief_median_m": null,
+            "background_relief_median_m": null,
+            "slope_deg_p95": 6.211407661437988
+          }
+        ],
+        "caveat": "Six approximate point labels; a relief comparison, not a detection-rate benchmark."
+      }
     }
   ],
   "candidates": [
@@ -445,9 +746,9 @@
       "id": "lanzarote",
       "site": "Lanzarote / Malpa\u00eds de La Corona, Canary Islands, Spain",
       "url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475",
-      "status": "not_verified",
-      "elevation_product": "CNIG MDT02 tile MDT02-REGCAN95-HU28-1080-4-COB2.TIF (catalog: 2 m, 72.01 MB)",
-      "note": "Tile over the jameos located via the CNIG catalogue; awaiting manual download, so no pixels have been checked."
+      "status": "validated",
+      "elevation_product": "CNIG PNOA-LiDAR MDT02, 2 m (MDT02-REGCAN95-HU28-1080-4-COB2.TIF)",
+      "note": "Downloaded manually and checked pixel by pixel in Phase D. Surface only."
     },
     {
       "id": "harrat_khaybar",
@@ -456,6 +757,23 @@
       "elevation_product": "ALOS-PALSAR-derived DEM (12.5 m, as used in a published study)",
       "note": "Too coarse for the 0.5 m coarsening experiment; no high-resolution DTM of a tube feature confirmed.",
       "url": "https://www.mdpi.com/2073-445X/12/3/705"
+    }
+  ],
+  "landmark_sources": [
+    {
+      "site": "moon",
+      "source": "LROC Pits Atlas, Marius Hills Pit",
+      "url": "https://lroc.im-ldi.com/atlases/pits/1"
+    },
+    {
+      "site": "earth",
+      "source": "USGS Geographic Names Information System (GNIS), public domain",
+      "url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/search/names"
+    },
+    {
+      "site": "lanzarote",
+      "source": "IGN Nomencl\u00e1tor Geogr\u00e1fico B\u00e1sico de Espa\u00f1a (NGBE), CC BY 4.0",
+      "url": "https://www.ign.es/wfs-inspire/ngbe"
     }
   ]
 }

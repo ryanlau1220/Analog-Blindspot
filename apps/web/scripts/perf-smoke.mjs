@@ -25,7 +25,8 @@ const READY_MS = Number(process.env.READY_MS ?? 15000);
 // where the check only catches pathological regressions. Override with MIN_FPS.
 const HW_MIN_FPS = 30;
 const SW_MIN_FPS = 2;
-const DATA_BUDGET = 8 * 1024 * 1024;
+// Three sites, every variant visited: 9.4 MB of assets in total (Phase D adds Lanzarote).
+const DATA_BUDGET = 12 * 1024 * 1024;
 const CHROME = process.env.CHROME ?? "/usr/bin/google-chrome";
 
 const server = await preview({ root: ROOT, preview: { port: 4317, strictPort: true, open: false } });
@@ -122,6 +123,9 @@ const scenarios = [
   { name: "earth_4m", key: "earth/4m", actions: [{ type: "selectVariant", variantId: "4m" }] },
   { name: "earth_10m", key: "earth/10m", actions: [{ type: "selectVariant", variantId: "10m" }] },
   { name: "earth_30m", key: "earth/30m", actions: [{ type: "selectVariant", variantId: "30m" }] },
+  { name: "lanzarote_2m", key: "lanzarote/2m", actions: [{ type: "selectSite", site: "lanzarote" }] },
+  { name: "lanzarote_30m", key: "lanzarote/30m", actions: [{ type: "selectVariant", variantId: "30m" }] },
+  { name: "earth_return", key: "earth/0p5m", actions: [{ type: "selectSite", site: "earth" }] },
   {
     name: "earth_0p5m_cutaway_x4",
     key: "earth/0p5m",

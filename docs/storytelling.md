@@ -47,3 +47,22 @@ The app opens in **story mode**: five chapters drive the 3D scene. **Explore** s
   a hardware GPU is still unmeasured.
 
 Not in Phase C: the printable Field Validation Brief (Phase E) and new sites (Phase D).
+
+## Phase D and E additions
+
+- **Lanzarote (validated in Phase D)** appears in chapter 3 as an extra step and in chapter 4 as extra steps
+  (2 m observed, then simulated 4, 10 and 30 m). The experiment card has a Lava Beds / Lanzarote tab. All of
+  this only appears if `sites.json` contains the Lanzarote site, which `export-web` writes only after the
+  Phase D gate passes.
+- `src/story/findings.ts` is the single source for the conclusion, hypothesis, limit and next-measurement
+  statements. The chapter-5 card and the brief both use it.
+- **Printable Field Validation Brief:** open `#brief`, or use the link in chapter 5. It is one A4 page built
+  from `sites.json`. It contains:
+  - the question;
+  - findings supported by the data, kept separate from research hypotheses;
+  - recommended next field measurements;
+  - experiment tables for both Earth sites;
+  - data products with licences, with unverified candidates marked NOT VERIFIED;
+  - source limitations and citations.
+
+  "Print / save as PDF" uses the browser's print dialog, with `@page` set to A4 and 10 mm margins.

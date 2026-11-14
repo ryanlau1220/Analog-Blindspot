@@ -61,6 +61,12 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     throw new Error("sites.json lacks story facts; rerun `uv run export-web`");
   const loss = lossResolution(exp);
   const kept = lastVisibleResolution(exp);
+  // Optional third site: only present in sites.json once its Phase D gate has passed.
+  const lanz = index.sites.find((s) => s.id === "lanzarote");
+  const lexp = lanz?.experiment;
+  const lKept = lexp ? lastVisibleResolution(lexp) : null;
+  const lLoss = lexp ? lossResolution(lexp) : null;
+  const median = (e: Experiment) => e.levels.find((l) => l.observed)?.landmark_relief_median_m ?? null;
   const simulated = earth.variants.filter((v) => !v.observed);
 
   const scenesOut: StoryScene[] = [
@@ -122,6 +128,15 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
           ms: 4500,
         },
         { preset: { view: "landmark", exaggeration: 2 }, ms: 4500, caption: "Vertical exaggeration ×2." },
+        ...(lanz
+          ? [
+              {
+                preset: { site: "lanzarote" as const, exaggeration: 2 as const, view: "landmark" as const },
+                ms: 5000,
+                caption: `Lanzarote, ${lanz.variants.find((v) => v.observed)?.resolution_m} m CNIG LiDAR terrain model: markers are named jameos (collapse openings into a lava tube) from the IGN gazetteer. Vertical exaggeration ×2.`,
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -133,6 +148,11 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
         loss !== null && kept !== null
           ? `Measured as relief (${exp.measure}), the bridge points stand out from ${exp.background_points} random points up to ${kept} m. From ${loss} m on, they do not.`
           : `Measured as relief (${exp.measure}), compare the bridge points with ${exp.background_points} random points at each grid.`,
+        ...(lanz && lexp && lKept !== null
+          ? [
+              `At Lanzarote the jameos have more relief (median ${median(lexp)?.toFixed(1)} m against ${median(exp)?.toFixed(1)} m for the bridges) and still stand out at ${lKept} m${lLoss === null ? ", the coarsest grid where this measure works" : `, but not from ${lLoss} m`}.`,
+            ]
+          : []),
       ],
       panel: "experiment",
       steps: [
@@ -145,6 +165,17 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
           ms: 3000,
           caption: `Simulated ${v.resolution_m} m grid.`,
         })),
+        ...(lanz
+          ? lanz.variants.map((v) => ({
+              preset: v.observed
+                ? { site: "lanzarote" as const, exaggeration: 2 as const, view: "landmark" as const }
+                : { variantId: v.id },
+              ms: 3000,
+              caption: v.observed
+                ? `Lanzarote, observed ${v.resolution_m} m grid.`
+                : `Lanzarote, simulated ${v.resolution_m} m grid.`,
+            }))
+          : []),
       ],
     },
     {

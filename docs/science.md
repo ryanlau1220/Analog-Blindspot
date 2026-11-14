@@ -140,9 +140,8 @@ rate has not been measured yet.** The report and screenshots are written to `app
 
 # Phase D: site expansion
 
-Status (2026-11-14): **Lanzarote is blocked on a manual download.** The exact tile is identified and the
-validation pipeline is ready, but no Lanzarote pixels have been checked yet. **Harrat Khaybar was not
-attempted.**
+Status (2026-11-14): **Lanzarote validated.** Tile `1080-4` was downloaded manually and passed the Phase D
+gate (8/8 checks). **Harrat Khaybar was not attempted.**
 
 ## Lanzarote / Malpaís de La Corona
 
@@ -171,34 +170,33 @@ step. I did not script around either. National WCS services were checked as an a
 `servicios.idee.es/wcs-inspire/mdt` serves 5 m at its finest, which is not the MDT02 product. GRAFCAN's WCS
 paths returned 404.
 
-**To finish Lanzarote:**
+**Result** (`datasets/manifest_phase_d.json`):
 
-1. Open https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475 in a browser, accept the
-   licence and download the file.
-2. Put it, under its original name, in `datasets/raw/cnig_mdt02_lanzarote/`. Add `1080-2` (sec=10325533) only
-   if the gate asks for it.
-3. Run `cd scientific && uv run phase-d && uv run export-web`, then `pnpm perf`.
+- File: 75,507,856 bytes (72.01 MiB, matching the catalogue), SHA-256 `c520f8c0a63946bd…`. It was saved with a
+  lowercase `.tif` extension and renamed to the catalogue name.
+- Grid: 8218 × 4773 px at 2 m; 71.5 % valid (112.2 km²); elevation −1.6 to 671.2 m.
+- **CRS tag differs from the name:** the file is tagged ETRS89 / UTM 28N (EPSG:25828), while the file name and
+  CNIG page say REGCAN95. PROJ applies no shift between the two, and the NGBE landmarks are ETRS89, so I used the
+  tag as-is and recorded the discrepancy.
+- The GeoTIFF is PixelIsPoint, so pixel edges fall on odd metres. The ROI is shifted onto the tile's own pixel
+  edges, so nothing is resampled.
+- **ROI:** 3 km square, E 649607–652607, N 3224561–3227561, with its top edge on the tile's top edge. A ROI
+  centred on the jameos would have run about 900 m past the tile (69 % valid). 99.6 % of the ROI is valid, and all
+  six landmarks fall on valid pixels. Tile `1080-2` was not needed.
+- **Sea surface:** the DTM keeps the sea as valid, nearly flat data (−0.55 to 0.34 m). That is 20.4 % of the
+  ROI. Background points must be at least 90 % above 1 m, which leaves 312 of the 400 seeded points.
 
-**What `uv run phase-d` checks once the file is present:**
+| Grid | Jameos, median relief (30 m) | Background (land), median |
+|---|---|---|
+| 2 m (observed) | 15.4 m | 5.1 m |
+| 4 m (simulated) | 14.8 m | 4.8 m |
+| 10 m (simulated) | 13.0 m | 4.3 m |
+| 30 / 60 m (simulated) | not measurable | not measurable |
 
-- **Integrity:** byte size against the catalogue MB, then SHA-256, recorded in an `.ingest.json` sidecar.
-- **Projection and grid:** CRS is REGCAN95 / UTM 28N (EPSG:4083) and pixel spacing is 2 m.
-- **Coverage:** valid-pixel fraction per tile, and at least 90 % valid in the 3 km ROI (its east edge
-  approaches the coast).
-- **Landmarks:** all six NGBE points fall on valid pixels.
-- **Relief:** relief within 30 m of the jameos is greater than at 400 seeded random points. This is the same
-  measure used at Lava Beds.
-- **Outputs:** simulated coarsening to 4, 10, 30 and 60 m, derived GeoTIFFs tagged `SIMULATED`, and hillshade
-  previews.
+Unlike the Lava Beds bridges (lost from 10 m), the jameos still stand out at 10 m. The web export adds
+Lanzarote as a third site (2 m observed; 4, 10 and 30 m simulated), and chapters 3–5 now include it.
 
-Tiles are mosaicked only if their grids are aligned, so nothing is resampled. Results go to
-`datasets/manifest_phase_d.json` and are also embedded in `datasets/manifest.json` under `phase_d`. Phase A
-keeps that key when it regenerates the manifest.
-
-If the gate passes, `export-web` adds a third site (2 m observed; 4, 10 and 30 m simulated) to the viewer, and
-the chapter-3 card switches to "data verified". Until then the card names the identified tile and says it is
-awaiting download. The validation branch is covered by `tests/test_phase_d.py`, which uses a synthetic tile in a
-temporary directory only. A version of that tile without depressions must fail the relief check, and it does.
+To rerun: `cd scientific && uv run phase-d && uv run export-web`.
 
 ## Harrat Khaybar (optional, not attempted)
 

@@ -43,11 +43,15 @@ attribution_derived = "Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es"
 
 [roi]
 name = "Malpaís de La Corona jameos (Cueva de los Verdes - Jameos del Agua)"
-center_lon = -13.4463
-center_lat = 29.1622
+# Explicit projected bounds (file CRS, EPSG:25828). The top edge is the top pixel
+# edge of tile 1080-4 (y = 3227561); x is centred on the six jameos
+# (649696..652519). A ROI centred on the jameos in y would extend ~900 m past the
+# tile's northern edge (69 % valid), so the ROI is pinned to the tile instead of
+# adding tile 1080-2. Every landmark's 30 m disk lies inside the ROI.
+left = 649607.0
+top = 3227561.0
 size_m = 3000.0  # divisible by every coarsening target
-snap_m = 60.0
-min_valid_fraction = 0.9  # the ROI's east edge approaches the coast
+min_valid_fraction = 0.9  # the ROI's south-east corner reaches the coast
 landmark_file = "landmarks/lanzarote_ngbe.geojson"
 required_landmarks = ["Jameo de la Gente", "Jameo Redondo", "Jameo Cumplido", "Jameo de Puerta Falsa",
                       "Cueva de los Verdes", "Jameos del Agua"]
@@ -59,3 +63,7 @@ min_valid_fraction = 0.5
 
 [landmark_check]
 radius_m = 30.0  # same measure as Lava Beds
+# The DTM keeps sea-surface pixels (measured -0.55..0.34 m, std 0.13 m) as valid data.
+# Background points must be on land, otherwise flat sea lowers the background relief.
+# A point is used only if at least 90 % of its 30 m disk is above this elevation.
+background_min_elev_m = 1.0

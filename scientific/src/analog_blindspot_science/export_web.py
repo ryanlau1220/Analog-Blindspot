@@ -112,6 +112,7 @@ def provenance(ds: dict) -> dict:
         "license": ds["license"]["terms"],
         "credit": ds["license"].get("credit"),
         "citation": ds["citations"][0],
+        "citations": ds["citations"],
     }
 
 
@@ -275,6 +276,28 @@ def export_variants(
     return variants, native
 
 
+def experiment_block(roi: dict, observed_res: float, bg_points: int, caveat: str, bg_note: str | None = None) -> dict:
+    return {
+        "measure": f"max - min elevation within {roi['landmark_check_radius_m']:g} m",
+        "radius_m": roi["landmark_check_radius_m"],
+        "landmark_count": len(roi["landmarks"]),
+        "background_points": bg_points,
+        "background_note": bg_note or f"{bg_points} reproducible random points (seed 20261114) inside the same ROI",
+        "method": "block_mean",
+        "levels": [
+            {
+                "resolution_m": lv["resolution_m"],
+                "observed": lv["resolution_m"] == observed_res,
+                "landmark_relief_median_m": lv["landmark_relief_median_m"],
+                "background_relief_median_m": lv["background_relief_p50_m"],
+                "slope_deg_p95": lv["slope_deg_p95"],
+            }
+            for lv in roi["resolution_levels"]
+        ],
+        "caveat": caveat,
+    }
+
+
 def export_earth(man: dict, out: Path) -> dict:
     ds = next(d for d in man["datasets"] if d["id"] == "ot_ca23_williams")
     roi = next(r for r in man["rois"] if r["id"] == "earth_lava_beds_cave_loop")
@@ -320,25 +343,9 @@ def export_earth(man: dict, out: Path) -> dict:
         "drape": None,
         "landmarks": landmarks,
         "subsurface": "not measured",
-        "experiment": {
-            "measure": f"max - min elevation within {roi['landmark_check_radius_m']:g} m",
-            "radius_m": roi["landmark_check_radius_m"],
-            "landmark_count": len(roi["landmarks"]),
-            "background_points": 400,
-            "background_note": "400 reproducible random points (seed 20261114) inside the same ROI",
-            "method": roi["coarsening"]["method"],
-            "levels": [
-                {
-                    "resolution_m": lv["resolution_m"],
-                    "observed": lv["resolution_m"] == 0.5,
-                    "landmark_relief_median_m": lv["landmark_relief_median_m"],
-                    "background_relief_median_m": lv["background_relief_p50_m"],
-                    "slope_deg_p95": lv["slope_deg_p95"],
-                }
-                for lv in roi["resolution_levels"]
-            ],
-            "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark.",
-        },
+        "experiment": experiment_block(
+            roi, 0.5, 400, "Eight approximate point labels; a relief comparison, not a detection-rate benchmark."
+        ),
     }
 
 
@@ -422,11 +429,20 @@ def export_lanzarote(rec: dict, out: Path) -> dict:
             "license": lic["terms"],
             "credit": lic["attribution_derived"],
             "citation": lic["attribution_unmodified"],
+            "citations": [lic["attribution_unmodified"], f"Licence: {lic['terms']} ({lic['terms_url']})"],
         },
         "variants": variants,
         "drape": None,
         "landmarks": landmarks,
         "subsurface": "not measured",
+        "experiment": experiment_block(
+            roi,
+            2.0,
+            roi["resolution_levels"][0]["background_points_used"],
+            "Six approximate point labels; a relief comparison, not a detection-rate benchmark.",
+            f"{roi['resolution_levels'][0]['background_points_used']} land points (of 400 seeded, seed 20261114) "
+            "inside the same ROI; sea surface excluded",
+        ),
     }
 
 
@@ -482,6 +498,23 @@ def main() -> int:
         "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
         "sites": sites,
         "candidates": candidates,
+        "landmark_sources": [
+            {
+                "site": "moon",
+                "source": "LROC Pits Atlas, Marius Hills Pit",
+                "url": "https://lroc.im-ldi.com/atlases/pits/1",
+            },
+            {
+                "site": "earth",
+                "source": "USGS Geographic Names Information System (GNIS), public domain",
+                "url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/search/names",
+            },
+            {
+                "site": "lanzarote",
+                "source": "IGN Nomenclátor Geográfico Básico de España (NGBE), CC BY 4.0",
+                "url": "https://www.ign.es/wfs-inspire/ngbe",
+            },
+        ],
     }
     (WEB_DATA / "sites.json").write_text(json.dumps(index, indent=2, allow_nan=False) + "\n")
     total = sum(p.stat().st_size for p in WEB_DATA.rglob("*") if p.is_file())

@@ -55,6 +55,7 @@ export interface Provenance {
   license: string;
   credit: string | null;
   citation: string;
+  citations?: string[];
 }
 
 export interface Site {
@@ -126,4 +127,5 @@ export interface SitesIndex {
   axes: string;
   sites: Site[];
   candidates: Candidate[];
+  landmark_sources?: Array<{ site: SiteId; source: string; url: string }>;
 }

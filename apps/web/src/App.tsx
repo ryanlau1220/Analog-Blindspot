@@ -12,6 +12,7 @@ import {
   sceneFromHash,
   storyReduce,
 } from "./story/story";
+import { Brief } from "./ui/Brief";
 import { ControlPanel } from "./ui/ControlPanel";
 import { EvidenceCard } from "./ui/EvidenceCard";
 import { SourcePanel } from "./ui/SourcePanel";
@@ -25,7 +26,18 @@ export function App() {
   }, []);
   if (error) return <FullScreenMessage title="Terrain data unavailable" body={error} />;
   if (!index) return <FullScreenMessage title="Loading verified terrain…" body="" />;
-  return <Experience index={index} />;
+  return <Routes index={index} />;
+}
+
+/** "#brief" shows the printable brief; anything else is the 3D experience. */
+function Routes({ index }: { index: SitesIndex }) {
+  const [brief, setBrief] = useState(() => window.location.hash === "#brief");
+  useEffect(() => {
+    const on = () => setBrief(window.location.hash === "#brief");
+    window.addEventListener("hashchange", on);
+    return () => window.removeEventListener("hashchange", on);
+  }, []);
+  return brief ? <Brief index={index} /> : <Experience index={index} />;
 }
 
 function Experience({ index }: { index: SitesIndex }) {

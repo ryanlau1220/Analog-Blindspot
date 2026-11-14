@@ -1,47 +1,468 @@
 {
-  "generated_utc": "2026-11-14T12:15:08+00:00",
+  "generated_utc": "2026-11-14T12:33:45+00:00",
   "pipeline_version": "phase-d-1",
   "gate": {
-    "status": "blocked",
+    "status": "pass",
     "checks": [
       {
         "name": "lanzarote:retrieved:MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
-        "passed": false,
-        "detail": "not found in datasets/raw/cnig_mdt02_lanzarote/ (manual download)"
+        "passed": true,
+        "detail": "75507856 bytes vs catalog 72.01 MB; sha256 c520f8c0a63946bd..."
+      },
+      {
+        "name": "lanzarote:crs:MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "passed": true,
+        "detail": "EPSG:25828 ETRS89 / UTM zone 28N (file tag; CNIG names the product REGCAN95)"
+      },
+      {
+        "name": "lanzarote:pixel_spacing:MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "passed": true,
+        "detail": "measured [2.0, 2.0] m"
+      },
+      {
+        "name": "lanzarote:has_valid_pixels:MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "passed": true,
+        "detail": "71.5% valid, 112.22 km2, elevation -1.6..671.2 m"
+      },
+      {
+        "name": "lanzarote:roi_valid_pixels",
+        "passed": true,
+        "detail": "99.63% valid in 3000 m ROI Roi(left=649607.0, bottom=3224561.0, right=652607.0, top=3227561.0)"
+      },
+      {
+        "name": "lanzarote:landmarks_present_in_ngbe",
+        "passed": true,
+        "detail": "6/6 required NGBE features"
+      },
+      {
+        "name": "lanzarote:landmarks_on_valid_pixels",
+        "passed": true,
+        "detail": "6/6 on valid 2 m pixels; not on valid data: []"
+      },
+      {
+        "name": "lanzarote:landmarks_rougher_than_background_at_native",
+        "passed": true,
+        "detail": "median relief within 30 m: jameos 15.385000000000002 m vs background 5.05999755859375 m; {'Jameo de la Gente': 21.37, 'Jameo Redondo': 12.08, 'Jameo Cumplido': 19.74, 'Jameo de Puerta Falsa': 17.87, 'Cueva de los Verdes': 12.9, 'Jameos del Agua': 9.72}"
       }
     ]
   },
+  "notes": [
+    "File CRS tag is EPSG:25828, not EPSG:4083 (REGCAN95) as the file name and CNIG page state. PROJ treats REGCAN95 and ETRS89 as identical (no-op transformation); landmarks (NGBE, EPSG:4258) are in ETRS89, so the file tag is used as-is.",
+    "GeoTIFF is PixelIsPoint: elevation posts sit on whole even metres, pixel edges on odd metres. The ROI is shifted onto the tile's pixel edges so no resampling is needed.",
+    "20.4% of the ROI is valid data at or below 1 m: a flat sea surface the DTM keeps as data. It is excluded from background relief points."
+  ],
   "dataset": {
     "id": "cnig_mdt02_lanzarote",
     "role": "earth_candidate_2",
-    "status": "awaiting_manual_download",
+    "status": "validated",
     "site": "Lanzarote / Malpa\u00eds de La Corona, Canary Islands, Spain",
     "title": "MDT02 - 2\u00aa cobertura (PNOA-LiDAR), Modelo Digital del Terreno 2 m",
+    "product_id": "MDT02-COB2",
+    "producer": "IGN / CNIG, PNOA-LiDAR (2nd coverage)",
     "catalog_url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02",
-    "tiles_identified": [
+    "format": "COG GeoTIFF",
+    "acquisition": {
+      "catalog_year": [
+        "2015"
+      ]
+    },
+    "license": {
+      "terms": "Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required",
+      "terms_url": "http://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf",
+      "attribution_unmodified": "MDT02-cob2 2015-2021 CC-BY 4.0 scne.es",
+      "attribution_derived": "Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es"
+    },
+    "files": [
       {
         "filename": "MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
-        "cnig_sec": "10325475",
+        "size_bytes": 75507856,
+        "mtime_ns": 1794659102261179200,
+        "sha256": "c520f8c0a63946bd275293e1831c0194e21f366362461437cee43013504fa0eb",
+        "ingested_utc": "2026-11-14T12:26:54+00:00",
+        "acquisition": "manual browser download from the CNIG download centre",
         "detail_url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475",
         "catalog_mb": 72.01,
-        "catalog_year": "2015"
-      },
-      {
-        "filename": "MDT02-REGCAN95-HU28-1080-2-COB2.TIF",
-        "cnig_sec": "10325533",
-        "detail_url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325533",
-        "catalog_mb": 58.92,
-        "catalog_year": "2015"
+        "catalog_year": "2015",
+        "cnig_sec": "10325475"
       }
     ],
-    "missing_files": [
-      "MDT02-REGCAN95-HU28-1080-4-COB2.TIF"
+    "horizontal_reference": {
+      "crs": "EPSG:25828",
+      "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 28N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25828\"]]"
+    },
+    "vertical_reference": {
+      "units": "metres",
+      "heights": "Orthometric (CNIG product description); geoid model not stated on the download page"
+    },
+    "measured": {
+      "tiles": {
+        "MDT02-REGCAN95-HU28-1080-4-COB2.TIF": {
+          "file": "MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+          "driver": "GTiff",
+          "width": 8218,
+          "height": 4773,
+          "band_count": 1,
+          "dtype": "float32",
+          "nodata": -32767.0,
+          "crs_wkt": "PROJCS[\"ETRS89 / UTM zone 28N\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"25828\"]]",
+          "crs_name": "utm",
+          "epsg": 25828,
+          "pixel_size": [
+            2.0,
+            2.0
+          ],
+          "bounds": {
+            "left": 639339.0,
+            "bottom": 3218015.0,
+            "right": 655775.0,
+            "top": 3227561.0
+          },
+          "transform": [
+            2.0,
+            0.0,
+            639339.0,
+            0.0,
+            -2.0,
+            3227561.0
+          ],
+          "area_or_point": "Point",
+          "scale": 1.0,
+          "offset": 0.0,
+          "valid_pixel_count": 28054270,
+          "valid_fraction": 0.7152228833224039,
+          "nodata_fraction": 0.2847771166775961,
+          "valid_area_km2": 112.21708,
+          "value_min": -1.590000033378601,
+          "value_max": 671.1500244140625,
+          "value_mean": 179.2575864963235,
+          "valid_data_bounds": {
+            "left": 639339.0,
+            "right": 654489.0,
+            "top": 3227561.0,
+            "bottom": 3218015.0
+          }
+        }
+      }
+    },
+    "known_limitations": [
+      "Surface DTM only; the T\u00fanel de la Atl\u00e1ntida / Cueva de los Verdes interior is not measured.",
+      "NGBE points come from a 1:25 000 base map; positions are approximate.",
+      "Native grid is 2 m (not 0.5 m as at Lava Beds); coarsened grids are simulations."
+    ]
+  },
+  "roi": {
+    "id": "earth_lanzarote_la_corona",
+    "name": "Malpa\u00eds de La Corona jameos (Cueva de los Verdes - Jameos del Agua)",
+    "bounds": {
+      "left": 649607.0,
+      "bottom": 3224561.0,
+      "right": 652607.0,
+      "top": 3227561.0,
+      "crs": "EPSG:25828"
+    },
+    "size_m": 3000.0,
+    "valid_fraction": 0.9962808888888889,
+    "landmarks": [
+      {
+        "name": "Jameo de la Gente",
+        "ngbe_id": "2629323",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.460693,
+        "lat": 29.16748,
+        "utm_x": 649695.6000015934,
+        "utm_y": 3227521.3674980737
+      },
+      {
+        "name": "Jameo Redondo",
+        "ngbe_id": "2629326",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.456909,
+        "lat": 29.166321,
+        "utm_x": 650065.3222451883,
+        "utm_y": 3227397.7583902096
+      },
+      {
+        "name": "Jameo Cumplido",
+        "ngbe_id": "2629322",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.453979,
+        "lat": 29.165527,
+        "utm_x": 650351.4580743595,
+        "utm_y": 3227313.5157554685
+      },
+      {
+        "name": "Jameo de Puerta Falsa",
+        "ngbe_id": "2629324",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.450684,
+        "lat": 29.163879,
+        "utm_x": 650674.347161603,
+        "utm_y": 3227135.1114943353
+      },
+      {
+        "name": "Cueva de los Verdes",
+        "ngbe_id": "2630216",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.439392,
+        "lat": 29.160278,
+        "utm_x": 651777.9594902615,
+        "utm_y": 3226750.5926439785
+      },
+      {
+        "name": "Jameos del Agua",
+        "ngbe_id": "2629328",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "lon": -13.431824,
+        "lat": 29.156921,
+        "utm_x": 652519.049448757,
+        "utm_y": 3226388.379132647
+      }
     ],
-    "why_manual": "CNIG direct download requires reCAPTCHA and an interactive licence step; it is not scripted.",
-    "instructions": [
-      "Open each detail_url, accept the licence and download the file into datasets/raw/cnig_mdt02_lanzarote/",
-      "Keep the original file name, then run: uv run phase-d && uv run export-web"
-    ],
-    "license": "Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required"
-  }
+    "landmark_source": "IGN NGBE, scientific/config/landmarks/lanzarote_ngbe.geojson",
+    "landmark_check_radius_m": 30.0,
+    "background": {
+      "points": 400,
+      "seed": 20261114,
+      "min_valid_fraction": 0.9,
+      "land_min_elev_m": 1.0,
+      "note": "disks must be >= 90 % land (above the threshold); sea-surface pixels are excluded"
+    },
+    "resolution_levels": [
+      {
+        "resolution_m": 2.0,
+        "label": "observed (CNIG PNOA-LiDAR MDT02, native 2 m)",
+        "shape": [
+          1500,
+          1500
+        ],
+        "valid_fraction": 0.9962808888888889,
+        "slope_deg_p95": 15.756325721740723,
+        "landmark_relief_m": {
+          "Jameo de la Gente": 21.37,
+          "Jameo Redondo": 12.08,
+          "Jameo Cumplido": 19.74,
+          "Jameo de Puerta Falsa": 17.87,
+          "Cueva de los Verdes": 12.9,
+          "Jameos del Agua": 9.72
+        },
+        "landmark_relief_median_m": 15.385000000000002,
+        "background_relief_p50_m": 5.05999755859375,
+        "background_points_used": 312
+      },
+      {
+        "resolution_m": 4.0,
+        "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+        "shape": [
+          750,
+          750
+        ],
+        "valid_fraction": 0.9963306666666667,
+        "slope_deg_p95": 12.842010498046875,
+        "landmark_relief_m": {
+          "Jameo de la Gente": 20.662,
+          "Jameo Redondo": 11.44,
+          "Jameo Cumplido": 18.713,
+          "Jameo de Puerta Falsa": 17.337,
+          "Cueva de los Verdes": 12.238,
+          "Jameos del Agua": 9.47
+        },
+        "landmark_relief_median_m": 14.7875,
+        "background_relief_p50_m": 4.788747787475586,
+        "background_points_used": 312
+      },
+      {
+        "resolution_m": 10.0,
+        "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+        "shape": [
+          300,
+          300
+        ],
+        "valid_fraction": 0.9962555555555556,
+        "slope_deg_p95": 9.56122875213623,
+        "landmark_relief_m": {
+          "Jameo de la Gente": 20.078,
+          "Jameo Redondo": 10.966,
+          "Jameo Cumplido": 17.275,
+          "Jameo de Puerta Falsa": 14.96,
+          "Cueva de los Verdes": 9.704,
+          "Jameos del Agua": 8.158
+        },
+        "landmark_relief_median_m": 12.963000000000001,
+        "background_relief_p50_m": 4.312796592712402,
+        "background_points_used": 312
+      },
+      {
+        "resolution_m": 30.0,
+        "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+        "shape": [
+          100,
+          100
+        ],
+        "valid_fraction": 0.9962,
+        "slope_deg_p95": 7.043182849884033,
+        "landmark_relief_m": {
+          "Jameo de la Gente": null,
+          "Jameo Redondo": null,
+          "Jameo Cumplido": null,
+          "Jameo de Puerta Falsa": null,
+          "Cueva de los Verdes": null,
+          "Jameos del Agua": null
+        },
+        "landmark_relief_median_m": null,
+        "background_relief_p50_m": null,
+        "background_points_used": 0
+      },
+      {
+        "resolution_m": 60.0,
+        "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+        "shape": [
+          50,
+          50
+        ],
+        "valid_fraction": 0.996,
+        "slope_deg_p95": 6.211407661437988,
+        "landmark_relief_m": {
+          "Jameo de la Gente": null,
+          "Jameo Redondo": null,
+          "Jameo Cumplido": null,
+          "Jameo de Puerta Falsa": null,
+          "Cueva de los Verdes": null,
+          "Jameos del Agua": null
+        },
+        "landmark_relief_median_m": null,
+        "background_relief_p50_m": null,
+        "background_points_used": 0
+      }
+    ]
+  },
+  "derived_assets": [
+    {
+      "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_2m.tif",
+      "sha256": "50b70a2c72c9e7f89bbc6c981036b9c5556b41db2f619022f3626f18ece5dac5",
+      "size_bytes": 4662172,
+      "width": 1500,
+      "height": 1500,
+      "pixel_size_m": 2.0,
+      "bounds": {
+        "left": 649607.0,
+        "bottom": 3224561.0,
+        "right": 652607.0,
+        "top": 3227561.0
+      },
+      "kind": "dtm_roi",
+      "resolution_m": 2.0,
+      "label": "observed (CNIG PNOA-LiDAR MDT02, native 2 m)",
+      "source": "cnig_mdt02_lanzarote"
+    },
+    {
+      "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_4m.tif",
+      "sha256": "073830594e0fb3adf355bf927624f48c4ce3ca6e27b852d0289c634b90b403f5",
+      "size_bytes": 1384614,
+      "width": 750,
+      "height": 750,
+      "pixel_size_m": 4.0,
+      "bounds": {
+        "left": 649607.0,
+        "bottom": 3224561.0,
+        "right": 652607.0,
+        "top": 3227561.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 4.0,
+      "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+      "source": "cnig_mdt02_lanzarote"
+    },
+    {
+      "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_10m.tif",
+      "sha256": "833e16a539ea918826de76822391fcf1fd6a29e1c3843e3ca895d67e88da164f",
+      "size_bytes": 265936,
+      "width": 300,
+      "height": 300,
+      "pixel_size_m": 10.0,
+      "bounds": {
+        "left": 649607.0,
+        "bottom": 3224561.0,
+        "right": 652607.0,
+        "top": 3227561.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 10.0,
+      "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+      "source": "cnig_mdt02_lanzarote"
+    },
+    {
+      "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_30m.tif",
+      "sha256": "2c33783dfd34a01698eda1b011741edf86507e20792331669ed624c72f834fa4",
+      "size_bytes": 32376,
+      "width": 100,
+      "height": 100,
+      "pixel_size_m": 30.0,
+      "bounds": {
+        "left": 649607.0,
+        "bottom": 3224561.0,
+        "right": 652607.0,
+        "top": 3227561.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 30.0,
+      "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+      "source": "cnig_mdt02_lanzarote"
+    },
+    {
+      "path": "datasets/derived/lanzarote/lanzarote_roi_dtm_60m.tif",
+      "sha256": "ffae8f5203d2afb6b3d0f578ca4c183514d0a05f7a9cadddc71e3f3ca5a47159",
+      "size_bytes": 9482,
+      "width": 50,
+      "height": 50,
+      "pixel_size_m": 60.0,
+      "bounds": {
+        "left": 649607.0,
+        "bottom": 3224561.0,
+        "right": 652607.0,
+        "top": 3227561.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 60.0,
+      "label": "SIMULATED COARSENING of the 2 m CNIG MDT02 - not an observation",
+      "source": "cnig_mdt02_lanzarote"
+    }
+  ],
+  "previews": [
+    {
+      "file": "lanzarote_roi_hillshade_2m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/lanzarote_roi_hillshade_2m.png"
+    },
+    {
+      "file": "lanzarote_roi_hillshade_4m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/lanzarote_roi_hillshade_4m.png"
+    },
+    {
+      "file": "lanzarote_roi_hillshade_10m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/lanzarote_roi_hillshade_10m.png"
+    },
+    {
+      "file": "lanzarote_roi_hillshade_30m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/lanzarote_roi_hillshade_30m.png"
+    },
+    {
+      "file": "lanzarote_roi_hillshade_60m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/lanzarote_roi_hillshade_60m.png"
+    },
+    {
+      "file": "lanzarote_jameos_2m_labeled.png",
+      "width": 1400,
+      "height": 1400,
+      "path": "datasets/previews/lanzarote_jameos_2m_labeled.png"
+    }
+  ]
 }

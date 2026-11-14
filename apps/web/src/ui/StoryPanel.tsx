@@ -51,6 +51,10 @@ export function StoryPanel({
           storyDispatch({ type: "pause" });
           sceneDispatch({ type: "selectVariant", variantId });
         }}
+        onSite={(site) => {
+          storyDispatch({ type: "pause" });
+          sceneDispatch({ type: "applyPreset", preset: { site, exaggeration: 2, view: "landmark" } });
+        }}
       />
     );
   if (scene.panel === "decision") panel = <DecisionCard index={index} />;
