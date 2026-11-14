@@ -19,6 +19,7 @@ dependencies = [
 fetch-sources = "analog_blindspot_science.fetch_sources:main"
 fetch-landmarks = "analog_blindspot_science.fetch_landmarks:main"
 phase-a = "analog_blindspot_science.phase_a:main"
+export-web = "analog_blindspot_science.export_web:main"
 
 [build-system]
 requires = ["uv_build>=0.10.8,<0.11.0"]

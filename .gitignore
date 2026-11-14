@@ -12,3 +12,7 @@ __pycache__/
 # Node
 node_modules/
 dist/
+
+# Perf smoke screenshots/report (regenerate with pnpm perf)
+apps/web/perf-results/
+*.tsbuildinfo

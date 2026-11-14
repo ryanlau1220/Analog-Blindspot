@@ -1,0 +1,11 @@
+{
+  "name": "analog-blindspot",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "test": "pnpm --filter web test",
+    "check": "pnpm --filter web check",
+    "perf": "pnpm --filter web perf"
+  }
+}

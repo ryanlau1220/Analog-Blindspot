@@ -1,0 +1,328 @@
+"""Export validated Phase A rasters as static web assets for the 3D slice.
+
+Usage: ``uv run export-web`` (after ``uv run phase-a`` has passed).
+
+The display mesh is a fixed LOD and is independent of the source DTM:
+
+* Moon: the 257 x 257 native 4 m ROI is used as-is (vertex = DTM post). Nodata
+  stays NaN so the renderer leaves a hole instead of inventing a pit floor.
+* Earth: every resolution variant is area-averaged onto the same 257 x 257
+  display grid (7.0 m cells over 1800 m). Shading detail comes from an
+  object-space normal map computed from the variant itself, at the variant's own
+  resolution (capped at 1 m for the 0.5 m LiDAR: an 1800 px lossless WebP).
+
+Outputs go to ``apps/web/public/data`` and are described by ``sites.json``.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+import rasterio
+from affine import Affine
+from PIL import Image
+from rasterio.enums import Resampling
+from rasterio.warp import reproject
+from rasterio.windows import Window
+
+from .download import sha256_file
+from .paths import MANIFEST_PATH, RAW_DIR, REPO_ROOT
+from .terrain import _gradients, block_mean
+
+WEB_DATA = REPO_ROOT / "apps" / "web" / "public" / "data"
+DISPLAY_N = 257
+EARTH_VARIANTS_M = [0.5, 4.0, 10.0, 30.0]
+NORMAL_MAX_RES_M = 1.0  # display cap for the normal map of the 0.5 m variant
+ASSET_VERSION = "phase-b-1"
+
+
+def res_tag(res: float) -> str:
+    return f"{res:g}m".replace(".", "p")
+
+
+def normal_map_rgb(z: np.ndarray, cell: float) -> np.ndarray:
+    """Object-space normals in scene axes (X east, Y up, Z south) as uint8 RGB."""
+    dzdx, dzdsouth = _gradients(z, cell)
+    n = np.stack([-dzdx, np.ones_like(dzdx), -dzdsouth], axis=-1)
+    bad = ~np.isfinite(n).all(axis=-1)
+    n[bad] = (0.0, 1.0, 0.0)
+    n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    return np.round((n * 0.5 + 0.5) * 255).astype(np.uint8)
+
+
+def write_normal_map(z: np.ndarray, cell: float, path: Path) -> dict:
+    # Lossless WebP: lossy encoding was tested and shifted normals by up to 88/255.
+    Image.fromarray(normal_map_rgb(z, cell), "RGB").save(path, "WEBP", lossless=True, method=6)
+    return {"file": path.name, "px": z.shape[1], "m_per_px": cell, "bytes": path.stat().st_size}
+
+
+def write_heights(z: np.ndarray, path: Path) -> dict:
+    a = np.ascontiguousarray(z, dtype="<f4")
+    path.write_bytes(a.tobytes())
+    return {"file": path.name, "dtype": "float32-le", "rows": a.shape[0], "cols": a.shape[1],
+            "nodata": "NaN", "bytes": path.stat().st_size, "sha256": sha256_file(path)}
+
+
+def finite_stats(z: np.ndarray) -> dict:
+    v = z[np.isfinite(z)]
+    return {"min_m": float(v.min()), "max_m": float(v.max()), "nan_count": int((~np.isfinite(z)).sum())}
+
+
+def read_masked(path: Path) -> tuple[np.ndarray, Affine, object]:
+    with rasterio.open(path) as ds:
+        m = ds.read(1, masked=True)
+        return m.filled(np.nan).astype(np.float32), ds.transform, ds.crs
+
+
+def to_display_grid(src: np.ndarray, src_tr: Affine, crs, left: float, top: float, extent: float) -> np.ndarray:
+    """Area-average (GDAL 'average', coverage-weighted) onto the fixed display grid."""
+    cell = extent / DISPLAY_N
+    dst = np.full((DISPLAY_N, DISPLAY_N), np.nan, dtype=np.float32)
+    reproject(src, dst, src_transform=src_tr, src_crs=crs, dst_transform=Affine(cell, 0, left, 0, -cell, top),
+              dst_crs=crs, resampling=Resampling.average, src_nodata=np.nan, dst_nodata=np.nan)
+    return dst
+
+
+def provenance(ds: dict) -> dict:
+    return {
+        "dataset_id": ds["id"],
+        "title": ds["title"],
+        "product_id": ds["product_id"],
+        "doi": ds.get("doi"),
+        "landing_page": ds["landing_page"],
+        "license": ds["license"]["terms"],
+        "credit": ds["license"].get("credit"),
+        "citation": ds["citations"][0],
+    }
+
+
+def export_moon(man: dict, out: Path) -> dict:
+    ds = next(d for d in man["datasets"] if d["id"] == "lroc_mariuspit01")
+    roi = next(r for r in man["rois"] if r["id"] == "moon_marius_hills_pit")
+    asset = next(a for a in man["derived_assets"] if a["source"] == "lroc_mariuspit01" and a["kind"] == "dtm_roi")
+    z, tr, _ = read_masked(REPO_ROOT / asset["path"])
+    if z.shape != (DISPLAY_N, DISPLAY_N):
+        raise ValueError(f"moon ROI {z.shape} != display grid")
+    cell = abs(tr.a)
+    out.mkdir(parents=True, exist_ok=True)
+    heights = write_heights(z, out / "heights.f32")
+    normal = write_normal_map(z, cell, out / "normal.webp")
+
+    # Real 4 m orthophoto on the same grid (image, not elevation, data).
+    w = roi["window_px"]
+    with rasterio.open(RAW_DIR / "lroc_mariuspit01" / "NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG") as o:
+        dn = o.read(1, window=Window(w["col_off"], w["row_off"], w["size"], w["size"]))
+        refl = np.where(dn != o.nodata, dn * o.scales[0] + o.offsets[0], np.nan)
+    v = refl[np.isfinite(refl)]
+    lo, hi = np.percentile(v, [1, 99])
+    g = np.clip((np.nan_to_num(refl, nan=lo) - lo) / (hi - lo), 0, 1)
+    rgba = np.dstack([g, g, g, np.isfinite(refl).astype(float)])
+    Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").save(out / "ortho.png", optimize=True)
+
+    pit = roi["landmark"]
+    loc = pit["located"]
+    pa = roi["pit_analysis"]
+    extent = DISPLAY_N * cell
+    return {
+        "id": "moon",
+        "body": "Moon",
+        "name": "Marius Hills Pit",
+        "extent_m": extent,
+        "crs": "Equirectangular Moon (1737.4 km sphere), map metres",
+        "vertical": ds["vertical_reference"]["reference"],
+        "provenance": provenance(ds),
+        "variants": [{
+            "id": "4m",
+            "resolution_m": 4.0,
+            "observed": True,
+            "label": "Observed: LROC NAC DTM, native 4 m posts",
+            "display": {"grid": DISPLAY_N, "cell_m": cell, "geometry": "native DTM posts (no resampling)"},
+            "heights": heights,
+            "elevation": finite_stats(z),
+            "normal_map": {**normal, "filter": "linear", "basis": "Horn gradients of the 4 m DTM"},
+            "derived_from": {"path": asset["path"], "sha256": asset["sha256"]},
+        }],
+        "drape": {"file": "ortho.png", "px": DISPLAY_N, "m_per_px": cell,
+                  "label": "LROC NAC orthophoto M1274609891, 4 m version (image data, not elevation)"},
+        "landmarks": [{
+            "id": "marius_hills_pit",
+            "name": pit["name"],
+            "kind": "pit",
+            # local metres from the ROI north-west corner
+            "x_m": (loc["col_f"] - w["col_off"]) * cell,
+            "y_m": (loc["row_f"] - w["row_off"]) * cell,
+            "surface_elev_m": pa["rim_median_elev_m"],
+            "source": pit["citation"],
+            "notes": [
+                f"Pit interior is nodata in this DTM: {pa['nodata_gap']['extent_ew_m']:.0f} x "
+                f"{pa['nodata_gap']['extent_ns_m']:.0f} m gap. Floor not measured.",
+                f"Valid funnel pixels reach >= {pa['measured_depression_m']:.1f} m below the rim (lower bound).",
+                f"Atlas depth {pit['atlas_depth_m']:g} m is from separate stereo modelling.",
+            ],
+        }],
+        "subsurface": "not measured",
+        "facts": {
+            "pit_lat": pit["lat"],
+            "pit_lon_east": pit["lon_east"],
+            "atlas_funnel_diameter_m": pit["funnel_diameter_m"],
+            "atlas_inner_diameter_m": pit["inner_diameter_m"],
+            "atlas_depth_m": pit["atlas_depth_m"],
+            "gap_extent_ew_m": pa["nodata_gap"]["extent_ew_m"],
+            "gap_extent_ns_m": pa["nodata_gap"]["extent_ns_m"],
+            "gap_equivalent_diameter_m": pa["nodata_gap"]["equivalent_diameter_m"],
+            "gap_posts": pa["nodata_gap"]["pixel_count"],
+            "depression_lower_bound_m": pa["measured_depression_m"],
+            "rim_annulus_m": [55.0, 90.0],
+            "lola_tie_rms_m": ds["accuracy"]["lola_tie_rms_m"],
+            "socet_precision_m": ds["accuracy"]["socet_precision_m"],
+            "product_valid_fraction": ds["measured"]["dtm"]["valid_fraction"],
+            "effective_resolution_note": (
+                "LROC RDR SIS: NAC DTMs are generated at a minimum of 3 times the native pixel scale of the "
+                "input stereo images, so detail finer than a few posts is not resolved."
+            ),
+        },
+    }
+
+
+def export_earth(man: dict, out: Path) -> dict:
+    ds = next(d for d in man["datasets"] if d["id"] == "ot_ca23_williams")
+    roi = next(r for r in man["rois"] if r["id"] == "earth_lava_beds_cave_loop")
+    b = roi["bounds_utm10n"]
+    extent = b["right"] - b["left"]
+    assets = {a["resolution_m"]: a for a in man["derived_assets"] if a["source"] == "ot_ca23_williams"}
+    variants = []
+    native = None
+    for res in EARTH_VARIANTS_M:
+        a = assets[res]
+        z, tr, crs = read_masked(REPO_ROOT / a["path"])
+        if (tr.c, tr.f) != (b["left"], b["top"]):
+            raise ValueError(f"{a['path']} not aligned with ROI")
+        vd = out / res_tag(res)
+        vd.mkdir(parents=True, exist_ok=True)
+        disp = to_display_grid(z, tr, crs, b["left"], b["top"], extent)
+        heights = write_heights(disp, vd / "heights.f32")
+        if res < NORMAL_MAX_RES_M:
+            f = round(NORMAL_MAX_RES_M / res)
+            zn, _ = block_mean(np.nan_to_num(z), np.isfinite(z), f, 0.5)
+            ncell = NORMAL_MAX_RES_M
+        else:
+            zn, ncell = z, res
+        normal = write_normal_map(zn, ncell, vd / "normal.webp")
+        observed = res == 0.5
+        if observed:
+            native = disp
+        variants.append({
+            "id": res_tag(res),
+            "resolution_m": res,
+            "observed": observed,
+            "label": ("Observed: NCALM LiDAR bare-earth DTM, 0.5 m" if observed else
+                      f"SIMULATED COARSENING to {res:g} m (block mean of the 0.5 m LiDAR). Not an observation."),
+            "display": {"grid": DISPLAY_N, "cell_m": extent / DISPLAY_N,
+                        "geometry": f"coverage-weighted average of the {res:g} m grid onto the display grid"},
+            "heights": heights,
+            "elevation": finite_stats(disp),
+            "normal_map": {**normal, "filter": "linear" if res < 4 else "nearest",
+                           "basis": (f"Horn gradients of the {res:g} m grid" if res >= NORMAL_MAX_RES_M else
+                                     "Horn gradients of a 1 m block mean of the 0.5 m DTM (display cap)")},
+            "derived_from": {"path": a["path"], "sha256": a["sha256"]},
+        })
+    assert native is not None
+    landmarks = []
+    for lm in roi["landmarks"]:
+        x, y = lm["utm_x"] - b["left"], b["top"] - lm["utm_y"]
+        i, j = int(y / (extent / DISPLAY_N)), int(x / (extent / DISPLAY_N))
+        landmarks.append({
+            "id": f"gnis_{lm['gnis_id']}",
+            "name": lm["name"],
+            "kind": "natural_bridge",
+            "x_m": x,
+            "y_m": y,
+            "surface_elev_m": float(native[i, j]),
+            "source": f"USGS GNIS feature {lm['gnis_id']} ({lm['gnis_url']})",
+            "notes": ["GNIS point position is approximate (tens of metres)."],
+        })
+    return {
+        "id": "earth",
+        "body": "Earth",
+        "name": "Lava Beds National Monument, Cave Loop",
+        "extent_m": extent,
+        "crs": "WGS84 / UTM zone 10N (EPSG:32610)",
+        "vertical": "NAVD88 (GEOID18), EPSG:5703",
+        "provenance": provenance(ds),
+        "variants": variants,
+        "drape": None,
+        "landmarks": landmarks,
+        "subsurface": "not measured",
+        "experiment": {
+            "measure": f"max - min elevation within {roi['landmark_check_radius_m']:g} m",
+            "radius_m": roi["landmark_check_radius_m"],
+            "landmark_count": len(roi["landmarks"]),
+            "background_points": 400,
+            "background_note": "400 reproducible random points (seed 20261114) inside the same ROI",
+            "method": roi["coarsening"]["method"],
+            "levels": [{
+                "resolution_m": lv["resolution_m"],
+                "observed": lv["resolution_m"] == 0.5,
+                "landmark_relief_median_m": lv["landmark_relief_median_m"],
+                "background_relief_median_m": lv["background_relief_p50_m"],
+                "slope_deg_p95": lv["slope_deg_p95"],
+            } for lv in roi["resolution_levels"]],
+            "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark.",
+        },
+    }
+
+
+CANDIDATES = [
+    {
+        "id": "lava_beds",
+        "site": "Lava Beds National Monument, California, USA",
+        "status": "validated",
+        "elevation_product": "NCALM airborne LiDAR bare-earth DTM, 0.5 m (OpenTopography, doi:10.5069/G9ST7N19)",
+        "note": "Downloaded and checked pixel by pixel in Phase A. Surface only.",
+        "url": "https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.102024.32610.1",
+    },
+    {
+        "id": "lanzarote",
+        "site": "Lanzarote / La Corona, Canary Islands, Spain",
+        "status": "not_verified",
+        "elevation_product": "CNIG PNOA-LiDAR MDT02 (catalog-stated 2 m bare-earth DTM)",
+        "note": "Catalog lists coverage, but the tile over the lava-tube surface has not been located or downloaded.",
+        "url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02",
+    },
+    {
+        "id": "harrat_khaybar",
+        "site": "Harrat Khaybar, Saudi Arabia",
+        "status": "not_verified",
+        "elevation_product": "ALOS-PALSAR-derived DEM (12.5 m, as used in a published study)",
+        "note": "Too coarse for the 0.5 m coarsening experiment; no high-resolution DTM of a tube feature confirmed.",
+        "url": "https://www.mdpi.com/2073-445X/12/3/705",
+    },
+]
+
+
+def main() -> int:
+    man = json.loads(MANIFEST_PATH.read_text())
+    if man["phase_a_gate"]["status"] != "pass":
+        print("Phase A gate has not passed; refusing to export web assets.", file=sys.stderr)
+        return 1
+    WEB_DATA.mkdir(parents=True, exist_ok=True)
+    sites = [export_moon(man, WEB_DATA / "moon"), export_earth(man, WEB_DATA / "earth")]
+    index = {
+        "asset_version": ASSET_VERSION,
+        "manifest_generated_utc": man["generated_utc"],
+        "manifest_sha256": sha256_file(MANIFEST_PATH),
+        "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
+        "sites": sites,
+        "candidates": CANDIDATES,
+    }
+    (WEB_DATA / "sites.json").write_text(json.dumps(index, indent=2, allow_nan=False) + "\n")
+    total = sum(p.stat().st_size for p in WEB_DATA.rglob("*") if p.is_file())
+    print(f"wrote {WEB_DATA.relative_to(REPO_ROOT)} ({total / 1e6:.2f} MB)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

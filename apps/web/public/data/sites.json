@@ -1,0 +1,461 @@
+{
+  "asset_version": "phase-b-1",
+  "manifest_generated_utc": "2026-11-14T06:46:16+00:00",
+  "manifest_sha256": "6b434e039d0f5c42e9e5568b802a4d7352b4393e003d1062ecef255657b375b9",
+  "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
+  "sites": [
+    {
+      "id": "moon",
+      "body": "Moon",
+      "name": "Marius Hills Pit",
+      "extent_m": 1027.99999999964,
+      "crs": "Equirectangular Moon (1737.4 km sphere), map metres",
+      "vertical": "Heights relative to the 1737.4 km lunar reference sphere",
+      "provenance": {
+        "dataset_id": "lroc_mariuspit01",
+        "title": "LROC NAC DTM Marius Pit (NAC_DTM_MARIUSPIT01)",
+        "product_id": "NAC_DTM_MARIUSPIT01",
+        "doi": null,
+        "landing_page": "https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_MARIUSPIT01",
+        "license": "Public domain (LROC PDS-delivered data products)",
+        "credit": "NASA/GSFC/Arizona State University",
+        "citation": "Henriksen, M.R., et al. (2017). Extracting accurate and precise topography from LROC narrow angle camera stereo observations. Icarus 283: 122-137. https://doi.org/10.1016/j.icarus.2016.05.012"
+      },
+      "variants": [
+        {
+          "id": "4m",
+          "resolution_m": 4.0,
+          "observed": true,
+          "label": "Observed: LROC NAC DTM, native 4 m posts",
+          "display": {
+            "grid": 257,
+            "cell_m": 3.9999999999986,
+            "geometry": "native DTM posts (no resampling)"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "a627b53b455579880a5b2c53872e0cbee4dbf3ba6ce792979937c0df767327b4"
+          },
+          "elevation": {
+            "min_m": -1586.94482421875,
+            "max_m": -1529.187255859375,
+            "nan_count": 159
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 257,
+            "m_per_px": 3.9999999999986,
+            "bytes": 32564,
+            "filter": "linear",
+            "basis": "Horn gradients of the 4 m DTM"
+          },
+          "derived_from": {
+            "path": "datasets/derived/moon/mariuspit01_roi_dtm_4m.tif",
+            "sha256": "f93216829163730f48e3670898ff19015b038e7db116c52286c6af42e6e3a54a"
+          }
+        }
+      ],
+      "drape": {
+        "file": "ortho.png",
+        "px": 257,
+        "m_per_px": 3.9999999999986,
+        "label": "LROC NAC orthophoto M1274609891, 4 m version (image data, not elevation)"
+      },
+      "landmarks": [
+        {
+          "id": "marius_hills_pit",
+          "name": "Marius Hills Pit",
+          "kind": "pit",
+          "x_m": 514.1904432068642,
+          "y_m": 512.4428278627408,
+          "surface_elev_m": -1570.791015625,
+          "source": "LROC Pits Atlas, Marius Hills Pit, https://lroc.im-ldi.com/atlases/pits/1 (accessed 2026-11-14)",
+          "notes": [
+            "Pit interior is nodata in this DTM: 60 x 52 m gap. Floor not measured.",
+            "Valid funnel pixels reach >= 15.8 m below the rim (lower bound).",
+            "Atlas depth 40 m is from separate stereo modelling."
+          ]
+        }
+      ],
+      "subsurface": "not measured",
+      "facts": {
+        "pit_lat": 14.0917,
+        "pit_lon_east": 303.2299,
+        "atlas_funnel_diameter_m": [
+          79,
+          92
+        ],
+        "atlas_inner_diameter_m": [
+          49,
+          55
+        ],
+        "atlas_depth_m": 40.0,
+        "gap_extent_ew_m": 60.0,
+        "gap_extent_ns_m": 52.0,
+        "gap_equivalent_diameter_m": 56.913279661307996,
+        "gap_posts": 159,
+        "depression_lower_bound_m": 15.841552734375,
+        "rim_annulus_m": [
+          55.0,
+          90.0
+        ],
+        "lola_tie_rms_m": 1.42,
+        "socet_precision_m": 3.43,
+        "product_valid_fraction": 0.67372589018874,
+        "effective_resolution_note": "LROC RDR SIS: NAC DTMs are generated at a minimum of 3 times the native pixel scale of the input stereo images, so detail finer than a few posts is not resolved."
+      }
+    },
+    {
+      "id": "earth",
+      "body": "Earth",
+      "name": "Lava Beds National Monument, Cave Loop",
+      "extent_m": 1800.0,
+      "crs": "WGS84 / UTM zone 10N (EPSG:32610)",
+      "vertical": "NAVD88 (GEOID18), EPSG:5703",
+      "provenance": {
+        "dataset_id": "ot_ca23_williams",
+        "title": "Lidar Survey of Lava Tubes, CA 2023 (bare-earth DTM)",
+        "product_id": "OTSDEM.102024.32610.1",
+        "doi": "10.5069/G9ST7N19",
+        "landing_page": "https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.102024.32610.1",
+        "license": "CC BY 4.0",
+        "credit": null,
+        "citation": "Williams, E. (2024). Lidar Survey of Lava Tubes, CA 2023. National Center for Airborne Laser Mapping (NCALM). Distributed by OpenTopography. https://doi.org/10.5069/G9ST7N19. Accessed 2026-11-14"
+      },
+      "variants": [
+        {
+          "id": "0p5m",
+          "resolution_m": 0.5,
+          "observed": true,
+          "label": "Observed: NCALM LiDAR bare-earth DTM, 0.5 m",
+          "display": {
+            "grid": 257,
+            "cell_m": 7.003891050583658,
+            "geometry": "coverage-weighted average of the 0.5 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "5cf556058be86b43dd93805026fd4c0b62cfacc3507a47f8c315a51f5d9c4935"
+          },
+          "elevation": {
+            "min_m": 1429.9068603515625,
+            "max_m": 1564.8974609375,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 1800,
+            "m_per_px": 1.0,
+            "bytes": 3646560,
+            "filter": "linear",
+            "basis": "Horn gradients of a 1 m block mean of the 0.5 m DTM (display cap)"
+          },
+          "derived_from": {
+            "path": "datasets/derived/earth/lavabeds_roi_dtm_0p5m.tif",
+            "sha256": "21cab5ddc740483c74b63af15b83813ebd981a98773c85234bc778c1d54293b6"
+          }
+        },
+        {
+          "id": "4m",
+          "resolution_m": 4.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 4 m (block mean of the 0.5 m LiDAR). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 7.003891050583658,
+            "geometry": "coverage-weighted average of the 4 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "d1341c7d382badc5c47bf5fb3bf9009890e46ac585a075d79ff06c821c617572"
+          },
+          "elevation": {
+            "min_m": 1430.0538330078125,
+            "max_m": 1564.8746337890625,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 450,
+            "m_per_px": 4.0,
+            "bytes": 234976,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 4 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/earth/lavabeds_roi_dtm_4m.tif",
+            "sha256": "0a1519f15da3f08b9cb14dfde3cdaa899fe9c805373af690ec03e1d68b0c6ccf"
+          }
+        },
+        {
+          "id": "10m",
+          "resolution_m": 10.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 10 m (block mean of the 0.5 m LiDAR). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 7.003891050583658,
+            "geometry": "coverage-weighted average of the 10 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "f016bd388cd88f2a6948fb84e190c0a47d45ea0b52ac158f269b4be97a701b4b"
+          },
+          "elevation": {
+            "min_m": 1430.951416015625,
+            "max_m": 1564.742919921875,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 180,
+            "m_per_px": 10.0,
+            "bytes": 35248,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 10 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/earth/lavabeds_roi_dtm_10m.tif",
+            "sha256": "f7a757e50e101f764b77382ec8c4d44192c8fbb0a184b4441c37171b0f9cf48f"
+          }
+        },
+        {
+          "id": "30m",
+          "resolution_m": 30.0,
+          "observed": false,
+          "label": "SIMULATED COARSENING to 30 m (block mean of the 0.5 m LiDAR). Not an observation.",
+          "display": {
+            "grid": 257,
+            "cell_m": 7.003891050583658,
+            "geometry": "coverage-weighted average of the 30 m grid onto the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "bd8d0ba533e80d22efac54d82ae135dafded8585368004d383b7538b3540606e"
+          },
+          "elevation": {
+            "min_m": 1436.015869140625,
+            "max_m": 1563.532470703125,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 60,
+            "m_per_px": 30.0,
+            "bytes": 3420,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 30 m grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/earth/lavabeds_roi_dtm_30m.tif",
+            "sha256": "a95d9b7f2426e6247687485827bb8d011fc187ac0983eccb1c1052d7aa099f20"
+          }
+        }
+      ],
+      "drape": null,
+      "landmarks": [
+        {
+          "id": "gnis_1657771",
+          "name": "Garden Bridges",
+          "kind": "natural_bridge",
+          "x_m": 934.2481593904085,
+          "y_m": 621.658546641469,
+          "surface_elev_m": 1505.70849609375,
+          "source": "USGS GNIS feature 1657771 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1657771)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707991",
+          "name": "Hopkins Bridge",
+          "kind": "natural_bridge",
+          "x_m": 955.4926338271471,
+          "y_m": 546.3148425891995,
+          "surface_elev_m": 1503.4501953125,
+          "source": "USGS GNIS feature 2707991 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707991)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707990",
+          "name": "Chocolate Bridge",
+          "kind": "natural_bridge",
+          "x_m": 986.19524889288,
+          "y_m": 535.833774949424,
+          "surface_elev_m": 1501.223388671875,
+          "source": "USGS GNIS feature 2707990 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707990)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707992",
+          "name": "Sentinel Bridge",
+          "kind": "natural_bridge",
+          "x_m": 1165.0847952086478,
+          "y_m": 635.2519890647382,
+          "surface_elev_m": 1494.9892578125,
+          "source": "USGS GNIS feature 2707992 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707992)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707989",
+          "name": "Venetian Bridge",
+          "kind": "natural_bridge",
+          "x_m": 933.4451213232242,
+          "y_m": 608.4006612179801,
+          "surface_elev_m": 1507.27978515625,
+          "source": "USGS GNIS feature 2707989 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707989)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707988",
+          "name": "Brushy Bridge",
+          "kind": "natural_bridge",
+          "x_m": 933.9774117229972,
+          "y_m": 639.2441149642691,
+          "surface_elev_m": 1506.999267578125,
+          "source": "USGS GNIS feature 2707988 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707988)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_2707987",
+          "name": "Natural Bridge",
+          "kind": "natural_bridge",
+          "x_m": 575.3553414803464,
+          "y_m": 1293.2724251355976,
+          "surface_elev_m": 1544.3153076171875,
+          "source": "USGS GNIS feature 2707987 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707987)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        },
+        {
+          "id": "gnis_1670696",
+          "name": "Ovis Bridge",
+          "kind": "natural_bridge",
+          "x_m": 667.5373146736529,
+          "y_m": 1243.2636112254113,
+          "surface_elev_m": 1531.4224853515625,
+          "source": "USGS GNIS feature 1670696 (https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670696)",
+          "notes": [
+            "GNIS point position is approximate (tens of metres)."
+          ]
+        }
+      ],
+      "subsurface": "not measured",
+      "experiment": {
+        "measure": "max - min elevation within 30 m",
+        "radius_m": 30.0,
+        "landmark_count": 8,
+        "background_points": 400,
+        "background_note": "400 reproducible random points (seed 20261114) inside the same ROI",
+        "method": "block_mean",
+        "levels": [
+          {
+            "resolution_m": 0.5,
+            "observed": true,
+            "landmark_relief_median_m": 8.436,
+            "background_relief_median_m": 5.9083251953125,
+            "slope_deg_p95": 25.124841690063477
+          },
+          {
+            "resolution_m": 2.0,
+            "observed": false,
+            "landmark_relief_median_m": 7.8995,
+            "background_relief_median_m": 5.6552734375,
+            "slope_deg_p95": 19.420446395874023
+          },
+          {
+            "resolution_m": 4.0,
+            "observed": false,
+            "landmark_relief_median_m": 7.417,
+            "background_relief_median_m": 5.29803466796875,
+            "slope_deg_p95": 15.427659034729004
+          },
+          {
+            "resolution_m": 10.0,
+            "observed": false,
+            "landmark_relief_median_m": 4.2675,
+            "background_relief_median_m": 4.7020263671875,
+            "slope_deg_p95": 10.806553840637207
+          },
+          {
+            "resolution_m": 30.0,
+            "observed": false,
+            "landmark_relief_median_m": null,
+            "background_relief_median_m": null,
+            "slope_deg_p95": 7.4405622482299805
+          },
+          {
+            "resolution_m": 60.0,
+            "observed": false,
+            "landmark_relief_median_m": null,
+            "background_relief_median_m": null,
+            "slope_deg_p95": 6.608067512512207
+          }
+        ],
+        "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark."
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "id": "lava_beds",
+      "site": "Lava Beds National Monument, California, USA",
+      "status": "validated",
+      "elevation_product": "NCALM airborne LiDAR bare-earth DTM, 0.5 m (OpenTopography, doi:10.5069/G9ST7N19)",
+      "note": "Downloaded and checked pixel by pixel in Phase A. Surface only.",
+      "url": "https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.102024.32610.1"
+    },
+    {
+      "id": "lanzarote",
+      "site": "Lanzarote / La Corona, Canary Islands, Spain",
+      "status": "not_verified",
+      "elevation_product": "CNIG PNOA-LiDAR MDT02 (catalog-stated 2 m bare-earth DTM)",
+      "note": "Catalog lists coverage, but the tile over the lava-tube surface has not been located or downloaded.",
+      "url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02"
+    },
+    {
+      "id": "harrat_khaybar",
+      "site": "Harrat Khaybar, Saudi Arabia",
+      "status": "not_verified",
+      "elevation_product": "ALOS-PALSAR-derived DEM (12.5 m, as used in a published study)",
+      "note": "Too coarse for the 0.5 m coarsening experiment; no high-resolution DTM of a tube feature confirmed.",
+      "url": "https://www.mdpi.com/2073-445X/12/3/705"
+    }
+  ]
+}

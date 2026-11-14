@@ -89,3 +89,51 @@ detection-rate benchmark: there are no mapped outline labels.
 - None of these products measure subsurface void geometry, on the Moon or on Earth.
 - Coarsened Earth rasters are simulations and must never be labelled as LROC or any other observation.
 - The 1.10 m LROC orthophotos give image resolution, not elevation resolution.
+
+# Phase B: 3D vertical slice
+
+## Run
+
+```sh
+cd scientific && uv run export-web    # validated rasters -> apps/web/public/data (5.4 MB, committed)
+cd .. && pnpm install
+pnpm dev                              # http://localhost:5173
+pnpm test && pnpm check               # Vitest, Biome, tsc
+pnpm build && pnpm perf               # headless-Chrome performance smoke test
+```
+
+`export-web` refuses to run unless the Phase A gate passed. The app makes no remote API calls; all terrain comes
+from `public/data`.
+
+## How the terrain is displayed
+
+- **Moon:** the mesh is the 257 × 257 native 4 m DTM window. Each vertex is one DTM post, with no resampling.
+  Every triangle that touches the 159 nodata posts is dropped, so the pit interior is a visible hole, not an
+  invented floor. An optional drape shows the real 4 m orthophoto.
+- **Earth:** four variants are available: 0.5 m (observed), and 4, 10 and 30 m (labelled `SIMULATED COARSENING`
+  everywhere in the UI and data). Each variant is area-averaged onto the same 257 × 257 display grid
+  (7.0 m cells). Shading comes from an object-space normal map computed from that variant at its own resolution.
+  For the 0.5 m variant the normal map is capped at 1 m/px. Coarse variants use nearest filtering, so 30 m cells
+  appear as cells. Normal maps use lossless WebP; lossy encoding was tested and rejected because it shifted
+  normals by up to 88/255.
+- All variants of a site share one datum, so switching variants never shifts the surface vertically. Vertical
+  exaggeration (×1/×2/×4) is always shown on screen, and ×1 is true scale.
+- **Cutaway:** an east–west clipping plane cuts the static block. A cap generated from the measured surface
+  profile closes the cut, and that profile is drawn in yellow. Everything below the surface (cap, walls, floor)
+  uses one hatched "not measured" material, and the block depth is labelled as display-only. Nodata along the
+  section line stays a gap. No subsurface or cave geometry exists in the scene.
+- **Markers:** markers show the Pits Atlas point (placed at the rim median, since the pit has no data) and the
+  eight GNIS bridges. Clicking a marker opens the location source and the original elevation product.
+
+## Performance smoke test (2026-11-14, this machine)
+
+There is no GPU here. Chrome fell back to SwiftShader (software), so frame rates are only a floor:
+
+- Each frame draws about 133k triangles at 1280 × 800. Software rendering gave 2.2–4.2 fps.
+- A variant was ready 0.5–2.9 s after it was requested.
+- 5.38 MB of data was transferred in total.
+- A burst of out-of-order actions ended in the correct state, with no console or page errors.
+
+The script requires 30 fps when it detects a hardware GPU and 2 fps on software rendering. **Hardware-GPU frame
+rate has not been measured yet.** The report and screenshots are written to `apps/web/perf-results/`
+(git-ignored).
