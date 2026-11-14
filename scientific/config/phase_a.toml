@@ -1,0 +1,79 @@
+# Phase A processing configuration. Everything a derived asset depends on is
+# declared here so outputs can be regenerated exactly.
+
+pipeline_version = "phase-a-1"
+
+[moon]
+product_id = "lroc_mariuspit01"
+dtm = "NAC_DTM_MARIUSPIT01.TIF"
+confidence = "NAC_DTM_MARIUSPIT01_CONF.IMG"
+ortho = "NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG"
+# ROI is a window of native pixels centred on the pit; no resampling.
+roi_size_px = 257
+
+[moon.pit]
+# LROC Pits Atlas entry 1 (https://lroc.im-ldi.com/atlases/pits/1), planetocentric, 0-360 E.
+name = "Marius Hills Pit"
+lat = 14.0917
+lon_east = 303.2299
+funnel_diameter_m = [79, 92]
+inner_diameter_m = [49, 55]
+atlas_depth_m = 40.0
+citation = "LROC Pits Atlas, Marius Hills Pit, https://lroc.im-ldi.com/atlases/pits/1 (accessed 2026-11-14)"
+
+[moon.pit_check]
+# Depression test: floor = minimum within inner radius, rim = median of an annulus
+# outside the funnel (atlas funnel max diameter 92 m -> radius 46 m).
+search_radius_m = 60.0
+rim_inner_m = 55.0
+rim_outer_m = 90.0
+# The README reports 3.43 m SOCET SET precision; require the depression to exceed
+# 3x that so it cannot be noise.
+min_depth_m = 10.3
+
+[earth]
+product_id = "ot_ca23_williams"
+dtm = "LAVA_GEG_50C_COG.tif"
+boundary = "CA23_Williams_raster_boundary.geojson"
+native_res_m = 0.5
+
+[earth.roi]
+# Cave Loop natural-bridge cluster (GNIS "Arch" features = lava-tube bridges).
+name = "Cave Loop lava-tube bridges"
+center_lat = 41.7060
+center_lon = -121.5145
+size_m = 1800.0  # divisible by every coarsening target below
+snap_m = 60.0  # ROI origin snapped to a 60 m grid so every level shares edges
+landmark_file = "landmarks/lava_beds_gnis.geojson"
+# Landmarks expected inside the ROI; the run fails if any is outside valid data.
+required_landmarks = [
+  "Garden Bridges", "Hopkins Bridge", "Chocolate Bridge", "Sentinel Bridge",
+  "Venetian Bridge", "Brushy Bridge", "Natural Bridge", "Ovis Bridge",
+]
+
+[earth.coarsen]
+# Simulated coarsening by block-mean aggregation of the 0.5 m bare-earth DTM.
+targets_m = [2.0, 4.0, 10.0, 30.0, 60.0]
+method = "block_mean"
+# A coarse cell is nodata if fewer than this fraction of its source pixels are valid.
+min_valid_fraction = 0.5
+
+[earth.landmark_check]
+# Local relief (max - min) within this radius of each GNIS point, per resolution.
+radius_m = 30.0
+
+# Human visual review of datasets/previews/*.png (2026-11-14). Re-review if inputs change.
+[[visual_review]]
+roi = "moon_marius_hills_pit"
+previews = ["moon_pit_roi_hillshade.png", "moon_pit_roi_ortho4m.png", "moon_pit_roi_confidence.png"]
+finding = """Pit funnel is visible in the 4 m hillshade around the atlas point; the pit interior is a compact
+nodata gap. The 4 m orthophoto has a square nodata block over the pit. No other nodata in the ROI."""
+
+[[visual_review]]
+roi = "earth_lava_beds_cave_loop"
+previews = ["earth_roi_hillshade_0p5m.png", "earth_bridges_zoom_0p5m.png", "earth_roi_hillshade_30m.png"]
+finding = """At 0.5 m a sinuous collapse trench runs SW-NE through the ROI with discrete collapse pits near the
+GNIS bridge points (Sentinel Bridge at the trench's NE end; Ovis and Natural Bridge on the SW trench segments;
+the Garden/Venetian/Brushy/Hopkins/Chocolate cluster beside small collapses to the north). GNIS points sit
+within tens of metres of, not exactly on, the features. Paved roads are also visible (anthropogenic). The
+trench is no longer recognisable in the 30 m simulated coarsening."""

@@ -1,0 +1,14 @@
+# Large source and derived rasters are reproducible from scientific/ scripts.
+datasets/raw/
+datasets/derived/
+*.part
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/

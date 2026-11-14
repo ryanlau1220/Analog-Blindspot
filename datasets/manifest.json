@@ -1,0 +1,1199 @@
+{
+  "manifest_version": 1,
+  "pipeline_version": "phase-a-1",
+  "generated_utc": "2026-11-14T06:46:16+00:00",
+  "generator": "scientific/: uv run fetch-sources && uv run fetch-landmarks && uv run phase-a",
+  "software": {
+    "python": "3.12.3",
+    "rasterio": "1.5.2",
+    "gdal": "3.12.2",
+    "numpy": "2.5.4",
+    "pyproj": "3.8.0",
+    "proj": "9.8.1"
+  },
+  "phase_a_gate": {
+    "status": "pass",
+    "checks": [
+      {
+        "name": "retrieved:lroc_mariuspit01/dtm",
+        "passed": true,
+        "detail": "167037299 bytes, sha256 db5daada9b38ae7a... re-verified on disk"
+      },
+      {
+        "name": "retrieved:lroc_mariuspit01/pds3_label",
+        "passed": true,
+        "detail": "3583 bytes, sha256 5d3fa5ea9c32c654... re-verified on disk"
+      },
+      {
+        "name": "retrieved:lroc_mariuspit01/readme",
+        "passed": true,
+        "detail": "8688 bytes, sha256 b6c512dbd8b48241... re-verified on disk"
+      },
+      {
+        "name": "retrieved:lroc_mariuspit01/confidence_map",
+        "passed": true,
+        "detail": "41740761 bytes, sha256 156cab7f1f96e18e... re-verified on disk"
+      },
+      {
+        "name": "retrieved:lroc_mariuspit01/orthophoto_4m",
+        "passed": true,
+        "detail": "83474860 bytes, sha256 c96dc87de204da82... re-verified on disk"
+      },
+      {
+        "name": "retrieved:ot_ca23_williams/dtm",
+        "passed": true,
+        "detail": "781152145 bytes, sha256 b3642df8207bd7a2... re-verified on disk"
+      },
+      {
+        "name": "retrieved:ot_ca23_williams/raster_boundary",
+        "passed": true,
+        "detail": "135654 bytes, sha256 477d17be07bd85d0... re-verified on disk"
+      },
+      {
+        "name": "retrieved:ot_ca23_williams/survey_report",
+        "passed": true,
+        "detail": "829707 bytes, sha256 43cfbbf2d4bb2441... re-verified on disk"
+      },
+      {
+        "name": "moon:crs_is_lunar",
+        "passed": true,
+        "detail": "Equirectangular Moon, sphere R=1737.4 km, no Earth EPSG"
+      },
+      {
+        "name": "moon:pixel_spacing_4m",
+        "passed": true,
+        "detail": "measured 4.0000000000 m/px (label MAP_SCALE 3.9999999999986)"
+      },
+      {
+        "name": "moon:label_matches_raster",
+        "passed": true,
+        "detail": "label 3331x12529, raster 3331x12529"
+      },
+      {
+        "name": "moon:companions_coregistered",
+        "passed": true,
+        "detail": "confidence map and 4 m orthophoto share the DTM grid"
+      },
+      {
+        "name": "moon:pit_inside_extent",
+        "passed": true,
+        "detail": "pit at row 7262.11, col 1649.55"
+      },
+      {
+        "name": "moon:pixel_location_two_methods",
+        "passed": true,
+        "detail": "pyproj vs PDS3 label equations differ by 1.51e-09 px"
+      },
+      {
+        "name": "moon:roi_valid_pixels",
+        "passed": true,
+        "detail": "99.76% valid in 257x257 px ROI (1028 m)"
+      },
+      {
+        "name": "moon:pit_depression_resolved",
+        "passed": true,
+        "detail": "valid funnel pixels reach 15.8 m below rim median (threshold 10.3 m = 3x SOCET precision)"
+      },
+      {
+        "name": "moon:pit_interior_nodata_explained",
+        "passed": true,
+        "detail": "interior nodata gap 60 x 52 m (eq. diam 56.9 m) contains atlas point; atlas inner diameter 49-55 m. Floor NOT measured by this DTM."
+      },
+      {
+        "name": "earth:crs_utm10n",
+        "passed": true,
+        "detail": "EPSG:32610"
+      },
+      {
+        "name": "earth:pixel_spacing_0.5m",
+        "passed": true,
+        "detail": "measured [0.5, 0.5] m"
+      },
+      {
+        "name": "earth:valid_area_matches_catalog",
+        "passed": true,
+        "detail": "valid-pixel area 57.45 km2 vs catalog 57.44 km2; published raster boundary polygon 57.44 km2"
+      },
+      {
+        "name": "earth:roi_inside_footprint",
+        "passed": true,
+        "detail": "ROI Roi(left=622680.0, bottom=4617300.0, right=624480.0, top=4619100.0) inside published raster boundary"
+      },
+      {
+        "name": "earth:roi_valid_pixels",
+        "passed": true,
+        "detail": "100.000% valid of 12,960,000 px"
+      },
+      {
+        "name": "earth:landmarks_present_in_gnis",
+        "passed": true,
+        "detail": "8 named GNIS lava-tube bridges found"
+      },
+      {
+        "name": "earth:landmarks_on_valid_pixels",
+        "passed": true,
+        "detail": "8/8 landmarks fall on valid 0.5 m pixels inside the ROI"
+      },
+      {
+        "name": "earth:landmarks_rougher_than_background_at_native",
+        "passed": true,
+        "detail": "median relief within 30 m of GNIS bridges 8.44 m vs 5.91 m at 400 seeded random ROI points; per landmark: {'Garden Bridges': 8.229, 'Hopkins Bridge': 5.882, 'Chocolate Bridge': 4.408, 'Sentinel Bridge': 9.049, 'Venetian Bridge': 8.643, 'Brushy Bridge': 6.644, 'Natural Bridge': 14.218, 'Ovis Bridge': 14.102}"
+      }
+    ]
+  },
+  "visual_review": [
+    {
+      "roi": "moon_marius_hills_pit",
+      "previews": [
+        "moon_pit_roi_hillshade.png",
+        "moon_pit_roi_ortho4m.png",
+        "moon_pit_roi_confidence.png"
+      ],
+      "finding": "Pit funnel is visible in the 4 m hillshade around the atlas point; the pit interior is a compact\nnodata gap. The 4 m orthophoto has a square nodata block over the pit. No other nodata in the ROI."
+    },
+    {
+      "roi": "earth_lava_beds_cave_loop",
+      "previews": [
+        "earth_roi_hillshade_0p5m.png",
+        "earth_bridges_zoom_0p5m.png",
+        "earth_roi_hillshade_30m.png"
+      ],
+      "finding": "At 0.5 m a sinuous collapse trench runs SW-NE through the ROI with discrete collapse pits near the\nGNIS bridge points (Sentinel Bridge at the trench's NE end; Ovis and Natural Bridge on the SW trench segments;\nthe Garden/Venetian/Brushy/Hopkins/Chocolate cluster beside small collapses to the north). GNIS points sit\nwithin tens of metres of, not exactly on, the features. Paved roads are also visible (anthropogenic). The\ntrench is no longer recognisable in the 30 m simulated coarsening."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "lroc_mariuspit01",
+      "role": "moon_primary",
+      "status": "validated",
+      "title": "LROC NAC DTM Marius Pit (NAC_DTM_MARIUSPIT01)",
+      "body": "Moon",
+      "product_id": "NAC_DTM_MARIUSPIT01",
+      "product_version": "v1.9",
+      "pds_data_set_id": "LRO-L-LROC-5-RDR-V1.0",
+      "pds_volume": "LROLRC_2001",
+      "doi": null,
+      "doi_note": "No product-level DOI found; cite PDS data set LRO-L-LROC-5-RDR-V1.0 and the product ID.",
+      "landing_page": "https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_MARIUSPIT01",
+      "overview_page": "https://data.lroc.im-ldi.com/lroc/view_rdr/NAC_DTM_MARIUSPIT01",
+      "producer": "LROC Science Operations Center, Arizona State University",
+      "source_images": [
+        "M1274609891L/R",
+        "M1274616922L/R"
+      ],
+      "acquisition": {
+        "start_utc": "2018-03-02T06:03:44",
+        "stop_utc": "2018-03-02T08:01:27"
+      },
+      "product_creation_utc": "2020-11-25T21:30:56",
+      "license": {
+        "terms": "Public domain (LROC PDS-delivered data products)",
+        "terms_url": "https://lroc.im-ldi.com/about/terms",
+        "credit": "NASA/GSFC/Arizona State University"
+      },
+      "citations": [
+        "Henriksen, M.R., et al. (2017). Extracting accurate and precise topography from LROC narrow angle camera stereo observations. Icarus 283: 122-137. https://doi.org/10.1016/j.icarus.2016.05.012",
+        "Robinson, M.S., et al. (2010). Lunar Reconnaissance Orbiter Camera (LROC) Instrument Overview. Space Science Reviews 150: 81-124."
+      ],
+      "files": [
+        {
+          "asset": "dtm",
+          "filename": "NAC_DTM_MARIUSPIT01.TIF",
+          "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.TIF",
+          "retrieved": true,
+          "final_url": "https://pds.mcp.nasa.gov/data/store/img/lunar_reconnaissance_orbiter/pds4/lroc/lro-l-lroc-5-rdr/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.TIF",
+          "size_bytes": 167037299,
+          "sha256": "db5daada9b38ae7a0316a6e289f2cfe9b78b708c52e3bafb345849e1975aa374",
+          "http_etag": "\"5f430ab62017b30c85d2f754c7f793fa\"",
+          "http_last_modified": "Fri, 14 Aug 2026 18:27:38 GMT",
+          "retrieved_utc": "2026-11-14T06:23:18+00:00"
+        },
+        {
+          "asset": "pds3_label",
+          "filename": "NAC_DTM_MARIUSPIT01.LBL",
+          "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.LBL",
+          "retrieved": true,
+          "final_url": "https://pds.mcp.nasa.gov/data/store/img/lunar_reconnaissance_orbiter/pds4/lroc/lro-l-lroc-5-rdr/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.LBL",
+          "size_bytes": 3583,
+          "sha256": "5d3fa5ea9c32c6542e250aa9f5e08eca4b152b48c6ed36ac941849bb63a1354e",
+          "http_etag": "\"10034d85c67b78417cc9654f8bce2494\"",
+          "http_last_modified": "Fri, 14 Aug 2026 18:41:29 GMT",
+          "retrieved_utc": "2026-11-14T06:23:20+00:00"
+        },
+        {
+          "asset": "readme",
+          "filename": "NAC_DTM_MARIUSPIT01_README.TXT",
+          "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_README.TXT",
+          "retrieved": true,
+          "final_url": "https://pds.mcp.nasa.gov/data/store/img/lunar_reconnaissance_orbiter/pds4/lroc/lro-l-lroc-5-rdr/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_README.TXT",
+          "size_bytes": 8688,
+          "sha256": "b6c512dbd8b48241dfc7fb5b5cbc047368ed38f39b1061b6ecba0a744d1d7e5d",
+          "http_etag": "\"151255ef291dab6b464379f567ca3f89\"",
+          "http_last_modified": "Fri, 14 Aug 2026 18:27:34 GMT",
+          "retrieved_utc": "2026-11-14T06:23:22+00:00"
+        },
+        {
+          "asset": "confidence_map",
+          "filename": "NAC_DTM_MARIUSPIT01_CONF.IMG",
+          "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_CONF.IMG",
+          "retrieved": true,
+          "final_url": "https://pds.mcp.nasa.gov/data/store/img/lunar_reconnaissance_orbiter/pds4/lroc/lro-l-lroc-5-rdr/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_CONF.IMG",
+          "size_bytes": 41740761,
+          "sha256": "156cab7f1f96e18eb946a7a662ce45dba9c1611b784a75eb475d8543416b61cc",
+          "http_etag": "\"52d50d061e89ddd80809ab5ed1effbb6\"",
+          "http_last_modified": "Fri, 14 Aug 2026 18:27:38 GMT",
+          "retrieved_utc": "2026-11-14T06:23:45+00:00"
+        },
+        {
+          "asset": "orthophoto_4m",
+          "filename": "NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG",
+          "url": "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG",
+          "retrieved": true,
+          "final_url": "https://pds.mcp.nasa.gov/data/store/img/lunar_reconnaissance_orbiter/pds4/lroc/lro-l-lroc-5-rdr/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG",
+          "size_bytes": 83474860,
+          "sha256": "c96dc87de204da8252f0f5d7b297c8f991994e2eb8fa8de113c935bb7d7ffa00",
+          "http_etag": "\"1c67cdb06c65323a15f3ade3f38c41be\"",
+          "http_last_modified": "Fri, 14 Aug 2026 18:27:35 GMT",
+          "retrieved_utc": "2026-11-14T06:24:09+00:00"
+        }
+      ],
+      "horizontal_reference": {
+        "body": "Moon",
+        "projection": "Equirectangular, standard parallel 14 N, central meridian 180 E",
+        "sphere_radius_m": 1737400.0,
+        "latitude_type": "planetocentric",
+        "longitude": "0-360 positive east",
+        "crs_wkt": "PROJCS[\"Equirectangular Moon\",GEOGCS[\"GCS_Moon\",DATUM[\"D_Moon\",SPHEROID[\"Moon_localRadius\",1737400,0]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",14],PARAMETER[\"central_meridian\",180],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]"
+      },
+      "vertical_reference": {
+        "units": "metres",
+        "reference": "Heights relative to the 1737.4 km lunar reference sphere",
+        "basis": "LROC NAC DTM convention; label defines the 1737.4 km sphere but does not state the height datum explicitly. Measured values (-1587..-1529 m in ROI) are consistent."
+      },
+      "accuracy": {
+        "lola_tie_rms_m": 1.42,
+        "lola_tracks": 15,
+        "socet_precision_m": 3.43,
+        "source": "NAC_DTM_MARIUSPIT01_README.TXT"
+      },
+      "catalog_metadata": {
+        "post_spacing_m": 3.9999999999986,
+        "lat_range": [
+          13.3969365,
+          15.0496562
+        ],
+        "lon_east_range": [
+          303.0056443,
+          303.4584932
+        ],
+        "nodata": -3.40282266e+38
+      },
+      "measured": {
+        "dtm": {
+          "file": "NAC_DTM_MARIUSPIT01.TIF",
+          "driver": "GTiff",
+          "width": 3331,
+          "height": 12529,
+          "band_count": 1,
+          "dtype": "float32",
+          "nodata": -3.4028226550889045e+38,
+          "crs_wkt": "PROJCS[\"Equirectangular Moon\",GEOGCS[\"GCS_Moon\",DATUM[\"D_Moon\",SPHEROID[\"Moon_localRadius\",1737400,0]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",14],PARAMETER[\"central_meridian\",180],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+          "crs_name": "eqc",
+          "epsg": null,
+          "pixel_size": [
+            3.9999999999986,
+            3.9999999999986
+          ],
+          "bounds": {
+            "left": 3619147.9999987,
+            "bottom": 406239.9999998575,
+            "right": 3632471.999998695,
+            "top": 456355.99999984
+          },
+          "transform": [
+            3.9999999999986,
+            0.0,
+            3619147.9999987,
+            0.0,
+            -3.9999999999986,
+            456355.99999984
+          ],
+          "area_or_point": "Area",
+          "scale": 1.0,
+          "offset": 0.0,
+          "valid_pixel_count": 28117343,
+          "valid_fraction": 0.67372589018874,
+          "nodata_fraction": 0.32627410981126004,
+          "valid_area_km2": 449.87748799968506,
+          "value_min": -1779.8778076171875,
+          "value_max": -1275.6622314453125,
+          "value_mean": -1538.50858570639,
+          "valid_data_bounds": {
+            "left": 3619623.9999987,
+            "right": 3632015.999998695,
+            "top": 456303.99999984,
+            "bottom": 406311.9999998575
+          }
+        },
+        "confidence_map": {
+          "file": "NAC_DTM_MARIUSPIT01_CONF.IMG",
+          "driver": "PDS",
+          "width": 3331,
+          "height": 12529,
+          "band_count": 1,
+          "dtype": "uint8",
+          "nodata": 0.0,
+          "crs_wkt": "PROJCS[\"EQUIRECTANGULAR MOON\",GEOGCS[\"GCS_MOON\",DATUM[\"D_MOON\",SPHEROID[\"MOON_localRadius\",1737400,0]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",14],PARAMETER[\"central_meridian\",180],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+          "crs_name": "eqc",
+          "epsg": null,
+          "pixel_size": [
+            3.9999999999986002,
+            3.9999999999986002
+          ],
+          "bounds": {
+            "left": 3619147.9999986934,
+            "bottom": 406239.9999998578,
+            "right": 3632471.9999986887,
+            "top": 456355.9999998403
+          },
+          "transform": [
+            3.9999999999986002,
+            0.0,
+            3619147.9999986934,
+            0.0,
+            -3.9999999999986002,
+            456355.9999998403
+          ],
+          "area_or_point": null,
+          "scale": 1.0,
+          "offset": 0.0
+        },
+        "orthophoto_4m": {
+          "file": "NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG",
+          "driver": "PDS",
+          "width": 3331,
+          "height": 12529,
+          "band_count": 1,
+          "dtype": "uint16",
+          "nodata": 0.0,
+          "crs_wkt": "PROJCS[\"EQUIRECTANGULAR MOON\",GEOGCS[\"GCS_MOON\",DATUM[\"D_MOON\",SPHEROID[\"MOON_localRadius\",1737400,0]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",14],PARAMETER[\"central_meridian\",180],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+          "crs_name": "eqc",
+          "epsg": null,
+          "pixel_size": [
+            3.9999999999986002,
+            3.9999999999986002
+          ],
+          "bounds": {
+            "left": 3619147.9999986934,
+            "bottom": 406239.9999998578,
+            "right": 3632471.9999986887,
+            "top": 456355.9999998403
+          },
+          "transform": [
+            3.9999999999986002,
+            0.0,
+            3619147.9999986934,
+            0.0,
+            -3.9999999999986002,
+            456355.9999998403
+          ],
+          "area_or_point": null,
+          "scale": 1.538698261e-05,
+          "offset": -0.0001538698261
+        }
+      },
+      "known_limitations": [
+        "Pit interior (floor and overhangs) is nodata in this DTM; pit floor depth is NOT measured here.",
+        "Atlas depth (40 m) comes from separate stereo modelling, not from these DTM pixels.",
+        "4 m post spacing: features narrower than ~3 posts (12 m) are not resolved.",
+        "1.10 m orthophotos exist but are image resolution, not elevation resolution.",
+        "README lists possible SOCET SET artifacts (boxes, seams, facets); see confidence map.",
+        "Subsurface void geometry is unmeasured by any product in this manifest."
+      ],
+      "not_to_be_confused_with": {
+        "product": "NAC_DTM_MARIUS (2 m/px)",
+        "reason": "Covers lon 303.86-304.36 E and does not contain the pit at 303.2299 E; not used."
+      }
+    },
+    {
+      "id": "ot_ca23_williams",
+      "role": "earth_reference_1",
+      "status": "validated",
+      "title": "Lidar Survey of Lava Tubes, CA 2023 (bare-earth DTM)",
+      "body": "Earth",
+      "site": "Lava Beds National Monument, California, USA",
+      "product_id": "OTSDEM.102024.32610.1",
+      "collection_id": "OT.102024.32610.1",
+      "short_name": "CA23_Williams",
+      "doi": "10.5069/G9ST7N19",
+      "landing_page": "https://portal.opentopography.org/datasetMetadata?otCollectionID=OT.102024.32610.1",
+      "producer": "NCALM (National Center for Airborne Laser Mapping); PI Edward Williams, Univ. of Maryland",
+      "distributor": "OpenTopography",
+      "funding": "NSF EAR-2324629",
+      "acquisition": {
+        "date": "2023-09-28"
+      },
+      "publication_date": "2024-10-23",
+      "license": {
+        "terms": "CC BY 4.0",
+        "terms_url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "citations": [
+        "Williams, E. (2024). Lidar Survey of Lava Tubes, CA 2023. National Center for Airborne Laser Mapping (NCALM). Distributed by OpenTopography. https://doi.org/10.5069/G9ST7N19. Accessed 2026-11-14"
+      ],
+      "acknowledgement": "Lidar data acquisition and processing completed by the National Center for Airborne Laser Mapping (NCALM). NCALM funding provided by NSF's Division of Earth Sciences, Instrumentation and Facilities Program. EAR-2324629",
+      "files": [
+        {
+          "asset": "dtm",
+          "filename": "LAVA_GEG_50C_COG.tif",
+          "url": "https://opentopography.s3.sdsc.edu/raster/CA23_Williams/CA23_Williams_be/LAVA_GEG_50C_COG.tif",
+          "retrieved": true,
+          "final_url": "https://opentopography.s3.sdsc.edu/raster/CA23_Williams/CA23_Williams_be/LAVA_GEG_50C_COG.tif",
+          "size_bytes": 781152145,
+          "sha256": "b3642df8207bd7a28ca39c9ecc4057dc8cccf4375b61b8bb8669b7e04dfd5179",
+          "http_etag": "\"00000000000000000000000000000000-1\"",
+          "http_last_modified": "Wed, 23 Oct 2024 06:18:01 GMT",
+          "retrieved_utc": "2026-11-14T06:26:31+00:00"
+        },
+        {
+          "asset": "raster_boundary",
+          "filename": "CA23_Williams_raster_boundary.geojson",
+          "url": "https://raw.githubusercontent.com/OpenTopography/Data_Catalog_Spatial_Boundaries/main/OpenTopography_Raster/CA23_Williams.geojson",
+          "retrieved": true,
+          "final_url": "https://raw.githubusercontent.com/OpenTopography/Data_Catalog_Spatial_Boundaries/main/OpenTopography_Raster/CA23_Williams.geojson",
+          "size_bytes": 135654,
+          "sha256": "477d17be07bd85d0b29fedca4aff57af3fd57b3ae41038ec03f223e17a5f7d0c",
+          "http_etag": "\"7c2b45f311421eb5f5a2652c08c904eeaa0f492345dad6434694718636e235ad\"",
+          "http_last_modified": null,
+          "retrieved_utc": "2026-11-14T06:26:32+00:00"
+        },
+        {
+          "asset": "survey_report",
+          "filename": "CA23_Williams_metadata.pdf",
+          "url": "https://object.cloud.sdsc.edu/v1/AUTH_opentopography/www/metadata/CA23_Williams_metadata.pdf",
+          "retrieved": true,
+          "final_url": "https://object.cloud.sdsc.edu/v1/AUTH_opentopography/www/metadata/CA23_Williams_metadata.pdf",
+          "size_bytes": 829707,
+          "sha256": "43cfbbf2d4bb2441741299b45a709c8df5e3a2ff9f2f07c11bfe716052373758",
+          "http_etag": "c32f5c273d05249e35312d8ccafe8efa",
+          "http_last_modified": "Wed, 16 Oct 2024 15:24:25 GMT",
+          "retrieved_utc": "2026-11-14T06:26:35+00:00"
+        }
+      ],
+      "horizontal_reference": {
+        "crs": "WGS84 (ITRF2014, epoch 2023.74) / UTM zone 10N",
+        "epsg": 32610,
+        "crs_wkt": "PROJCS[\"WGS 84 / UTM zone 10N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-123],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"32610\"]]"
+      },
+      "vertical_reference": {
+        "units": "metres",
+        "datum": "NAVD88 (GEOID18)",
+        "epsg": 5703,
+        "basis": "OpenTopography metadata; the GeoTIFF itself carries no vertical CRS."
+      },
+      "catalog_metadata": {
+        "raster_resolution_m": 0.5,
+        "area_km2": 57.44,
+        "point_density_per_m2": 21.84,
+        "bbox_lonlat": [
+          -121.57188041421496,
+          41.68693814691719,
+          -121.46215226553198,
+          41.77291549498684
+        ]
+      },
+      "measured": {
+        "dtm": {
+          "file": "LAVA_GEG_50C_COG.tif",
+          "driver": "GTiff",
+          "width": 20009,
+          "height": 20009,
+          "band_count": 1,
+          "dtype": "float32",
+          "nodata": -9999.0,
+          "crs_wkt": "PROJCS[\"WGS 84 / UTM zone 10N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",-123],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"32610\"]]",
+          "crs_name": "utm",
+          "epsg": 32610,
+          "pixel_size": [
+            0.5,
+            0.5
+          ],
+          "bounds": {
+            "left": 617997.5,
+            "bottom": 4615997.5,
+            "right": 628002.0,
+            "top": 4626002.0
+          },
+          "transform": [
+            0.5,
+            0.0,
+            617997.5,
+            0.0,
+            -0.5,
+            4626002.0
+          ],
+          "area_or_point": "Area",
+          "scale": 1.0,
+          "offset": 0.0,
+          "valid_pixel_count": 229807531,
+          "valid_fraction": 0.5740021093661434,
+          "nodata_fraction": 0.4259978906338566,
+          "valid_area_km2": 57.45188275,
+          "value_min": 1277.2330322265625,
+          "value_max": 1674.9366455078125,
+          "value_mean": 1430.7947340839432,
+          "valid_data_bounds": {
+            "left": 618741.0,
+            "right": 627955.5,
+            "top": 4625648.0,
+            "bottom": 4616039.5
+          }
+        },
+        "raster_boundary_area_km2": 57.441381177146994
+      },
+      "known_limitations": [
+        "Surface (bare-earth) LiDAR only: no subsurface tube geometry is measured.",
+        "GNIS landmark coordinates are approximate points, not mapped outlines.",
+        "Coarsened rasters are simulations derived from this DTM, not observations at those resolutions."
+      ]
+    }
+  ],
+  "rois": [
+    {
+      "id": "moon_marius_hills_pit",
+      "dataset": "lroc_mariuspit01",
+      "landmark": {
+        "name": "Marius Hills Pit",
+        "lat": 14.0917,
+        "lon_east": 303.2299,
+        "funnel_diameter_m": [
+          79,
+          92
+        ],
+        "inner_diameter_m": [
+          49,
+          55
+        ],
+        "atlas_depth_m": 40.0,
+        "citation": "LROC Pits Atlas, Marius Hills Pit, https://lroc.im-ldi.com/atlases/pits/1 (accessed 2026-11-14)",
+        "located": {
+          "lat": 14.0917,
+          "lon_east_0_360": 303.2299,
+          "lon_east_pm180": -56.77010000000001,
+          "map_x_m": 3625746.1904419046,
+          "map_y_m": 427307.55717198725,
+          "row_f": 7262.11070696573,
+          "col_f": 1649.547610801761,
+          "row": 7262,
+          "col": 1649,
+          "label_row_f": 7262.110706965788,
+          "label_col_f": 1649.5476108032744,
+          "pyproj_vs_label_px": 1.5145181481793625e-09,
+          "inside_raster_extent": true,
+          "inside_label_latlon_extent": true
+        }
+      },
+      "window_px": {
+        "row_off": 7134,
+        "col_off": 1521,
+        "size": 257
+      },
+      "extent_m": 1028.0,
+      "bounds_map_m": {
+        "left": 3625231.9999986975,
+        "bottom": 426791.99999985035,
+        "right": 3626259.999998697,
+        "top": 427819.99999985
+      },
+      "valid_fraction": 0.9975926963315115,
+      "pit_analysis": {
+        "search_valid_fraction": 0.7757404795486601,
+        "rim_valid_fraction": 1.0,
+        "nodata_gap": {
+          "present": true,
+          "pixel_count": 159,
+          "area_m2": 2544.0,
+          "equivalent_diameter_m": 56.913279661307996,
+          "extent_ns_m": 52.0,
+          "extent_ew_m": 60.0,
+          "centroid_offset_from_atlas_m": 7.368367648320644,
+          "contains_atlas_point": true,
+          "touches_roi_edge": false
+        },
+        "pit_floor_measured": false,
+        "lowest_valid_elev_m": -1586.632568359375,
+        "lowest_valid_row": 131,
+        "lowest_valid_col": 124,
+        "lowest_valid_offset_from_atlas_m": 21.1169923898962,
+        "rim_median_elev_m": -1570.791015625,
+        "rim_p90_elev_m": -1569.7210693359375,
+        "measured_depression_m": 15.841552734375,
+        "measured_depression_is_lower_bound": true
+      },
+      "confidence_within_search_radius": {
+        "pixels": 709,
+        "class_fractions": {
+          "correlated": 0.5021,
+          "manually_edited": 0.0677,
+          "nodata": 0.2243,
+          "suspicious": 0.2059
+        }
+      },
+      "confidence_roi": {
+        "correlated": 0.9599,
+        "manually_edited": 0.0007,
+        "nodata": 0.0024,
+        "suspicious": 0.037
+      },
+      "orthophoto_4m_nodata_in_roi": {
+        "nodata_pixel_count": 256,
+        "extent_ew_m": 64.0,
+        "extent_ns_m": 64.0
+      }
+    },
+    {
+      "id": "earth_lava_beds_cave_loop",
+      "dataset": "ot_ca23_williams",
+      "name": "Cave Loop lava-tube bridges",
+      "bounds_utm10n": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "size_m": 1800.0,
+      "valid_fraction": 1.0,
+      "landmarks": [
+        {
+          "name": "Garden Bridges",
+          "gnis_id": 1657771,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1657771",
+          "lon": -121.5141734,
+          "lat": 41.7084969,
+          "utm_x": 623614.2481593904,
+          "utm_y": 4618478.3414533585
+        },
+        {
+          "name": "Hopkins Bridge",
+          "gnis_id": 2707991,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707991",
+          "lon": -121.5139025,
+          "lat": 41.709172,
+          "utm_x": 623635.4926338271,
+          "utm_y": 4618553.685157411
+        },
+        {
+          "name": "Chocolate Bridge",
+          "gnis_id": 2707990,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707990",
+          "lon": -121.5135314,
+          "lat": 41.7092616,
+          "utm_x": 623666.1952488929,
+          "utm_y": 4618564.166225051
+        },
+        {
+          "name": "Sentinel Bridge",
+          "gnis_id": 2707992,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707992",
+          "lon": -121.5114025,
+          "lat": 41.7083386,
+          "utm_x": 623845.0847952086,
+          "utm_y": 4618464.748010935
+        },
+        {
+          "name": "Venetian Bridge",
+          "gnis_id": 2707989,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707989",
+          "lon": -121.5141803,
+          "lat": 41.7086164,
+          "utm_x": 623613.4451213232,
+          "utm_y": 4618491.599338782
+        },
+        {
+          "name": "Brushy Bridge",
+          "gnis_id": 2707988,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707988",
+          "lon": -121.5141803,
+          "lat": 41.7083386,
+          "utm_x": 623613.977411723,
+          "utm_y": 4618460.755885036
+        },
+        {
+          "name": "Natural Bridge",
+          "gnis_id": 2707987,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707987",
+          "lon": -121.5186247,
+          "lat": 41.7025053,
+          "utm_x": 623255.3553414803,
+          "utm_y": 4617806.727574864
+        },
+        {
+          "name": "Ovis Bridge",
+          "gnis_id": 1670696,
+          "gnis_feature_class": "Arch",
+          "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670696",
+          "lon": -121.5175068,
+          "lat": 41.7029413,
+          "utm_x": 623347.5373146737,
+          "utm_y": 4617856.736388775
+        }
+      ],
+      "landmark_source": "USGS GNIS via The National Map Gazetteer, scientific/config/landmarks/lava_beds_gnis.geojson",
+      "landmark_check_radius_m": 30.0,
+      "resolution_levels": [
+        {
+          "resolution_m": 0.5,
+          "label": "observed (NCALM LiDAR bare-earth DTM, native 0.5 m)",
+          "shape": [
+            3600,
+            3600
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1427.940673828125,
+          "elev_max_m": 1565.2362060546875,
+          "slope_deg_p50": 6.586421012878418,
+          "slope_deg_p95": 25.124841690063477,
+          "slope_deg_max": 83.97008514404297,
+          "landmark_relief_m": {
+            "Garden Bridges": 8.229,
+            "Hopkins Bridge": 5.882,
+            "Chocolate Bridge": 4.408,
+            "Sentinel Bridge": 9.049,
+            "Venetian Bridge": 8.643,
+            "Brushy Bridge": 6.644,
+            "Natural Bridge": 14.218,
+            "Ovis Bridge": 14.102
+          },
+          "landmark_relief_median_m": 8.436,
+          "background_relief_p50_m": 5.9083251953125,
+          "background_relief_p90_m": 10.274841308593752
+        },
+        {
+          "resolution_m": 2.0,
+          "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+          "shape": [
+            900,
+            900
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1428.3668212890625,
+          "elev_max_m": 1565.195068359375,
+          "slope_deg_p50": 5.983822822570801,
+          "slope_deg_p95": 19.420446395874023,
+          "slope_deg_max": 71.73596954345703,
+          "landmark_relief_m": {
+            "Garden Bridges": 7.67,
+            "Hopkins Bridge": 4.86,
+            "Chocolate Bridge": 4.264,
+            "Sentinel Bridge": 8.975,
+            "Venetian Bridge": 8.129,
+            "Brushy Bridge": 6.363,
+            "Natural Bridge": 13.94,
+            "Ovis Bridge": 13.162
+          },
+          "landmark_relief_median_m": 7.8995,
+          "background_relief_p50_m": 5.6552734375,
+          "background_relief_p90_m": 9.85733642578125
+        },
+        {
+          "resolution_m": 4.0,
+          "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+          "shape": [
+            450,
+            450
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1428.8182373046875,
+          "elev_max_m": 1565.0343017578125,
+          "slope_deg_p50": 5.445594310760498,
+          "slope_deg_p95": 15.427659034729004,
+          "slope_deg_max": 55.969356536865234,
+          "landmark_relief_m": {
+            "Garden Bridges": 7.119,
+            "Hopkins Bridge": 4.042,
+            "Chocolate Bridge": 4.268,
+            "Sentinel Bridge": 8.406,
+            "Venetian Bridge": 7.715,
+            "Brushy Bridge": 6.126,
+            "Natural Bridge": 13.14,
+            "Ovis Bridge": 12.813
+          },
+          "landmark_relief_median_m": 7.417,
+          "background_relief_p50_m": 5.29803466796875,
+          "background_relief_p90_m": 9.22742919921875
+        },
+        {
+          "resolution_m": 10.0,
+          "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+          "shape": [
+            180,
+            180
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1430.951416015625,
+          "elev_max_m": 1564.742919921875,
+          "slope_deg_p50": 4.5386552810668945,
+          "slope_deg_p95": 10.806553840637207,
+          "slope_deg_max": 30.266212463378906,
+          "landmark_relief_m": {
+            "Garden Bridges": 3.675,
+            "Hopkins Bridge": 3.067,
+            "Chocolate Bridge": 3.737,
+            "Sentinel Bridge": 6.674,
+            "Venetian Bridge": 4.586,
+            "Brushy Bridge": 3.949,
+            "Natural Bridge": 10.702,
+            "Ovis Bridge": 10.666
+          },
+          "landmark_relief_median_m": 4.2675,
+          "background_relief_p50_m": 4.7020263671875,
+          "background_relief_p90_m": 8.074462890625
+        },
+        {
+          "resolution_m": 30.0,
+          "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+          "shape": [
+            60,
+            60
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1436.015869140625,
+          "elev_max_m": 1563.532470703125,
+          "slope_deg_p50": 3.616912841796875,
+          "slope_deg_p95": 7.4405622482299805,
+          "slope_deg_max": 14.699462890625,
+          "landmark_relief_m": {
+            "Garden Bridges": null,
+            "Hopkins Bridge": null,
+            "Chocolate Bridge": null,
+            "Sentinel Bridge": null,
+            "Venetian Bridge": null,
+            "Brushy Bridge": null,
+            "Natural Bridge": null,
+            "Ovis Bridge": null
+          },
+          "landmark_relief_median_m": null,
+          "background_relief_p50_m": null,
+          "background_relief_p90_m": null
+        },
+        {
+          "resolution_m": 60.0,
+          "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+          "shape": [
+            30,
+            30
+          ],
+          "valid_fraction": 1.0,
+          "elev_min_m": 1439.7218017578125,
+          "elev_max_m": 1560.244140625,
+          "slope_deg_p50": 3.1639394760131836,
+          "slope_deg_p95": 6.608067512512207,
+          "slope_deg_max": 10.6121244430542,
+          "landmark_relief_m": {
+            "Garden Bridges": null,
+            "Hopkins Bridge": null,
+            "Chocolate Bridge": null,
+            "Sentinel Bridge": null,
+            "Venetian Bridge": null,
+            "Brushy Bridge": null,
+            "Natural Bridge": null,
+            "Ovis Bridge": null
+          },
+          "landmark_relief_median_m": null,
+          "background_relief_p50_m": null,
+          "background_relief_p90_m": null
+        }
+      ],
+      "coarsening": {
+        "method": "block_mean",
+        "min_valid_fraction": 0.5,
+        "note": "Integer-factor block mean on the native UTM grid; every level has identical bounds. Derivatives recomputed per level (Horn 3x3)."
+      }
+    }
+  ],
+  "derived_assets": [
+    {
+      "path": "datasets/derived/moon/mariuspit01_roi_dtm_4m.tif",
+      "sha256": "f93216829163730f48e3670898ff19015b038e7db116c52286c6af42e6e3a54a",
+      "size_bytes": 119028,
+      "width": 257,
+      "height": 257,
+      "pixel_size_m": 3.9999999999986,
+      "bounds": {
+        "left": 3625231.9999986975,
+        "bottom": 426791.99999985035,
+        "right": 3626259.999998697,
+        "top": 427819.99999985
+      },
+      "kind": "dtm_roi",
+      "label": "observed (LROC NAC DTM, native 4 m)",
+      "source": "lroc_mariuspit01"
+    },
+    {
+      "path": "datasets/derived/moon/mariuspit01_roi_confidence.tif",
+      "sha256": "f79378c77ad7025da6d861d2d53a0df2304115bdcc692b1347aad3af4f55bdf4",
+      "size_bytes": 14401,
+      "width": 257,
+      "height": 257,
+      "pixel_size_m": 3.9999999999986,
+      "bounds": {
+        "left": 3625231.9999986975,
+        "bottom": 426791.99999985035,
+        "right": 3626259.999998697,
+        "top": 427819.99999985
+      },
+      "kind": "confidence_roi",
+      "label": "observed (LROC confidence map)",
+      "source": "lroc_mariuspit01"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_0p5m.tif",
+      "sha256": "21cab5ddc740483c74b63af15b83813ebd981a98773c85234bc778c1d54293b6",
+      "size_bytes": 20280626,
+      "width": 3600,
+      "height": 3600,
+      "pixel_size_m": 0.5,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi",
+      "resolution_m": 0.5,
+      "label": "observed (NCALM LiDAR bare-earth DTM, native 0.5 m)",
+      "source": "ot_ca23_williams"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_2m.tif",
+      "sha256": "5ec356a765f5eab1e69a56ebdb492fecdb0e87ef0fc2ea2dedbf48f9e62592d2",
+      "size_bytes": 1506957,
+      "width": 900,
+      "height": 900,
+      "pixel_size_m": 2.0,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 2.0,
+      "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+      "source": "ot_ca23_williams"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_4m.tif",
+      "sha256": "0a1519f15da3f08b9cb14dfde3cdaa899fe9c805373af690ec03e1d68b0c6ccf",
+      "size_bytes": 403795,
+      "width": 450,
+      "height": 450,
+      "pixel_size_m": 4.0,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 4.0,
+      "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+      "source": "ot_ca23_williams"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_10m.tif",
+      "sha256": "f7a757e50e101f764b77382ec8c4d44192c8fbb0a184b4441c37171b0f9cf48f",
+      "size_bytes": 70433,
+      "width": 180,
+      "height": 180,
+      "pixel_size_m": 10.0,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 10.0,
+      "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+      "source": "ot_ca23_williams"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_30m.tif",
+      "sha256": "a95d9b7f2426e6247687485827bb8d011fc187ac0983eccb1c1052d7aa099f20",
+      "size_bytes": 9617,
+      "width": 60,
+      "height": 60,
+      "pixel_size_m": 30.0,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 30.0,
+      "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+      "source": "ot_ca23_williams"
+    },
+    {
+      "path": "datasets/derived/earth/lavabeds_roi_dtm_60m.tif",
+      "sha256": "4f5540c496b6238966fdce223a548e064d87c9e1a4b8a6cd02f920865e36550c",
+      "size_bytes": 3545,
+      "width": 30,
+      "height": 30,
+      "pixel_size_m": 60.0,
+      "bounds": {
+        "left": 622680.0,
+        "bottom": 4617300.0,
+        "right": 624480.0,
+        "top": 4619100.0
+      },
+      "kind": "dtm_roi_simulated_coarsening",
+      "resolution_m": 60.0,
+      "label": "SIMULATED COARSENING of 0.5 m Lava Beds LiDAR DTM - not an observation",
+      "source": "ot_ca23_williams"
+    }
+  ],
+  "previews": [
+    {
+      "file": "moon_pit_roi_hillshade.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/moon_pit_roi_hillshade.png"
+    },
+    {
+      "file": "moon_pit_roi_ortho4m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/moon_pit_roi_ortho4m.png"
+    },
+    {
+      "file": "moon_pit_roi_confidence.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/moon_pit_roi_confidence.png"
+    },
+    {
+      "file": "moon_full_dtm_context.png",
+      "width": 319,
+      "height": 1200,
+      "path": "datasets/previews/moon_full_dtm_context.png"
+    },
+    {
+      "file": "earth_roi_hillshade_0p5m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_0p5m.png"
+    },
+    {
+      "file": "earth_roi_hillshade_2m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_2m.png"
+    },
+    {
+      "file": "earth_roi_hillshade_4m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_4m.png"
+    },
+    {
+      "file": "earth_roi_hillshade_10m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_10m.png"
+    },
+    {
+      "file": "earth_roi_hillshade_30m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_30m.png"
+    },
+    {
+      "file": "earth_roi_hillshade_60m.png",
+      "width": 900,
+      "height": 900,
+      "path": "datasets/previews/earth_roi_hillshade_60m.png"
+    },
+    {
+      "file": "earth_bridges_zoom_0p5m.png",
+      "width": 981,
+      "height": 1200,
+      "path": "datasets/previews/earth_bridges_zoom_0p5m.png"
+    }
+  ],
+  "fetch_report": {
+    "run_utc": "2026-11-14T06:22:23+00:00",
+    "ok": [
+      {
+        "id": "lroc_mariuspit01",
+        "asset": "dtm",
+        "sha256": "db5daada9b38ae7a0316a6e289f2cfe9b78b708c52e3bafb345849e1975aa374",
+        "size_bytes": 167037299
+      },
+      {
+        "id": "lroc_mariuspit01",
+        "asset": "pds3_label",
+        "sha256": "5d3fa5ea9c32c6542e250aa9f5e08eca4b152b48c6ed36ac941849bb63a1354e",
+        "size_bytes": 3583
+      },
+      {
+        "id": "lroc_mariuspit01",
+        "asset": "readme",
+        "sha256": "b6c512dbd8b48241dfc7fb5b5cbc047368ed38f39b1061b6ecba0a744d1d7e5d",
+        "size_bytes": 8688
+      },
+      {
+        "id": "lroc_mariuspit01",
+        "asset": "confidence_map",
+        "sha256": "156cab7f1f96e18eb946a7a662ce45dba9c1611b784a75eb475d8543416b61cc",
+        "size_bytes": 41740761
+      },
+      {
+        "id": "lroc_mariuspit01",
+        "asset": "orthophoto_4m",
+        "sha256": "c96dc87de204da8252f0f5d7b297c8f991994e2eb8fa8de113c935bb7d7ffa00",
+        "size_bytes": 83474860
+      },
+      {
+        "id": "ot_ca23_williams",
+        "asset": "dtm",
+        "sha256": "b3642df8207bd7a28ca39c9ecc4057dc8cccf4375b61b8bb8669b7e04dfd5179",
+        "size_bytes": 781152145
+      },
+      {
+        "id": "ot_ca23_williams",
+        "asset": "raster_boundary",
+        "sha256": "477d17be07bd85d0b29fedca4aff57af3fd57b3ae41038ec03f223e17a5f7d0c",
+        "size_bytes": 135654
+      },
+      {
+        "id": "ot_ca23_williams",
+        "asset": "survey_report",
+        "sha256": "43cfbbf2d4bb2441741299b45a709c8df5e3a2ff9f2f07c11bfe716052373758",
+        "size_bytes": 829707
+      }
+    ],
+    "failed": []
+  },
+  "candidates_not_validated": [
+    {
+      "site": "Lanzarote / La Corona, Canary Islands, Spain",
+      "status": "not_verified",
+      "reason": "Out of Phase A scope; exact CNIG MDT02 COG tile not yet located or downloaded."
+    },
+    {
+      "site": "Harrat Khaybar, Saudi Arabia",
+      "status": "not_verified",
+      "reason": "Out of Phase A scope; only 12.5 m ALOS-PALSAR-derived DEMs identified; resolution_insufficient for the 0.5 m coarsening experiment."
+    }
+  ]
+}

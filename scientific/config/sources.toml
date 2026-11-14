@@ -1,0 +1,67 @@
+# Primary source products for Phase A. Sizes are the HTTP Content-Length values
+# observed on 2026-11-14; a mismatch aborts the download instead of silently
+# accepting a different file.
+
+[[product]]
+id = "lroc_mariuspit01"
+role = "moon_primary"
+asset = "dtm"
+filename = "NAC_DTM_MARIUSPIT01.TIF"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.TIF"
+expected_size = 167037299
+
+[[product]]
+id = "lroc_mariuspit01"
+role = "moon_primary"
+asset = "pds3_label"
+filename = "NAC_DTM_MARIUSPIT01.LBL"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01.LBL"
+expected_size = 3583
+
+[[product]]
+id = "lroc_mariuspit01"
+role = "moon_primary"
+asset = "readme"
+filename = "NAC_DTM_MARIUSPIT01_README.TXT"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_README.TXT"
+expected_size = 8688
+
+[[product]]
+id = "lroc_mariuspit01"
+role = "moon_primary"
+asset = "confidence_map"
+filename = "NAC_DTM_MARIUSPIT01_CONF.IMG"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_CONF.IMG"
+expected_size = 41740761
+
+[[product]]
+id = "lroc_mariuspit01"
+role = "moon_primary"
+asset = "orthophoto_4m"
+filename = "NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG"
+url = "https://pds.lroc.im-ldi.com/data/LRO-L-LROC-5-RDR-V1.0/LROLRC_2001/DATA/SDP/NAC_DTM/MARIUSPIT01/NAC_DTM_MARIUSPIT01_M1274609891_4M.IMG"
+expected_size = 83474860
+
+[[product]]
+id = "ot_ca23_williams"
+role = "earth_reference_1"
+asset = "dtm"
+filename = "LAVA_GEG_50C_COG.tif"
+url = "https://opentopography.s3.sdsc.edu/raster/CA23_Williams/CA23_Williams_be/LAVA_GEG_50C_COG.tif"
+expected_size = 781152145
+
+[[product]]
+id = "ot_ca23_williams"
+role = "earth_reference_1"
+asset = "raster_boundary"
+filename = "CA23_Williams_raster_boundary.geojson"
+url = "https://raw.githubusercontent.com/OpenTopography/Data_Catalog_Spatial_Boundaries/main/OpenTopography_Raster/CA23_Williams.geojson"
+expected_size = 135654
+
+[[product]]
+id = "ot_ca23_williams"
+role = "earth_reference_1"
+asset = "survey_report"
+filename = "CA23_Williams_metadata.pdf"
+url = "https://object.cloud.sdsc.edu/v1/AUTH_opentopography/www/metadata/CA23_Williams_metadata.pdf"
+expected_size = 829707

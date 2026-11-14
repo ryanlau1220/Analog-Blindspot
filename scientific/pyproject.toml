@@ -1,0 +1,43 @@
+[project]
+name = "analog-blindspot-science"
+version = "0.1.0"
+description = "Phase A raster validation and preprocessing for Analog Blindspot"
+authors = [
+    { name = "ryanlau1220", email = "liujunhong20@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.5.4",
+    "pillow>=13.0.0",
+    "pyproj>=3.8.0",
+    "rasterio>=1.5.2",
+    "requests>=2.34.2",
+    "shapely>=2.2.0",
+]
+
+[project.scripts]
+fetch-sources = "analog_blindspot_science.fetch_sources:main"
+fetch-landmarks = "analog_blindspot_science.fetch_landmarks:main"
+phase-a = "analog_blindspot_science.phase_a:main"
+
+[build-system]
+requires = ["uv_build>=0.10.8,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+ignore = ["ISC004", "RUF046"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["data: requires downloaded source rasters in datasets/raw"]

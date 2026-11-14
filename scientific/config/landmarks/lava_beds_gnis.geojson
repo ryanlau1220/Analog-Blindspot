@@ -1,0 +1,832 @@
+{
+  "type": "FeatureCollection",
+  "source": {
+    "name": "USGS Geographic Names Information System (GNIS), The National Map Gazetteer",
+    "service": "https://carto.nationalmap.gov/arcgis/rest/services/geonames/MapServer/5/query",
+    "query": {
+      "geometry": "-121.57188041,41.68693815,-121.46215227,41.77291549",
+      "geometryType": "esriGeometryEnvelope",
+      "inSR": "4326",
+      "outSR": "4326",
+      "spatialRel": "esriSpatialRelIntersects",
+      "outFields": "gaz_id,gaz_name,gaz_featureclass,county_name,state_alpha",
+      "orderByFields": "gaz_id",
+      "f": "json"
+    },
+    "license": "Public domain (U.S. Government work)",
+    "retrieved_utc": "2026-11-14T06:28:16+00:00",
+    "positional_note": "GNIS points are approximate; they are not LiDAR-derived."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5529174,
+          41.7233786
+        ]
+      },
+      "properties": {
+        "name": "Bearpaw Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 218916,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/218916",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.4833301,
+          41.6977125
+        ]
+      },
+      "properties": {
+        "name": "Caldwell Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 220383,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/220383",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5671893,
+          41.703432
+        ]
+      },
+      "properties": {
+        "name": "Eagle Nest Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 222817,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/222817",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5472297,
+          41.6990519
+        ]
+      },
+      "properties": {
+        "name": "Heppe Chimney",
+        "gnis_feature_class": "Pillar",
+        "gnis_id": 225192,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/225192",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5329871,
+          41.714816
+        ]
+      },
+      "properties": {
+        "name": "Hippo Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 225362,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/225362",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.548063,
+          41.6926631
+        ]
+      },
+      "properties": {
+        "name": "Mammoth Crater",
+        "gnis_feature_class": "Crater",
+        "gnis_id": 227994,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/227994",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5538966,
+          41.7162739
+        ]
+      },
+      "properties": {
+        "name": "Modoc Crater",
+        "gnis_feature_class": "Crater",
+        "gnis_id": 228896,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/228896",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5290947,
+          41.7379996
+        ]
+      },
+      "properties": {
+        "name": "Schonchin Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 232667,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/232667",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5377852,
+          41.748774
+        ]
+      },
+      "properties": {
+        "name": "Semi Crater",
+        "gnis_feature_class": "Crater",
+        "gnis_id": 232798,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/232798",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5380629,
+          41.7337741
+        ]
+      },
+      "properties": {
+        "name": "The Castles",
+        "gnis_feature_class": "Pillar",
+        "gnis_id": 236154,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/236154",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.472703,
+          41.7438025
+        ]
+      },
+      "properties": {
+        "name": "Three Sisters",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 236317,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/236317",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.4936174,
+          41.7468303
+        ]
+      },
+      "properties": {
+        "name": "Captain Jacks Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 252012,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252012",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5175069,
+          41.7309967
+        ]
+      },
+      "properties": {
+        "name": "Irish Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 252034,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252034",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.526396,
+          41.7334965
+        ]
+      },
+      "properties": {
+        "name": "Symbol Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 252059,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252059",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5386914,
+          41.7684587
+        ]
+      },
+      "properties": {
+        "name": "Thomas Hill",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 252089,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252089",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5374102,
+          41.7675178
+        ]
+      },
+      "properties": {
+        "name": "Howe Point",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 252127,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252127",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5399636,
+          41.7690735
+        ]
+      },
+      "properties": {
+        "name": "Harris Knoll",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 252142,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252142",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5346438,
+          41.7811871
+        ]
+      },
+      "properties": {
+        "name": "Clinton Draw",
+        "gnis_feature_class": "Valley",
+        "gnis_id": 252184,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252184",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5269593,
+          41.7702957
+        ]
+      },
+      "properties": {
+        "name": "Cranston Knob",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 252185,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252185",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5370956,
+          41.7700001
+        ]
+      },
+      "properties": {
+        "name": "The Thumb of the Glove",
+        "gnis_feature_class": "Valley",
+        "gnis_id": 252221,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252221",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5400045,
+          41.7691477
+        ]
+      },
+      "properties": {
+        "name": "Wright Ridge",
+        "gnis_feature_class": "Ridge",
+        "gnis_id": 252296,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/252296",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5483409,
+          41.7657179
+        ]
+      },
+      "properties": {
+        "name": "Black Crater",
+        "gnis_feature_class": "Crater",
+        "gnis_id": 257111,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/257111",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5677859,
+          41.7568288
+        ]
+      },
+      "properties": {
+        "name": "Fleener Chimneys",
+        "gnis_feature_class": "Pillar",
+        "gnis_id": 260200,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/260200",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5141734,
+          41.7084969
+        ]
+      },
+      "properties": {
+        "name": "Garden Bridges",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 1657771,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1657771",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5366113,
+          41.6915574
+        ]
+      },
+      "properties": {
+        "name": "Hidden Valley",
+        "gnis_feature_class": "Valley",
+        "gnis_id": 1657780,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1657780",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5146409,
+          41.761392
+        ]
+      },
+      "properties": {
+        "name": "Schonchin Flow",
+        "gnis_feature_class": "Lava",
+        "gnis_id": 1657825,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1657825",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5536388,
+          41.7376684
+        ]
+      },
+      "properties": {
+        "name": "Bat Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 1658003,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1658003",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.482981,
+          41.7057892
+        ]
+      },
+      "properties": {
+        "name": "Caldwell Minor",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 1658192,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1658192",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.515333,
+          41.7175301
+        ]
+      },
+      "properties": {
+        "name": "Crescent Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 1658349,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1658349",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5255073,
+          41.7682965
+        ]
+      },
+      "properties": {
+        "name": "Hardin Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 1658711,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1658711",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5293305,
+          41.7026314
+        ]
+      },
+      "properties": {
+        "name": "Red Butte",
+        "gnis_feature_class": "Summit",
+        "gnis_id": 1659478,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1659478",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5433407,
+          41.6987742
+        ]
+      },
+      "properties": {
+        "name": "Heppe Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 1670692,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670692",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5491743,
+          41.7279406
+        ]
+      },
+      "properties": {
+        "name": "Merrill Natural Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 1670693,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670693",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5175068,
+          41.7029413
+        ]
+      },
+      "properties": {
+        "name": "Ovis Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 1670696,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670696",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.500562,
+          41.7365525
+        ]
+      },
+      "properties": {
+        "name": "Peninsula Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 1670698,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/1670698",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5680692,
+          41.7580609
+        ]
+      },
+      "properties": {
+        "name": "Dragons Mouth",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707979,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707979",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5491803,
+          41.7280609
+        ]
+      },
+      "properties": {
+        "name": "Bearpaw Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707981,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707981",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5458469,
+          41.7444497
+        ]
+      },
+      "properties": {
+        "name": "Balcony Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707983,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707983",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5450136,
+          41.7450053
+        ]
+      },
+      "properties": {
+        "name": "Boulevard Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707985,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707985",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5186247,
+          41.7025053
+        ]
+      },
+      "properties": {
+        "name": "Natural Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707987,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707987",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5141803,
+          41.7083386
+        ]
+      },
+      "properties": {
+        "name": "Brushy Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707988,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707988",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5141803,
+          41.7086164
+        ]
+      },
+      "properties": {
+        "name": "Venetian Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707989,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707989",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5135314,
+          41.7092616
+        ]
+      },
+      "properties": {
+        "name": "Chocolate Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707990,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707990",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5139025,
+          41.709172
+        ]
+      },
+      "properties": {
+        "name": "Hopkins Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707991,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707991",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5114025,
+          41.7083386
+        ]
+      },
+      "properties": {
+        "name": "Sentinel Bridge",
+        "gnis_feature_class": "Arch",
+        "gnis_id": 2707992,
+        "gnis_url": "https://edits.nationalmap.gov/apps/gaz-domestic/public/summary/2707992",
+        "county": "Siskiyou",
+        "state": "CA"
+      }
+    }
+  ]
+}
