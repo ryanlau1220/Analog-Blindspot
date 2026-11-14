@@ -2,10 +2,11 @@ import type { Dispatch, ReactNode } from "react";
 import type { Site, SiteId } from "../data/types";
 import { EXAGGERATIONS, type SceneAction, type SceneState } from "../scene/state";
 
-const SITES: Array<{ id: SiteId; label: string }> = [
-  { id: "moon", label: "Moon · Marius Hills Pit" },
-  { id: "earth", label: "Earth · Lava Beds" },
-];
+const SITE_LABELS: Record<SiteId, string> = {
+  moon: "Moon · Marius Hills Pit",
+  earth: "Earth · Lava Beds",
+  lanzarote: "Earth · Lanzarote",
+};
 
 function Seg({
   active,
@@ -43,10 +44,13 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function ControlPanel({
+  sites,
   site,
   state,
   dispatch,
 }: {
+  /** only sites present in sites.json (validated data) are offered */
+  sites: Site[];
   site: Site;
   state: SceneState;
   dispatch: Dispatch<SceneAction>;
@@ -54,14 +58,14 @@ export function ControlPanel({
   return (
     <div className="absolute inset-x-3 bottom-3 flex flex-wrap items-end gap-x-6 gap-y-3 rounded-lg bg-black/65 px-4 py-3 backdrop-blur sm:inset-x-auto sm:right-6 sm:bottom-6 sm:max-w-3xl">
       <Group title="Site">
-        {SITES.map((s) => (
+        {sites.map((s) => (
           <Seg
             key={s.id}
             testId={`site-${s.id}`}
             active={state.site === s.id}
             onClick={() => dispatch({ type: "selectSite", site: s.id })}
           >
-            {s.label}
+            {SITE_LABELS[s.id]}
           </Seg>
         ))}
       </Group>

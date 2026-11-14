@@ -36,24 +36,26 @@ class Roi:
         return self.right - self.left
 
 
-def to_utm(lon: float, lat: float) -> tuple[float, float]:
-    return Transformer.from_crs(WGS84, UTM10N, always_xy=True).transform(lon, lat)
+def to_utm(lon: float, lat: float, crs: str = UTM10N, src_crs: str = WGS84) -> tuple[float, float]:
+    return Transformer.from_crs(src_crs, crs, always_xy=True).transform(lon, lat)
 
 
-def snapped_roi(center_lon: float, center_lat: float, size_m: float, snap_m: float) -> Roi:
-    """Square ROI of ``size_m`` whose corners sit on a ``snap_m`` grid in UTM 10N."""
+def snapped_roi(
+    center_lon: float, center_lat: float, size_m: float, snap_m: float, crs: str = UTM10N, src_crs: str = WGS84
+) -> Roi:
+    """Square ROI of ``size_m`` whose corners sit on a ``snap_m`` grid in the metric ``crs``."""
     if size_m % snap_m:
         raise ValueError("size_m must be a multiple of snap_m")
-    x, y = to_utm(center_lon, center_lat)
+    x, y = to_utm(center_lon, center_lat, crs, src_crs)
     left = math.floor((x - size_m / 2) / snap_m + 0.5) * snap_m
     bottom = math.floor((y - size_m / 2) / snap_m + 0.5) * snap_m
     return Roi(left, bottom, left + size_m, bottom + size_m)
 
 
-def read_roi(path: Path, roi: Roi) -> tuple[np.ndarray, np.ndarray, Affine, dict]:
+def read_roi(path: Path, roi: Roi, epsg: int = 32610) -> tuple[np.ndarray, np.ndarray, Affine, dict]:
     with rasterio.open(path) as ds:
-        if ds.crs.to_epsg() != 32610:
-            raise ValueError(f"expected EPSG:32610, got {ds.crs}")
+        if ds.crs.to_epsg() != epsg:
+            raise ValueError(f"expected EPSG:{epsg}, got {ds.crs}")
         b = ds.bounds
         if roi.left < b.left or roi.right > b.right or roi.bottom < b.bottom or roi.top > b.top:
             raise ValueError(f"ROI {roi} outside raster bounds {b}")
@@ -67,12 +69,14 @@ def read_roi(path: Path, roi: Roi) -> tuple[np.ndarray, np.ndarray, Affine, dict
     return z, valid_mask(z, prof["nodata"]), tr, prof
 
 
-def load_landmarks(path: Path) -> list[dict]:
+def load_landmarks(path: Path, crs: str = UTM10N) -> list[dict]:
+    """Landmark points projected to ``crs``; the file's ``source.crs`` (default WGS84) is honoured."""
     data = json.loads(path.read_text())
+    src = data.get("source", {}).get("crs", WGS84)
     out = []
     for f in data["features"]:
         lon, lat = f["geometry"]["coordinates"]
-        x, y = to_utm(lon, lat)
+        x, y = to_utm(lon, lat, crs, src)
         out.append({**f["properties"], "lon": lon, "lat": lat, "utm_x": x, "utm_y": y})
     return out
 
@@ -129,8 +133,13 @@ def local_relief(z: np.ndarray, valid: np.ndarray, tr: Affine, x: float, y: floa
     }
 
 
-def relief_baseline(z: np.ndarray, valid: np.ndarray, tr: Affine, radius_m: float, n: int, seed: int) -> np.ndarray:
-    """Relief at ``n`` reproducible random points in the ROI (margin = radius)."""
+def relief_baseline(
+    z: np.ndarray, valid: np.ndarray, tr: Affine, radius_m: float, n: int, seed: int, min_valid: float = 0.0
+) -> np.ndarray:
+    """Relief at ``n`` reproducible random points in the ROI (margin = radius).
+
+    Points whose disk is less than ``min_valid`` valid are skipped (e.g. at a coastline).
+    """
     rng = np.random.default_rng(seed)
     h, w = z.shape
     cell = tr.a
@@ -138,9 +147,9 @@ def relief_baseline(z: np.ndarray, valid: np.ndarray, tr: Affine, radius_m: floa
     out = []
     for r, c in zip(rng.integers(m, h - m, n), rng.integers(m, w - m, n), strict=True):
         x, y = tr @ (c + 0.5, r + 0.5)
-        rel = local_relief(z, valid, tr, x, y, radius_m)["relief_m"]
-        if rel is not None:
-            out.append(rel)
+        lr = local_relief(z, valid, tr, x, y, radius_m)
+        if lr["relief_m"] is not None and (lr["valid_fraction"] or 0.0) >= min_valid:
+            out.append(lr["relief_m"])
     return np.array(out)
 
 

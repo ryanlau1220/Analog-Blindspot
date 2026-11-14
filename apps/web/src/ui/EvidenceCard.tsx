@@ -20,7 +20,13 @@ export function EvidenceCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-widest text-amber-300/80">
-            {landmark.kind === "pit" ? "Mapped pit" : "Named natural bridge"}
+            {
+              {
+                pit: "Mapped pit",
+                natural_bridge: "Named natural bridge",
+                jameo: "Named jameo (lava-tube collapse opening)",
+              }[landmark.kind]
+            }
           </p>
           <h2 className="text-lg text-white">{landmark.name}</h2>
         </div>

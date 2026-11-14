@@ -1,6 +1,6 @@
 /** Shapes of public/data/sites.json, written by `uv run export-web`. */
 
-export type SiteId = "moon" | "earth";
+export type SiteId = "moon" | "earth" | "lanzarote";
 
 export interface HeightsAsset {
   file: string;
@@ -36,7 +36,7 @@ export interface Variant {
 export interface Landmark {
   id: string;
   name: string;
-  kind: "pit" | "natural_bridge";
+  kind: "pit" | "natural_bridge" | "jameo";
   /** metres east of the ROI north-west corner */
   x_m: number;
   /** metres south of the ROI north-west corner */

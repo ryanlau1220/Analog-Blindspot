@@ -715,6 +715,9 @@ def main() -> int:
         ],
     }
     DATASETS_DIR.mkdir(parents=True, exist_ok=True)
+    phase_d = DATASETS_DIR / "manifest_phase_d.json"
+    if phase_d.exists():  # keep the Phase D record when Phase A is regenerated
+        manifest["phase_d"] = json.loads(phase_d.read_text())
     MANIFEST_PATH.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
     print(f"gate={'PASS' if gate.passed else 'FAIL'}; wrote {rel(MANIFEST_PATH)}", file=sys.stderr)
     return 0 if gate.passed else 1

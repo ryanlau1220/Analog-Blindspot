@@ -1,0 +1,47 @@
+{
+  "generated_utc": "2026-11-14T12:15:08+00:00",
+  "pipeline_version": "phase-d-1",
+  "gate": {
+    "status": "blocked",
+    "checks": [
+      {
+        "name": "lanzarote:retrieved:MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "passed": false,
+        "detail": "not found in datasets/raw/cnig_mdt02_lanzarote/ (manual download)"
+      }
+    ]
+  },
+  "dataset": {
+    "id": "cnig_mdt02_lanzarote",
+    "role": "earth_candidate_2",
+    "status": "awaiting_manual_download",
+    "site": "Lanzarote / Malpa\u00eds de La Corona, Canary Islands, Spain",
+    "title": "MDT02 - 2\u00aa cobertura (PNOA-LiDAR), Modelo Digital del Terreno 2 m",
+    "catalog_url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02",
+    "tiles_identified": [
+      {
+        "filename": "MDT02-REGCAN95-HU28-1080-4-COB2.TIF",
+        "cnig_sec": "10325475",
+        "detail_url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475",
+        "catalog_mb": 72.01,
+        "catalog_year": "2015"
+      },
+      {
+        "filename": "MDT02-REGCAN95-HU28-1080-2-COB2.TIF",
+        "cnig_sec": "10325533",
+        "detail_url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325533",
+        "catalog_mb": 58.92,
+        "catalog_year": "2015"
+      }
+    ],
+    "missing_files": [
+      "MDT02-REGCAN95-HU28-1080-4-COB2.TIF"
+    ],
+    "why_manual": "CNIG direct download requires reCAPTCHA and an interactive licence step; it is not scripted.",
+    "instructions": [
+      "Open each detail_url, accept the licence and download the file into datasets/raw/cnig_mdt02_lanzarote/",
+      "Keep the original file name, then run: uv run phase-d && uv run export-web"
+    ],
+    "license": "Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required"
+  }
+}

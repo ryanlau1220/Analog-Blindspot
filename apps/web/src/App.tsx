@@ -71,7 +71,7 @@ function Experience({ index }: { index: SitesIndex }) {
         />
       ) : (
         <>
-          <ControlPanel site={site} state={state} dispatch={dispatch} />
+          <ControlPanel sites={index.sites} site={site} state={state} dispatch={dispatch} />
           <button
             type="button"
             data-testid="story-toggle"

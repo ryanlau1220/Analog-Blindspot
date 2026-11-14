@@ -18,6 +18,8 @@ dependencies = [
 [project.scripts]
 fetch-sources = "analog_blindspot_science.fetch_sources:main"
 fetch-landmarks = "analog_blindspot_science.fetch_landmarks:main"
+fetch-landmarks-es = "analog_blindspot_science.fetch_landmarks_es:main"
+phase-d = "analog_blindspot_science.phase_d:main"
 phase-a = "analog_blindspot_science.phase_a:main"
 export-web = "analog_blindspot_science.export_web:main"
 

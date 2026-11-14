@@ -17,8 +17,10 @@ EARTH_DTM = RAW_DIR / "ot_ca23_williams" / "LAVA_GEG_50C_COG.tif"
 
 pytestmark = [
     pytest.mark.data,
-    pytest.mark.skipif(not (MOON_DTM.exists() and EARTH_DTM.exists() and MANIFEST_PATH.exists()),
-                       reason="source rasters / manifest not present"),
+    pytest.mark.skipif(
+        not (MOON_DTM.exists() and EARTH_DTM.exists() and MANIFEST_PATH.exists()),
+        reason="source rasters / manifest not present",
+    ),
 ]
 
 
@@ -53,8 +55,17 @@ def test_gate_passed_and_all_sources_retrieved(manifest):
 
 def test_manifest_has_required_provenance_fields(manifest):
     for ds in manifest["datasets"]:
-        for key in ("landing_page", "product_id", "acquisition", "license", "horizontal_reference",
-                    "vertical_reference", "measured", "known_limitations", "citations"):
+        for key in (
+            "landing_page",
+            "product_id",
+            "acquisition",
+            "license",
+            "horizontal_reference",
+            "vertical_reference",
+            "measured",
+            "known_limitations",
+            "citations",
+        ):
             assert ds.get(key), f"{ds['id']} missing {key}"
         assert ds["measured"]["dtm"]["valid_fraction"] > 0
 

@@ -7,7 +7,7 @@ import { CameraRig } from "./CameraRig";
 import { type LabelRegistry, LandmarkLabels, Landmarks } from "./Landmarks";
 import { cameraPreset, poseKey, type SceneState, siteDatum } from "./state";
 
-const SURFACE = { moon: "#b9b4aa", earth: "#a99b86" } as const;
+const SURFACE: Record<Site["id"], string> = { moon: "#b9b4aa", earth: "#a99b86", lanzarote: "#8f8a84" };
 
 export function cutZ(site: Site, position: number): number {
   return -site.extent_m / 2 + position * site.extent_m;

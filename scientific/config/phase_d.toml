@@ -1,0 +1,61 @@
+# Phase D: Lanzarote / Malpaís de La Corona (CNIG PNOA-LiDAR MDT02, 2nd coverage).
+#
+# Tiles were identified on 2026-11-14 by querying the CNIG download centre
+# (archivosSerie, codSerie=MDT02) at each NGBE landmark point. The download
+# centre gates direct downloads behind reCAPTCHA and a licence step, so the
+# files are fetched manually in a browser and placed in
+# datasets/raw/cnig_mdt02_lanzarote/. They are then verified here.
+
+pipeline_version = "phase-d-1"
+product_id = "cnig_mdt02_lanzarote"
+raw_subdir = "cnig_mdt02_lanzarote"
+
+[[tile]]
+filename = "MDT02-REGCAN95-HU28-1080-4-COB2.TIF"
+cnig_sec = "10325475"
+detail_url = "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475"
+catalog_mb = 72.01
+catalog_year = "2015"
+covers = ["Jameo de la Gente", "Jameo Redondo", "Jameo Cumplido", "Jameo de Puerta Falsa",
+          "Cueva de los Verdes", "Jameos del Agua"]
+
+[[tile]]
+filename = "MDT02-REGCAN95-HU28-1080-2-COB2.TIF"
+cnig_sec = "10325533"
+detail_url = "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325533"
+catalog_mb = 58.92
+catalog_year = "2015"
+covers = ["Jameo de la Gente", "Jameo Redondo", "Jameo Cumplido"]
+# Only needed if the ROI crosses the western edge of 1080-4.
+optional = true
+
+[product]
+title = "MDT02 - 2ª cobertura (PNOA-LiDAR), Modelo Digital del Terreno 2 m"
+catalog_url = "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02"
+format = "COG GeoTIFF"
+expected_epsg = 4083  # REGCAN95 / UTM zone 28N (filename HU28; CNIG: REGCAN95 + UTM in Canarias)
+native_res_m = 2.0
+heights = "Orthometric (CNIG product description); geoid model not stated on the download page"
+license = "Orden FOM/2807/2015 licence, compatible with CC BY 4.0; attribution required"
+license_url = "http://www.ign.es/resources/licencia/Condiciones_licenciaUso_IGN.pdf"
+attribution_unmodified = "MDT02-cob2 2015-2021 CC-BY 4.0 scne.es"
+attribution_derived = "Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es"
+
+[roi]
+name = "Malpaís de La Corona jameos (Cueva de los Verdes - Jameos del Agua)"
+center_lon = -13.4463
+center_lat = 29.1622
+size_m = 3000.0  # divisible by every coarsening target
+snap_m = 60.0
+min_valid_fraction = 0.9  # the ROI's east edge approaches the coast
+landmark_file = "landmarks/lanzarote_ngbe.geojson"
+required_landmarks = ["Jameo de la Gente", "Jameo Redondo", "Jameo Cumplido", "Jameo de Puerta Falsa",
+                      "Cueva de los Verdes", "Jameos del Agua"]
+
+[coarsen]
+targets_m = [4.0, 10.0, 30.0, 60.0]
+method = "block_mean"
+min_valid_fraction = 0.5
+
+[landmark_check]
+radius_m = 30.0  # same measure as Lava Beds

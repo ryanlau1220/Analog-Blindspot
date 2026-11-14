@@ -62,8 +62,15 @@ def write_normal_map(z: np.ndarray, cell: float, path: Path) -> dict:
 def write_heights(z: np.ndarray, path: Path) -> dict:
     a = np.ascontiguousarray(z, dtype="<f4")
     path.write_bytes(a.tobytes())
-    return {"file": path.name, "dtype": "float32-le", "rows": a.shape[0], "cols": a.shape[1],
-            "nodata": "NaN", "bytes": path.stat().st_size, "sha256": sha256_file(path)}
+    return {
+        "file": path.name,
+        "dtype": "float32-le",
+        "rows": a.shape[0],
+        "cols": a.shape[1],
+        "nodata": "NaN",
+        "bytes": path.stat().st_size,
+        "sha256": sha256_file(path),
+    }
 
 
 def finite_stats(z: np.ndarray) -> dict:
@@ -81,8 +88,17 @@ def to_display_grid(src: np.ndarray, src_tr: Affine, crs, left: float, top: floa
     """Area-average (GDAL 'average', coverage-weighted) onto the fixed display grid."""
     cell = extent / DISPLAY_N
     dst = np.full((DISPLAY_N, DISPLAY_N), np.nan, dtype=np.float32)
-    reproject(src, dst, src_transform=src_tr, src_crs=crs, dst_transform=Affine(cell, 0, left, 0, -cell, top),
-              dst_crs=crs, resampling=Resampling.average, src_nodata=np.nan, dst_nodata=np.nan)
+    reproject(
+        src,
+        dst,
+        src_transform=src_tr,
+        src_crs=crs,
+        dst_transform=Affine(cell, 0, left, 0, -cell, top),
+        dst_crs=crs,
+        resampling=Resampling.average,
+        src_nodata=np.nan,
+        dst_nodata=np.nan,
+    )
     return dst
 
 
@@ -134,35 +150,43 @@ def export_moon(man: dict, out: Path) -> dict:
         "crs": "Equirectangular Moon (1737.4 km sphere), map metres",
         "vertical": ds["vertical_reference"]["reference"],
         "provenance": provenance(ds),
-        "variants": [{
-            "id": "4m",
-            "resolution_m": 4.0,
-            "observed": True,
-            "label": "Observed: LROC NAC DTM, native 4 m posts",
-            "display": {"grid": DISPLAY_N, "cell_m": cell, "geometry": "native DTM posts (no resampling)"},
-            "heights": heights,
-            "elevation": finite_stats(z),
-            "normal_map": {**normal, "filter": "linear", "basis": "Horn gradients of the 4 m DTM"},
-            "derived_from": {"path": asset["path"], "sha256": asset["sha256"]},
-        }],
-        "drape": {"file": "ortho.png", "px": DISPLAY_N, "m_per_px": cell,
-                  "label": "LROC NAC orthophoto M1274609891, 4 m version (image data, not elevation)"},
-        "landmarks": [{
-            "id": "marius_hills_pit",
-            "name": pit["name"],
-            "kind": "pit",
-            # local metres from the ROI north-west corner
-            "x_m": (loc["col_f"] - w["col_off"]) * cell,
-            "y_m": (loc["row_f"] - w["row_off"]) * cell,
-            "surface_elev_m": pa["rim_median_elev_m"],
-            "source": pit["citation"],
-            "notes": [
-                f"Pit interior is nodata in this DTM: {pa['nodata_gap']['extent_ew_m']:.0f} x "
-                f"{pa['nodata_gap']['extent_ns_m']:.0f} m gap. Floor not measured.",
-                f"Valid funnel pixels reach >= {pa['measured_depression_m']:.1f} m below the rim (lower bound).",
-                f"Atlas depth {pit['atlas_depth_m']:g} m is from separate stereo modelling.",
-            ],
-        }],
+        "variants": [
+            {
+                "id": "4m",
+                "resolution_m": 4.0,
+                "observed": True,
+                "label": "Observed: LROC NAC DTM, native 4 m posts",
+                "display": {"grid": DISPLAY_N, "cell_m": cell, "geometry": "native DTM posts (no resampling)"},
+                "heights": heights,
+                "elevation": finite_stats(z),
+                "normal_map": {**normal, "filter": "linear", "basis": "Horn gradients of the 4 m DTM"},
+                "derived_from": {"path": asset["path"], "sha256": asset["sha256"]},
+            }
+        ],
+        "drape": {
+            "file": "ortho.png",
+            "px": DISPLAY_N,
+            "m_per_px": cell,
+            "label": "LROC NAC orthophoto M1274609891, 4 m version (image data, not elevation)",
+        },
+        "landmarks": [
+            {
+                "id": "marius_hills_pit",
+                "name": pit["name"],
+                "kind": "pit",
+                # local metres from the ROI north-west corner
+                "x_m": (loc["col_f"] - w["col_off"]) * cell,
+                "y_m": (loc["row_f"] - w["row_off"]) * cell,
+                "surface_elev_m": pa["rim_median_elev_m"],
+                "source": pit["citation"],
+                "notes": [
+                    f"Pit interior is nodata in this DTM: {pa['nodata_gap']['extent_ew_m']:.0f} x "
+                    f"{pa['nodata_gap']['extent_ns_m']:.0f} m gap. Floor not measured.",
+                    f"Valid funnel pixels reach >= {pa['measured_depression_m']:.1f} m below the rim (lower bound).",
+                    f"Atlas depth {pit['atlas_depth_m']:g} m is from separate stereo modelling.",
+                ],
+            }
+        ],
         "subsurface": "not measured",
         "facts": {
             "pit_lat": pit["lat"],
@@ -187,15 +211,20 @@ def export_moon(man: dict, out: Path) -> dict:
     }
 
 
-def export_earth(man: dict, out: Path) -> dict:
-    ds = next(d for d in man["datasets"] if d["id"] == "ot_ca23_williams")
-    roi = next(r for r in man["rois"] if r["id"] == "earth_lava_beds_cave_loop")
-    b = roi["bounds_utm10n"]
-    extent = b["right"] - b["left"]
-    assets = {a["resolution_m"]: a for a in man["derived_assets"] if a["source"] == "ot_ca23_williams"}
+def export_variants(
+    assets: dict,
+    b: dict,
+    extent: float,
+    out: Path,
+    resolutions: list[float],
+    native_res: float,
+    observed_label: str,
+    source_phrase: str,
+) -> tuple[list[dict], np.ndarray]:
+    """Write heights + normal map per resolution onto the shared 257x257 display grid."""
     variants = []
     native = None
-    for res in EARTH_VARIANTS_M:
+    for res in resolutions:
         a = assets[res]
         z, tr, crs = read_masked(REPO_ROOT / a["path"])
         if (tr.c, tr.f) != (b["left"], b["top"]):
@@ -211,39 +240,74 @@ def export_earth(man: dict, out: Path) -> dict:
         else:
             zn, ncell = z, res
         normal = write_normal_map(zn, ncell, vd / "normal.webp")
-        observed = res == 0.5
+        observed = res == native_res
         if observed:
             native = disp
-        variants.append({
-            "id": res_tag(res),
-            "resolution_m": res,
-            "observed": observed,
-            "label": ("Observed: NCALM LiDAR bare-earth DTM, 0.5 m" if observed else
-                      f"SIMULATED COARSENING to {res:g} m (block mean of the 0.5 m LiDAR). Not an observation."),
-            "display": {"grid": DISPLAY_N, "cell_m": extent / DISPLAY_N,
-                        "geometry": f"coverage-weighted average of the {res:g} m grid onto the display grid"},
-            "heights": heights,
-            "elevation": finite_stats(disp),
-            "normal_map": {**normal, "filter": "linear" if res < 4 else "nearest",
-                           "basis": (f"Horn gradients of the {res:g} m grid" if res >= NORMAL_MAX_RES_M else
-                                     "Horn gradients of a 1 m block mean of the 0.5 m DTM (display cap)")},
-            "derived_from": {"path": a["path"], "sha256": a["sha256"]},
-        })
+        variants.append(
+            {
+                "id": res_tag(res),
+                "resolution_m": res,
+                "observed": observed,
+                "label": observed_label
+                if observed
+                else f"SIMULATED COARSENING to {res:g} m (block mean of {source_phrase}). Not an observation.",
+                "display": {
+                    "grid": DISPLAY_N,
+                    "cell_m": extent / DISPLAY_N,
+                    "geometry": f"coverage-weighted average of the {res:g} m grid onto the display grid",
+                },
+                "heights": heights,
+                "elevation": finite_stats(disp),
+                "normal_map": {
+                    **normal,
+                    "filter": "linear" if res < 4 else "nearest",
+                    "basis": (
+                        f"Horn gradients of the {res:g} m grid"
+                        if res >= NORMAL_MAX_RES_M
+                        else f"Horn gradients of a 1 m block mean of the {res:g} m DTM (display cap)"
+                    ),
+                },
+                "derived_from": {"path": a["path"], "sha256": a["sha256"]},
+            }
+        )
+    if native is None:
+        raise ValueError("no observed variant exported")
+    return variants, native
+
+
+def export_earth(man: dict, out: Path) -> dict:
+    ds = next(d for d in man["datasets"] if d["id"] == "ot_ca23_williams")
+    roi = next(r for r in man["rois"] if r["id"] == "earth_lava_beds_cave_loop")
+    b = roi["bounds_utm10n"]
+    extent = b["right"] - b["left"]
+    assets = {a["resolution_m"]: a for a in man["derived_assets"] if a["source"] == "ot_ca23_williams"}
+    variants, native = export_variants(
+        assets,
+        b,
+        extent,
+        out,
+        EARTH_VARIANTS_M,
+        0.5,
+        "Observed: NCALM LiDAR bare-earth DTM, 0.5 m",
+        "the 0.5 m LiDAR",
+    )
     assert native is not None
     landmarks = []
     for lm in roi["landmarks"]:
         x, y = lm["utm_x"] - b["left"], b["top"] - lm["utm_y"]
         i, j = int(y / (extent / DISPLAY_N)), int(x / (extent / DISPLAY_N))
-        landmarks.append({
-            "id": f"gnis_{lm['gnis_id']}",
-            "name": lm["name"],
-            "kind": "natural_bridge",
-            "x_m": x,
-            "y_m": y,
-            "surface_elev_m": float(native[i, j]),
-            "source": f"USGS GNIS feature {lm['gnis_id']} ({lm['gnis_url']})",
-            "notes": ["GNIS point position is approximate (tens of metres)."],
-        })
+        landmarks.append(
+            {
+                "id": f"gnis_{lm['gnis_id']}",
+                "name": lm["name"],
+                "kind": "natural_bridge",
+                "x_m": x,
+                "y_m": y,
+                "surface_elev_m": float(native[i, j]),
+                "source": f"USGS GNIS feature {lm['gnis_id']} ({lm['gnis_url']})",
+                "notes": ["GNIS point position is approximate (tens of metres)."],
+            }
+        )
     return {
         "id": "earth",
         "body": "Earth",
@@ -263,13 +327,16 @@ def export_earth(man: dict, out: Path) -> dict:
             "background_points": 400,
             "background_note": "400 reproducible random points (seed 20261114) inside the same ROI",
             "method": roi["coarsening"]["method"],
-            "levels": [{
-                "resolution_m": lv["resolution_m"],
-                "observed": lv["resolution_m"] == 0.5,
-                "landmark_relief_median_m": lv["landmark_relief_median_m"],
-                "background_relief_median_m": lv["background_relief_p50_m"],
-                "slope_deg_p95": lv["slope_deg_p95"],
-            } for lv in roi["resolution_levels"]],
+            "levels": [
+                {
+                    "resolution_m": lv["resolution_m"],
+                    "observed": lv["resolution_m"] == 0.5,
+                    "landmark_relief_median_m": lv["landmark_relief_median_m"],
+                    "background_relief_median_m": lv["background_relief_p50_m"],
+                    "slope_deg_p95": lv["slope_deg_p95"],
+                }
+                for lv in roi["resolution_levels"]
+            ],
             "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark.",
         },
     }
@@ -303,6 +370,100 @@ CANDIDATES = [
 ]
 
 
+LANZAROTE_VARIANTS_M = [2.0, 4.0, 10.0, 30.0]
+
+
+def export_lanzarote(rec: dict, out: Path) -> dict:
+    ds, roi = rec["dataset"], rec["roi"]
+    b = roi["bounds"]
+    extent = b["right"] - b["left"]
+    assets = {a["resolution_m"]: a for a in rec["derived_assets"]}
+    variants, native = export_variants(
+        assets,
+        b,
+        extent,
+        out,
+        LANZAROTE_VARIANTS_M,
+        2.0,
+        "Observed: CNIG PNOA-LiDAR MDT02 bare-earth DTM, 2 m",
+        "the 2 m MDT02",
+    )
+    cell = extent / DISPLAY_N
+    landmarks = []
+    for lm in roi["landmarks"]:
+        x, y = lm["utm_x"] - b["left"], b["top"] - lm["utm_y"]
+        h = native[min(int(y / cell), DISPLAY_N - 1), min(int(x / cell), DISPLAY_N - 1)]
+        landmarks.append(
+            {
+                "id": f"ngbe_{lm['ngbe_id']}",
+                "name": lm["name"],
+                "kind": "jameo",
+                "x_m": x,
+                "y_m": y,
+                "surface_elev_m": float(h) if np.isfinite(h) else float(np.nanmedian(native)),
+                "source": f"IGN NGBE feature {lm['ngbe_id']} (https://www.ign.es/web/ign/portal/ide-area-nomenclatura)",
+                "notes": ["NGBE point from the 1:25 000 base map; position is approximate."],
+            }
+        )
+    lic = ds["license"]
+    return {
+        "id": "lanzarote",
+        "body": "Earth",
+        "name": "Malpaís de La Corona, Lanzarote",
+        "extent_m": extent,
+        "crs": b["crs"] + " (REGCAN95 / UTM zone 28N)",
+        "vertical": ds["vertical_reference"]["heights"],
+        "provenance": {
+            "dataset_id": ds["id"],
+            "title": ds["title"],
+            "product_id": ", ".join(f["filename"] for f in ds["files"]),
+            "doi": None,
+            "landing_page": ds["files"][0]["detail_url"],
+            "license": lic["terms"],
+            "credit": lic["attribution_derived"],
+            "citation": lic["attribution_unmodified"],
+        },
+        "variants": variants,
+        "drape": None,
+        "landmarks": landmarks,
+        "subsurface": "not measured",
+    }
+
+
+def lanzarote_candidate(rec: dict | None) -> dict:
+    base = {
+        "id": "lanzarote",
+        "site": "Lanzarote / Malpaís de La Corona, Canary Islands, Spain",
+        "url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02",
+    }
+    if rec and rec["dataset"]["status"] == "validated":
+        return {
+            **base,
+            "status": "validated",
+            "elevation_product": "CNIG PNOA-LiDAR MDT02, 2 m ("
+            + ", ".join(f["filename"] for f in rec["dataset"]["files"])
+            + ")",
+            "note": "Downloaded manually and checked pixel by pixel in Phase D. Surface only.",
+            "url": rec["dataset"]["files"][0]["detail_url"],
+        }
+    if rec and rec["dataset"]["status"] == "awaiting_manual_download":
+        t = rec["dataset"]["tiles_identified"][0]
+        return {
+            **base,
+            "status": "not_verified",
+            "elevation_product": f"CNIG MDT02 tile {t['filename']} (catalog: 2 m, {t['catalog_mb']} MB)",
+            "note": "Tile over the jameos located via the CNIG catalogue; awaiting manual download, so no "
+            "pixels have been checked.",
+            "url": t["detail_url"],
+        }
+    return {
+        **base,
+        "status": "not_verified",
+        "elevation_product": "CNIG PNOA-LiDAR MDT02 (catalog-stated 2 m bare-earth DTM)",
+        "note": "Phase D validation failed or has not been run; see datasets/manifest_phase_d.json.",
+    }
+
+
 def main() -> int:
     man = json.loads(MANIFEST_PATH.read_text())
     if man["phase_a_gate"]["status"] != "pass":
@@ -310,13 +471,17 @@ def main() -> int:
         return 1
     WEB_DATA.mkdir(parents=True, exist_ok=True)
     sites = [export_moon(man, WEB_DATA / "moon"), export_earth(man, WEB_DATA / "earth")]
+    phase_d = man.get("phase_d")
+    if phase_d and phase_d["dataset"]["status"] == "validated":
+        sites.append(export_lanzarote(phase_d, WEB_DATA / "lanzarote"))
+    candidates = [c if c["id"] != "lanzarote" else lanzarote_candidate(phase_d) for c in CANDIDATES]
     index = {
         "asset_version": ASSET_VERSION,
         "manifest_generated_utc": man["generated_utc"],
         "manifest_sha256": sha256_file(MANIFEST_PATH),
         "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
         "sites": sites,
-        "candidates": CANDIDATES,
+        "candidates": candidates,
     }
     (WEB_DATA / "sites.json").write_text(json.dumps(index, indent=2, allow_nan=False) + "\n")
     total = sum(p.stat().st_size for p in WEB_DATA.rglob("*") if p.is_file())

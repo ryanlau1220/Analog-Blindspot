@@ -1,0 +1,124 @@
+{
+  "type": "FeatureCollection",
+  "source": {
+    "name": "IGN Nomenclátor Geográfico Básico de España (NGBE), INSPIRE WFS",
+    "service": "https://www.ign.es/wfs-inspire/ngbe",
+    "query": {
+      "service": "WFS",
+      "version": "2.0.0",
+      "request": "GetFeature",
+      "typeNames": "gn:NamedPlace",
+      "count": "1000",
+      "BBOX": "29.120,-13.500,29.200,-13.400,urn:ogc:def:crs:EPSG::4258"
+    },
+    "crs": "EPSG:4258",
+    "license": "CC BY 4.0 (IGN / scne.es)",
+    "retrieved_utc": "2026-11-14T12:03:59+00:00",
+    "selection": "type 'Elemento puntual del paisaje' and name matching '^(Jameo|Jameos|Cueva)\\\\b', of 119 places in the bbox",
+    "positional_note": "Points from the 1:25 000 BTN25 base map; approximate, not LiDAR-derived."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.460693,
+          29.16748
+        ]
+      },
+      "properties": {
+        "name": "Jameo de la Gente",
+        "ngbe_id": "2629323",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2629323"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.456909,
+          29.166321
+        ]
+      },
+      "properties": {
+        "name": "Jameo Redondo",
+        "ngbe_id": "2629326",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2629326"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.453979,
+          29.165527
+        ]
+      },
+      "properties": {
+        "name": "Jameo Cumplido",
+        "ngbe_id": "2629322",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2629322"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.450684,
+          29.163879
+        ]
+      },
+      "properties": {
+        "name": "Jameo de Puerta Falsa",
+        "ngbe_id": "2629324",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2629324"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.439392,
+          29.160278
+        ]
+      },
+      "properties": {
+        "name": "Cueva de los Verdes",
+        "ngbe_id": "2630216",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2630216"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -13.431824,
+          29.156921
+        ]
+      },
+      "properties": {
+        "name": "Jameos del Agua",
+        "ngbe_id": "2629328",
+        "ngbe_local_type": "Elemento puntual del paisaje",
+        "source_of_name": "MITMA.IGN.BTN25",
+        "ngbe_uri": "https://www.ign.es/wfs-inspire/ngbe?service=WFS&version=2.0.0&request=GetFeatureById&storedquery_id=urn:ogc:def:query:OGC-WFS::GetFeatureById&ID=ES.IGN.NGBE.2629328"
+      }
+    }
+  ]
+}

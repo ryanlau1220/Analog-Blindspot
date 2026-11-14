@@ -3,7 +3,7 @@ import type { HeightsAsset, SiteId, SitesIndex } from "./types";
 export const DATA_ROOT = `${import.meta.env.BASE_URL}data`;
 
 export function variantDir(site: SiteId, variantId: string): string {
-  return site === "moon" ? `${DATA_ROOT}/moon` : `${DATA_ROOT}/earth/${variantId}`;
+  return site === "moon" ? `${DATA_ROOT}/moon` : `${DATA_ROOT}/${site}/${variantId}`;
 }
 
 export function validateIndex(raw: unknown): SitesIndex {

@@ -137,3 +137,72 @@ There is no GPU here. Chrome fell back to SwiftShader (software), so frame rates
 The script requires 30 fps when it detects a hardware GPU and 2 fps on software rendering. **Hardware-GPU frame
 rate has not been measured yet.** The report and screenshots are written to `apps/web/perf-results/`
 (git-ignored).
+
+# Phase D: site expansion
+
+Status (2026-11-14): **Lanzarote is blocked on a manual download.** The exact tile is identified and the
+validation pipeline is ready, but no Lanzarote pixels have been checked yet. **Harrat Khaybar was not
+attempted.**
+
+## Lanzarote / Malpaís de La Corona
+
+**Landmarks.** `uv run fetch-landmarks-es` queries the IGN Nomenclátor Geográfico Básico de España (NGBE)
+INSPIRE WFS for the La Corona area. It keeps the six point features named as jameos or caves: Jameo de la
+Gente, Jameo Redondo, Jameo Cumplido, Jameo de Puerta Falsa, Cueva de los Verdes and Jameos del Agua. A geodetic
+vertex that is also called "Jameos del Agua" and the area name "Jameos de Arriba" are excluded. The positions
+come from the 1:25 000 BTN25 base map and are approximate. The output is
+`scientific/config/landmarks/lanzarote_ngbe.geojson`, which is committed.
+
+**Tiles.** I queried the CNIG download centre catalogue (`archivosSerie`, MDT02 2nd coverage) at each landmark
+point:
+
+| File | CNIG id | Catalogue size | Year | Covers |
+|---|---|---|---|---|
+| `MDT02-REGCAN95-HU28-1080-4-COB2.TIF` | 10325475 | 72.01 MB | 2015 | all six landmarks (required) |
+| `MDT02-REGCAN95-HU28-1080-2-COB2.TIF` | 10325533 | 58.92 MB | 2015 | western three (optional) |
+
+The CNIG detail page states: COG format, 2 m, REGCAN95 with UTM in the Canary Islands, orthometric heights, one
+file per MTN25 sheet. The licence is Orden FOM/2807/2015, which is compatible with CC BY 4.0. For derived
+products the required attribution is "Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es". The download
+page does not name the geoid model, so the manifest leaves it unstated.
+
+**Why the download is manual.** CNIG's direct download runs through reCAPTCHA and then an interactive licence
+step. I did not script around either. National WCS services were checked as an alternative.
+`servicios.idee.es/wcs-inspire/mdt` serves 5 m at its finest, which is not the MDT02 product. GRAFCAN's WCS
+paths returned 404.
+
+**To finish Lanzarote:**
+
+1. Open https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475 in a browser, accept the
+   licence and download the file.
+2. Put it, under its original name, in `datasets/raw/cnig_mdt02_lanzarote/`. Add `1080-2` (sec=10325533) only
+   if the gate asks for it.
+3. Run `cd scientific && uv run phase-d && uv run export-web`, then `pnpm perf`.
+
+**What `uv run phase-d` checks once the file is present:**
+
+- **Integrity:** byte size against the catalogue MB, then SHA-256, recorded in an `.ingest.json` sidecar.
+- **Projection and grid:** CRS is REGCAN95 / UTM 28N (EPSG:4083) and pixel spacing is 2 m.
+- **Coverage:** valid-pixel fraction per tile, and at least 90 % valid in the 3 km ROI (its east edge
+  approaches the coast).
+- **Landmarks:** all six NGBE points fall on valid pixels.
+- **Relief:** relief within 30 m of the jameos is greater than at 400 seeded random points. This is the same
+  measure used at Lava Beds.
+- **Outputs:** simulated coarsening to 4, 10, 30 and 60 m, derived GeoTIFFs tagged `SIMULATED`, and hillshade
+  previews.
+
+Tiles are mosaicked only if their grids are aligned, so nothing is resampled. Results go to
+`datasets/manifest_phase_d.json` and are also embedded in `datasets/manifest.json` under `phase_d`. Phase A
+keeps that key when it regenerates the manifest.
+
+If the gate passes, `export-web` adds a third site (2 m observed; 4, 10 and 30 m simulated) to the viewer, and
+the chapter-3 card switches to "data verified". Until then the card names the identified tile and says it is
+awaiting download. The validation branch is covered by `tests/test_phase_d.py`, which uses a synthetic tile in a
+temporary directory only. A version of that tile without depressions must fail the relief check, and it does.
+
+## Harrat Khaybar (optional, not attempted)
+
+The handoff's source is a 12.5 m ALOS-PALSAR-derived DEM from ASF Vertex, and that download needs a NASA
+Earthdata login. At 12.5 m it cannot support the 0.5 m coarsening experiment anyway (`resolution_insufficient`).
+It stays in the app as "not verified" with no profile. A substitute such as the 30 m Copernicus DEM would be a
+different product (a surface model, not a terrain model, and coarser), so I did not use one without agreement.

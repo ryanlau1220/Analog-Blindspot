@@ -1,7 +1,7 @@
 {
   "asset_version": "phase-b-1",
   "manifest_generated_utc": "2026-11-14T06:46:16+00:00",
-  "manifest_sha256": "6b434e039d0f5c42e9e5568b802a4d7352b4393e003d1062ecef255657b375b9",
+  "manifest_sha256": "d6c5e39a7644aac26883167dfc7c2be5f708eadcaf48b56acadcac91144c4fe0",
   "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
   "sites": [
     {
@@ -443,11 +443,11 @@
     },
     {
       "id": "lanzarote",
-      "site": "Lanzarote / La Corona, Canary Islands, Spain",
+      "site": "Lanzarote / Malpa\u00eds de La Corona, Canary Islands, Spain",
+      "url": "https://centrodedescargas.cnig.es/CentroDescargas/detalleArchivo?sec=10325475",
       "status": "not_verified",
-      "elevation_product": "CNIG PNOA-LiDAR MDT02 (catalog-stated 2 m bare-earth DTM)",
-      "note": "Catalog lists coverage, but the tile over the lava-tube surface has not been located or downloaded.",
-      "url": "https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02"
+      "elevation_product": "CNIG MDT02 tile MDT02-REGCAN95-HU28-1080-4-COB2.TIF (catalog: 2 m, 72.01 MB)",
+      "note": "Tile over the jameos located via the CNIG catalogue; awaiting manual download, so no pixels have been checked."
     },
     {
       "id": "harrat_khaybar",
