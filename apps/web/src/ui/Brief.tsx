@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import brandMark from "../assets/brand-mark.svg";
 import type { Site, SitesIndex } from "../data/types";
 import { CITATIONS } from "../story/analogy";
 import { buildFindings } from "../story/findings";
@@ -29,7 +30,9 @@ export function Brief({ index }: { index: SitesIndex }) {
       <article className="mx-auto max-w-[210mm] bg-white px-[12mm] py-[10mm] text-[9.5pt] leading-snug shadow print:max-w-none print:px-0 print:py-0 print:shadow-none">
         <header className="flex items-end justify-between border-b-2 border-zinc-900 pb-1.5">
           <div>
-            <p className="text-[8pt] uppercase tracking-[0.2em] text-zinc-500">Analog Blindspot</p>
+            <p className="flex items-center gap-2 text-[8pt] uppercase tracking-[0.2em] text-zinc-500">
+              <img src={brandMark} alt="" aria-hidden="true" width="22" height="22" /> Analog Blindspot
+            </p>
             <h1 className="text-[16pt] font-semibold">
               Field Validation Brief: Marius Hills Pit and Earth analogs
             </h1>

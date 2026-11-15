@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Pause, Play } from "lucide-react";
 import { type Dispatch, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import brandMark from "../assets/brand-mark.svg";
 import { AmbientSound } from "../audio/AmbientSound";
 import type { ExperimentLevel, Site, SitesIndex, Variant } from "../data/types";
 import type { SceneAction, SceneState } from "../scene/state";
@@ -40,8 +41,16 @@ export function TopBar({
   const inStory = story.mode === "story";
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-10 grid grid-cols-[1fr_auto] items-start gap-x-3 gap-y-2 p-3 sm:p-6">
-      <p className="pointer-events-auto self-center text-[9px] font-semibold tracking-[0.18em] whitespace-nowrap text-zinc-100 sm:text-[11px] sm:tracking-[0.35em]">
-        <span className="max-[360px]:hidden">ANALOG </span>BLINDSPOT
+      <p className="pointer-events-auto flex min-w-0 items-center gap-2 self-center text-[9px] font-semibold tracking-[0.18em] whitespace-nowrap text-zinc-100 sm:text-[11px] sm:tracking-[0.35em]">
+        <img
+          src={brandMark}
+          alt=""
+          aria-hidden="true"
+          width="30"
+          height="30"
+          className="h-7 w-7 shrink-0 sm:h-8 sm:w-8"
+        />
+        <span className="whitespace-nowrap max-[360px]:sr-only">ANALOG BLINDSPOT</span>
         <span className="ml-3 hidden font-normal tracking-normal text-zinc-400 lg:inline">
           Discover what planetary maps cannot tell us.
         </span>

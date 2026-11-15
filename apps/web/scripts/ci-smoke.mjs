@@ -77,6 +77,12 @@ try {
     });
     try {
       await page.goto(`${base}?test=1#scene=experiment`, { waitUntil: "networkidle" });
+      const iconHref = await page.locator('link[rel="icon"]').getAttribute("href");
+      if (!iconHref || !(await page.request.get(new URL(iconHref, base).href)).ok())
+        throw new Error("Favicon is missing or unreachable");
+      const logo = page.locator("header img").first();
+      if (!(await logo.evaluate((img) => img.complete && img.naturalWidth > 0)))
+        throw new Error("Brand mark did not load");
       const copyToggle = page.getByTestId("copy-toggle");
       await copyToggle.click();
       if ((await copyToggle.getAttribute("aria-expanded")) !== "false")
