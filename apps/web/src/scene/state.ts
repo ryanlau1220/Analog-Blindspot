@@ -5,7 +5,7 @@ import type { Site, SiteId, SitesIndex, Variant } from "../data/types";
  * site's first landmark (the pit) or the centroid of all landmarks; "section"
  * looks north at the cutaway face.
  */
-export const VIEWS = ["overview", "hero", "landmark", "section", "anomaly"] as const;
+export const VIEWS = ["overview", "hero", "landmark", "section", "anomaly", "feature"] as const;
 export type View = (typeof VIEWS)[number];
 
 /** Discrete, serialisable scene state. Every field is valid for every site. */
@@ -20,6 +20,8 @@ export interface SceneState {
   compare: boolean;
   /** show the unverified relief anomalies of the lattice search for the shown grid */
   search: boolean;
+  /** Coordinates in the site's terrain extent, identifying a specific search candidate. */
+  featuredAnomaly: { x_m: number; y_m: number } | null;
 }
 
 export const EXAGGERATIONS = [1, 2, 4] as const;
@@ -36,6 +38,7 @@ export type SceneAction =
   | { type: "setView"; view: View }
   | { type: "setCompare"; enabled: boolean }
   | { type: "setSearch"; enabled: boolean }
+  | { type: "setFeaturedAnomaly"; target: SceneState["featuredAnomaly"] }
   | { type: "applyPreset"; preset: ScenePreset };
 
 /** A partial target state, e.g. one story step. Applied field by field through the reducer. */
@@ -50,6 +53,7 @@ export interface ScenePreset {
   view?: View;
   compare?: boolean;
   search?: boolean;
+  featuredAnomaly?: SceneState["featuredAnomaly"];
 }
 
 export function findSite(index: SitesIndex, id: SiteId): Site {
@@ -86,6 +90,7 @@ export function initialState(index: SitesIndex, site: SiteId = "moon"): SceneSta
     view: "overview",
     compare: false,
     search: false,
+    featuredAnomaly: null,
   };
 }
 
@@ -108,6 +113,7 @@ function presetActions(index: SitesIndex, state: SceneState, p: ScenePreset): Sc
   if (p.view) out.push({ type: "setView", view: p.view });
   if (p.compare !== undefined) out.push({ type: "setCompare", enabled: p.compare });
   if (p.search !== undefined) out.push({ type: "setSearch", enabled: p.search });
+  if (p.featuredAnomaly !== undefined) out.push({ type: "setFeaturedAnomaly", target: p.featuredAnomaly });
   return out;
 }
 
@@ -125,6 +131,7 @@ export function reduce(index: SitesIndex, state: SceneState, action: SceneAction
         ...state,
         site: action.site,
         variantId: observedVariantId(site),
+        featuredAnomaly: null,
         drape: site.drape ? state.drape : "relief",
       };
     }
@@ -154,6 +161,13 @@ export function reduce(index: SitesIndex, state: SceneState, action: SceneAction
       return state.compare === action.enabled ? state : { ...state, compare: action.enabled };
     case "setSearch":
       return state.search === action.enabled ? state : { ...state, search: action.enabled };
+    case "setFeaturedAnomaly": {
+      const target = action.target;
+      const candidates =
+        findSite(index, state.site).experiment?.search?.levels.flatMap((l) => l.candidates) ?? [];
+      if (target && !candidates.some((c) => c.x_m === target.x_m && c.y_m === target.y_m)) return state;
+      return { ...state, featuredAnomaly: target };
+    }
     case "applyPreset":
       return presetActions(index, state, action.preset).reduce((s, a) => reduce(index, s, a), state);
   }
@@ -171,8 +185,9 @@ export interface CameraPose {
  */
 export function cameraPreset(
   site: Site,
-  state: Pick<SceneState, "exaggeration" | "view" | "cutaway">,
+  state: Pick<SceneState, "exaggeration" | "view" | "cutaway" | "featuredAnomaly">,
   wide = true,
+  featuredHeight?: number,
 ): CameraPose {
   const e = site.extent_m;
   const ex = state.exaggeration;
@@ -195,15 +210,28 @@ export function cameraPreset(
   const shift = (k: number): [number, number] => (wide ? [-k * 0.82 * e, k * 0.57 * e] : [0, 0]);
   switch (state.view) {
     case "anomaly": {
-      const candidate = site.experiment?.search?.levels.find((l) => l.observed)?.candidates[2];
+      const candidate = state.featuredAnomaly;
       if (!candidate)
         return { position: [0.62 * e, 0.42 * e + relief, 0.78 * e], target: [0, relief * 0.25, 0] };
       const x = candidate.x_m - half;
       const z = candidate.y_m - half;
+      const y =
+        featuredHeight !== undefined && Number.isFinite(featuredHeight)
+          ? (featuredHeight - datum) * ex
+          : focus.y;
       return {
-        position: [x + 0.12 * e, focus.y + 0.14 * e, z + 0.18 * e],
-        target: [x, focus.y, z],
+        position: [x + 0.08 * e, y + 0.095 * e, z + 0.12 * e],
+        target: [x, y, z],
       };
+    }
+    case "feature": {
+      const feature = lms[0];
+      if (!feature)
+        return { position: [0.62 * e, 0.42 * e + relief, 0.78 * e], target: [0, relief * 0.25, 0] };
+      const x = feature.x_m - half;
+      const y = (feature.surface_elev_m - datum) * ex;
+      const z = feature.y_m - half;
+      return { position: [x + 0.07 * e, y + 0.09 * e, z + 0.12 * e], target: [x, y, z] };
     }
     case "hero": {
       // Close oblique look at the focus (the pit): ~0.28 extent away, ~28 deg above the horizon.
@@ -237,5 +265,7 @@ export function cameraPreset(
 
 export function poseKey(state: SceneState, wide = true): string {
   const cut = state.view === "section" ? state.cutaway.position.toFixed(3) : "";
-  return `${state.site}:${state.exaggeration}:${state.view}:${cut}:${wide ? "w" : "n"}`;
+  const feature =
+    state.view === "anomaly" ? `${state.featuredAnomaly?.x_m}:${state.featuredAnomaly?.y_m}` : "";
+  return `${state.site}:${state.exaggeration}:${state.view}:${cut}:${feature}:${wide ? "w" : "n"}`;
 }

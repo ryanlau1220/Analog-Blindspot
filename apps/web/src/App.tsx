@@ -129,6 +129,7 @@ function Experience({ index }: { index: SitesIndex }) {
               navigationLocked={scrolling || focusLab}
               focusLab={focusLab}
               anomalies={anomalies}
+              presentation={judge}
             />
           </div>
           {!judge && (
@@ -159,6 +160,7 @@ function Experience({ index }: { index: SitesIndex }) {
               apply={(preset) => dispatch({ type: "applyPreset", preset })}
               onExit={() => {
                 setJudge(false);
+                dispatch({ type: "setFeaturedAnomaly", target: null });
                 storyDispatch({ type: "story" });
               }}
             />

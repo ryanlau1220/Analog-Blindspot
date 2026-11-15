@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, Pause, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { SitesIndex } from "../data/types";
 import type { ScenePreset } from "../scene/state";
+import { findFeaturedAnomaly } from "../story/featuredAnomaly";
 
 /** A separate, uninterrupted presentation; the full research experience remains available. */
 export function JudgePresentation({
@@ -18,8 +19,9 @@ export function JudgePresentation({
   const earth = index.sites.find((s) => s.id === "earth");
   const observed = earth?.variants.find((v) => v.observed);
   const level = earth?.experiment?.search?.levels.find((l) => l.observed);
-  const candidate = level?.candidates[2];
+  const candidate = findFeaturedAnomaly(level);
   const search = earth?.experiment?.search;
+  const comparison = earth?.experiment?.levels.find((item) => item.resolution_m === 10);
   const slides: {
     label: string;
     title: string;
@@ -63,25 +65,48 @@ export function JudgePresentation({
     {
       label: "03 / THE EXPERIMENT",
       title: "Test the blind spot on Earth.",
-      text: "Compare observed Lava Beds LiDAR with a simulated 10 m grid.",
-      detail: "Grid averaging is a simulation, not a model of a lunar instrument.",
+      text: "Watch the same ground change from observed LiDAR to a simulated 10 m grid.",
+      detail:
+        comparison?.landmark_relief_median_m != null && comparison.background_relief_median_m != null
+          ? `At 10 m, the sampled bridge-point median is ${comparison.landmark_relief_median_m.toFixed(1)} m; background is ${comparison.background_relief_median_m.toFixed(1)} m. This is not a cave-detection test.`
+          : "Grid averaging is a simulation, not a lunar sensor model.",
       preset: {
         site: "earth",
         variantId: earth?.variants.find((v) => v.resolution_m === 10)?.id,
-        view: "hero",
+        view: "feature",
         cutaway: false,
         compare: true,
         search: false,
         exaggeration: 2,
       },
-      ms: 18000,
+      ms: 16000,
     },
     {
       label: "04 / THE INVESTIGATION",
+      title: "Search the whole landscape.",
+      text: level
+        ? `${level.flagged_points} high-relief points across ${level.lattice_points.toLocaleString()} sampled locations.`
+        : "Flag unusually high relief across the search region.",
+      detail:
+        "Amber rings mark unverified clusters. Green rings are near mapped cave entrances; neither is proof of a cave.",
+      preset: {
+        site: "earth",
+        variantId: observed?.id,
+        view: "overview",
+        cutaway: false,
+        compare: false,
+        search: true,
+        featuredAnomaly: null,
+        exaggeration: 2,
+      },
+      ms: 9000,
+    },
+    {
+      label: "05 / THE LEAD",
       title: "A lead, not a discovery.",
       text:
         level && candidate
-          ? `${level.candidate_clusters} unverified clusters. This one has ${candidate.relief_m.toFixed(1)} m of local relief.`
+          ? `${level.candidate_clusters} unverified clusters. The highlighted lead has ${candidate.relief_m.toFixed(1)} m of local relief within a ${search?.radius_m} m radius.`
           : "The terrain search highlights unverified leads for investigation.",
       detail:
         level && search
@@ -94,12 +119,13 @@ export function JudgePresentation({
         cutaway: false,
         compare: false,
         search: true,
+        featuredAnomaly: candidate ? { x_m: candidate.x_m, y_m: candidate.y_m } : null,
         exaggeration: 2,
       },
-      ms: 22000,
+      ms: 18000,
     },
     {
-      label: "05 / THE NEXT STEP",
+      label: "06 / THE NEXT STEP",
       title: "Find the clues. Verify what matters.",
       text: "Use Earth analogs to plan targeted observations, then verify promising terrain in the field.",
       detail:
@@ -111,9 +137,10 @@ export function JudgePresentation({
         cutaway: false,
         compare: false,
         search: true,
+        featuredAnomaly: candidate ? { x_m: candidate.x_m, y_m: candidate.y_m } : null,
         exaggeration: 2,
       },
-      ms: 20000,
+      ms: 17000,
     },
   ];
   const slide = slides[step];

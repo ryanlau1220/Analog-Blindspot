@@ -3,6 +3,7 @@ import { MoveHorizontal } from "lucide-react";
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { AnomalyCandidate, Site, Variant } from "../data/types";
+import { sampleHeight } from "../terrain/grid";
 import { TerrainBlock } from "../terrain/TerrainBlock";
 import { useVariantAssets } from "../terrain/useVariantAssets";
 import { Anomalies } from "./Anomalies";
@@ -44,6 +45,7 @@ export function Viewer({
   navigationLocked = false,
   focusLab = false,
   anomalies = null,
+  presentation = false,
 }: {
   site: Site;
   variant: Variant;
@@ -58,6 +60,7 @@ export function Viewer({
   focusLab?: boolean;
   /** unverified lattice-search clusters for the grid on screen */
   anomalies?: { candidates: AnomalyCandidate[]; radius: number } | null;
+  presentation?: boolean;
 }) {
   const wide = useWideLayout();
   const { assets, loading, error } = useVariantAssets(site, variant);
@@ -113,6 +116,35 @@ export function Viewer({
   const rightClip = useMemo(() => [planes.right], [planes]);
   const moon = site.id === "moon";
   const ready = shown && !loading && (!comparing || cmpShown) ? shown.key : null;
+  const featuredHeight =
+    shown && state.featuredAnomaly
+      ? sampleHeight(
+          shown.grid,
+          state.featuredAnomaly.x_m - site.extent_m / 2,
+          state.featuredAnomaly.y_m - site.extent_m / 2,
+        )
+      : undefined;
+
+  useEffect(() => {
+    if (
+      !presentation ||
+      !cmpShown ||
+      !compareVariant ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const delay = window.setTimeout(() => {
+      sweep.current = startReveal(setSplit, () => {
+        setSplit(0.5);
+        sweep.current = null;
+      });
+    }, 700);
+    return () => {
+      window.clearTimeout(delay);
+      sweep.current?.();
+      sweep.current = null;
+    };
+  }, [presentation, cmpShown, compareVariant]);
 
   return (
     <>
@@ -165,6 +197,7 @@ export function Viewer({
             exaggeration={state.exaggeration}
             candidates={anomalies.candidates}
             radius={anomalies.radius}
+            featured={state.featuredAnomaly}
           />
         )}
         <Landmarks
@@ -176,8 +209,8 @@ export function Viewer({
           labels={labels}
         />
         <CameraRig
-          pose={cameraPreset(site, state, wide)}
-          poseKey={poseKey(state, wide)}
+          pose={cameraPreset(site, state, wide, featuredHeight)}
+          poseKey={`${poseKey(state, wide)}:${state.view === "anomaly" && featuredHeight !== undefined ? "sampled" : "pending"}`}
           far={site.extent_m * 20}
           intro={intro}
           navigationLocked={navigationLocked || sweeping}

@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { parseHeights, validateIndex } from "../data/load";
 import type { SitesIndex } from "../data/types";
-import { initialState, reduce, type SceneAction } from "./state";
+import { FEATURED_ANOMALY, findFeaturedAnomaly } from "../story/featuredAnomaly";
+import { cameraPreset, initialState, reduce, type SceneAction } from "./state";
 
 const DATA = join(__dirname, "../../public/data");
 const index: SitesIndex = validateIndex(JSON.parse(readFileSync(join(DATA, "sites.json"), "utf8")));
@@ -41,6 +42,25 @@ describe("exported assets", () => {
 });
 
 describe("scene reducer", () => {
+  it("ties the featured search measurement, marker coordinates, and camera target to the same candidate", () => {
+    const site = index.sites.find((s) => s.id === "earth");
+    if (!site) throw new Error("earth missing");
+    const candidate = findFeaturedAnomaly(site.experiment?.search?.levels.find((l) => l.observed));
+    expect(candidate).toMatchObject(FEATURED_ANOMALY);
+    expect(candidate?.relief_m).toBeGreaterThan(0);
+    const state = reduce(index, initialState(index, "earth"), {
+      type: "applyPreset",
+      preset: { view: "anomaly", featuredAnomaly: FEATURED_ANOMALY },
+    });
+    const height = site.variants[0]?.elevation.min_m ?? 0;
+    const pose = cameraPreset(site, state, true, height);
+    expect(pose.target).toEqual([
+      FEATURED_ANOMALY.x_m - site.extent_m / 2,
+      0,
+      FEATURED_ANOMALY.y_m - site.extent_m / 2,
+    ]);
+    expect(reduce(index, state, { type: "setFeaturedAnomaly", target: { x_m: -1, y_m: -1 } })).toBe(state);
+  });
   it("resets to the observed variant when switching site", () => {
     let s = initialState(index, "earth");
     s = reduce(index, s, { type: "selectVariant", variantId: "30m" });

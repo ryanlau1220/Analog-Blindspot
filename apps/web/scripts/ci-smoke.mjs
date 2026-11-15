@@ -195,10 +195,19 @@ try {
       if ((await radios.count()) < 2) throw new Error("Missing grid choices");
       await page.getByTestId("judge-toggle").click();
       await page.getByRole("button", { name: "Pause", exact: true }).click();
-      for (let step = 0; step < 3; step++)
+      for (let step = 0; step < 4; step++)
         await page.getByRole("button", { name: "Next", exact: true }).click();
       await page.getByText("A lead, not a discovery.").waitFor();
       await page.getByText(/24 unverified clusters/).waitFor();
+      await page.waitForFunction(() => {
+        const state = window.__ab?.state;
+        return (
+          state?.view === "anomaly" &&
+          state.search &&
+          state.featuredAnomaly?.x_m === 1395 &&
+          state.featuredAnomaly?.y_m === 915
+        );
+      });
       await page.getByRole("button", { name: "Exit", exact: true }).click();
       await page.getByTestId("decision-view").waitFor();
       await page.getByRole("button", { name: "Evidence", exact: true }).click();
