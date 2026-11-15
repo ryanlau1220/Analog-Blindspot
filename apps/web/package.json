@@ -10,7 +10,8 @@
     "test": "vitest --run",
     "check": "biome check . && tsc -b --noEmit",
     "format": "biome check --write .",
-    "perf": "node scripts/perf-smoke.mjs"
+    "perf": "node scripts/perf-smoke.mjs",
+    "smoke": "node scripts/ci-smoke.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

@@ -1,0 +1,112 @@
+name: CI and Cloudflare deployment
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serializing main runs prevents deployments from racing; PRs have their own groups.
+concurrency:
+  group: analog-blindspot-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-and-deploy:
+    name: Validate and deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests and static checks
+        run: |
+          pnpm test
+          pnpm check
+
+      - name: Set up scientific tooling
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          version: '0.10.8'
+          python-version: '3.12'
+
+      - name: Run scientific tests
+        working-directory: scientific
+        run: uv run --locked pytest -q -m 'not data'
+
+      - name: Build production assets
+        run: pnpm build
+
+      - name: Check production build in desktop and mobile browsers
+        run: pnpm --filter web smoke
+
+      - name: Validate Cloudflare configuration
+        run: pnpm exec wrangler deploy --dry-run
+
+      # An older run that was delayed or re-run must not replace a newer main deployment.
+      - name: Check whether this commit is still the head of main
+        id: head
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          main_sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$RUN_SHA" = "$main_sha" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+            echo "Skipping deployment: this run is no longer the head of main."
+          fi
+
+      - name: Deploy to Cloudflare Workers
+        if: steps.head.outputs.current == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo 'Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in GitHub Actions secrets.' >&2
+            exit 1
+          fi
+          pnpm exec wrangler deploy
+
+      - name: Verify deployed production files
+        if: steps.head.outputs.current == 'true'
+        run: |
+          base='https://analog-blindspot.ryanlau1220.workers.dev'
+          for attempt in {1..12}; do
+            if curl -fsSL "$base/" -o /tmp/analog-index.html &&
+               curl -fsSL "$base/data/sites.json" -o /tmp/analog-sites.json &&
+               curl -fsSL "$base/data/moon/heights.f32" -o /tmp/analog-heights.f32 &&
+               cmp -s apps/web/dist/index.html /tmp/analog-index.html &&
+               cmp -s apps/web/dist/data/sites.json /tmp/analog-sites.json &&
+               cmp -s apps/web/dist/data/moon/heights.f32 /tmp/analog-heights.f32; then
+              echo 'Production HTML, site data and lunar terrain match this build.'
+              exit 0
+            fi
+            echo "Production files not ready (attempt $attempt/12); retrying."
+            sleep 5
+          done
+          echo 'Production files did not match the validated build.' >&2
+          exit 1

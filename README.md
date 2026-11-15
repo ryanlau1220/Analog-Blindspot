@@ -27,20 +27,23 @@ The app reads only `apps/web/public/data` (9.4 MB, committed) and makes no remot
 
 ## Cloudflare deployment
 
-This is a static-only Cloudflare Worker; no Worker code, secrets, or backend are required. After pushing these
-files, import the repository in **Workers & Pages → Create → Import a repository**, select `main` as the
-production branch, and use the repository root with these Workers Builds settings:
+This is a static-only Cloudflare Worker; no Worker code or backend is required. The GitHub Actions workflow
+`.github/workflows/ci-deploy.yml` validates pull requests and pushes to `main`, and deploys a validated `main`
+commit to Cloudflare. It also supports manual runs on `main`. The workflow runs a desktop and mobile browser
+smoke test, scientific tests that do not require the ignored raw rasters, and compares key production files to
+the validated build after deploying. A stale run skips deployment if a newer commit is already on `main`.
 
-- Build command: `pnpm build`
-- Deploy command: `pnpm exec wrangler deploy`
-- Preview command: `pnpm exec wrangler preview`
-- Build output: `apps/web/dist` (configured in `wrangler.jsonc`)
+Configure the repository's **Settings → Secrets and variables → Actions → Repository secrets**:
 
-Cloudflare installs dependencies before running the build. `.node-version` and `packageManager` pin the tested
-Node and pnpm versions. Leave `BASE_PATH` unset when serving from the domain root. Once connected, pushes to
-`main` deploy production; confirm the build and check the live site, the resolution comparison, the evidence
-drawer, and `#brief`. You can validate the configuration locally without deploying with
-`pnpm build && pnpm exec wrangler deploy --dry-run`.
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID that owns the Worker.
+- `CLOUDFLARE_API_TOKEN`: a Cloudflare API token scoped to that account with the **Edit Cloudflare Workers**
+  template. Never commit the token or paste it into an issue.
+
+Use `.node-version` and the `packageManager` field for the tested Node and pnpm versions. Leave `BASE_PATH` unset
+for the production domain root. To verify locally without deploying, run `pnpm install --frozen-lockfile`,
+`pnpm test`, `pnpm check`, `pnpm build`, `pnpm --filter web smoke` (requires Chrome), and
+`pnpm exec wrangler deploy --dry-run`. Do not also enable automatic Cloudflare Git builds for this Worker unless
+you deliberately want two deployment systems.
 
 ## Rebuild the data
 
