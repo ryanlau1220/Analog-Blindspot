@@ -23,6 +23,8 @@ export function TopBar({
   story,
   storyDispatch,
   onEvidence,
+  scrollJourney,
+  onScrollJourney,
 }: {
   site: Site;
   variant: Variant;
@@ -31,6 +33,8 @@ export function TopBar({
   story: StoryState;
   storyDispatch: Dispatch<StoryAction>;
   onEvidence: () => void;
+  scrollJourney: boolean;
+  onScrollJourney: () => void;
 }) {
   const inStory = story.mode === "story";
   return (
@@ -74,6 +78,15 @@ export function TopBar({
           aria-label="Chapters"
           className="pointer-events-auto col-span-2 sm:col-span-1 sm:col-start-2 sm:justify-self-end"
         >
+          <button
+            type="button"
+            data-testid="scroll-toggle"
+            aria-pressed={scrollJourney}
+            onClick={onScrollJourney}
+            className="mb-1 text-[11px] text-teal-200 min-h-6"
+          >
+            {scrollJourney ? "↓ Scroll journey on" : "↓ Try scroll journey"}
+          </button>
           <ol className="flex gap-1">
             {scenes.map((s, i) => (
               <li key={s.id}>
@@ -84,7 +97,7 @@ export function TopBar({
                   aria-label={`Chapter ${i + 1}: ${s.chapter}`}
                   onClick={() => storyDispatch({ type: "goTo", scene: i })}
                   className={`flex flex-col items-start rounded px-1.5 py-1 text-left transition ${
-                    i === story.scene ? "text-white" : "text-zinc-500 hover:text-zinc-200"
+                    i === story.scene ? "text-white" : "text-zinc-300 hover:text-white"
                   }`}
                 >
                   <span
@@ -137,6 +150,8 @@ export function StoryOverlay({
   scene: sceneState,
   sceneDispatch,
   onEvidence,
+  focusLab,
+  onFocusLab,
 }: {
   index: SitesIndex;
   scenes: StoryScene[];
@@ -145,6 +160,8 @@ export function StoryOverlay({
   scene: SceneState;
   sceneDispatch: Dispatch<SceneAction>;
   onEvidence: () => void;
+  focusLab: boolean;
+  onFocusLab: () => void;
 }) {
   const scene = scenes[story.scene];
   const step = scene?.steps[story.step];
@@ -201,6 +218,8 @@ export function StoryOverlay({
         }}
         onCompare={(enabled) => sceneDispatch({ type: "setCompare", enabled })}
         onDetails={onEvidence}
+        focused={focusLab}
+        onFocus={onFocusLab}
       />
     );
   if (scene.panel === "decision") {
@@ -228,10 +247,10 @@ export function StoryOverlay({
     <div
       ref={root}
       data-testid="story-panel"
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 grid max-h-[66dvh] grid-cols-1 items-end gap-x-8 gap-y-4 overflow-y-auto bg-gradient-to-t from-[#090d16] via-[#090d16]/85 to-transparent px-4 pt-16 pb-4 sm:px-8 sm:pb-8 lg:max-h-none lg:grid-cols-[minmax(0,36rem)_1fr] lg:overflow-visible lg:from-[#090d16]/90 lg:via-transparent"
+      className={`${focusLab ? "ab-lab-focused" : ""} pointer-events-none absolute inset-x-0 bottom-0 z-10 grid max-h-[66dvh] grid-cols-1 items-end gap-x-8 gap-y-4 overflow-y-auto bg-gradient-to-t from-[#090d16] via-[#090d16]/85 to-transparent px-4 pt-16 pb-4 sm:px-8 sm:pb-8 lg:max-h-none lg:grid-cols-[minmax(0,36rem)_1fr] lg:overflow-visible lg:from-[#090d16]/90 lg:via-transparent`}
     >
       <div
-        className="pointer-events-auto rounded-lg bg-[#090d16]/85 p-3 lg:bg-transparent lg:p-0"
+        className={`ab-story-copy pointer-events-auto rounded-lg bg-[#090d16]/85 p-3 lg:bg-transparent lg:p-0 ${focusLab ? "hidden" : ""}`}
         aria-live="polite"
       >
         <p data-anim className="ab-chapter-label text-[11px] uppercase tracking-[0.3em] text-teal-300/90">
@@ -269,7 +288,10 @@ export function StoryOverlay({
           {panel}
         </div>
       )}
-      <div data-anim className="pointer-events-auto flex flex-wrap items-center gap-3 lg:col-start-1">
+      <div
+        data-anim
+        className={`pointer-events-auto flex flex-wrap items-center gap-3 lg:col-start-1 ${focusLab ? "hidden" : ""}`}
+      >
         <button
           type="button"
           data-testid="primary-action"

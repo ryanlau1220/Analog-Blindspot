@@ -1,5 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import gsap from "gsap";
+import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Site, Variant } from "../data/types";
 import { TerrainBlock } from "../terrain/TerrainBlock";
@@ -37,6 +38,8 @@ export function Viewer({
   selected,
   onSelect,
   intro,
+  navigationLocked = false,
+  focusLab = false,
 }: {
   site: Site;
   variant: Variant;
@@ -47,6 +50,8 @@ export function Viewer({
   onSelect: (id: string | null) => void;
   /** establishing dolly on first load */
   intro?: boolean;
+  navigationLocked?: boolean;
+  focusLab?: boolean;
 }) {
   const wide = useWideLayout();
   const { assets, loading, error } = useVariantAssets(site, variant);
@@ -54,6 +59,49 @@ export function Viewer({
   const cmp = useVariantAssets(site, cmpVariant);
   const [labels] = useState<LabelRegistry>(() => new Map());
   const [split, setSplit] = useState(0.5);
+  const sweep = useRef<gsap.core.Tween | null>(null);
+  const [sweeping, setSweeping] = useState(false);
+  const stopSweep = useCallback(() => {
+    sweep.current?.kill();
+    sweep.current = null;
+    setSweeping(false);
+  }, []);
+  // Cancel stale reveals when the selected dataset or comparison changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: dataset identity controls cleanup
+  useEffect(() => {
+    stopSweep();
+    setSplit(0.5);
+    return () => {
+      sweep.current?.kill();
+    };
+  }, [site.id, variant.id, compareVariant?.id]);
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) stopSweep();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [stopSweep]);
+  const reveal = () => {
+    stopSweep();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSplit(0.5);
+      return;
+    }
+    const cursor = { value: 0.92 };
+    setSplit(cursor.value);
+    setSweeping(true);
+    sweep.current = gsap.to(cursor, {
+      value: 0.08,
+      duration: 3.6,
+      ease: "power2.inOut",
+      onUpdate: () => setSplit(cursor.value),
+      onComplete: () => {
+        setSweeping(false);
+        sweep.current = null;
+      },
+    });
+  };
   const datum = siteDatum(site);
   const depth = site.extent_m * 0.12;
   const z = cutZ(site, state.cutaway.position);
@@ -122,6 +170,7 @@ export function Viewer({
           poseKey={poseKey(state, wide)}
           far={site.extent_m * 20}
           intro={intro}
+          navigationLocked={navigationLocked || sweeping}
         />
         <ReadySignal readyKey={ready} />
       </Canvas>
@@ -135,7 +184,33 @@ export function Viewer({
       />
       <LandmarkLabels site={site} selected={selected} onSelect={onSelect} labels={labels} />
       {cmpShown && compareVariant && (
-        <SplitHandle split={split} onSplit={setSplit} left={compareVariant} right={variant} />
+        <>
+          <SplitHandle
+            split={split}
+            onSplit={(value) => {
+              stopSweep();
+              setSplit(value);
+            }}
+            left={compareVariant}
+            right={variant}
+          />
+          <div className={`ab-reveal-controls ${focusLab ? "is-focused" : ""}`}>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-teal-200">
+              Same ground · different grid
+            </p>
+            <button
+              type="button"
+              data-testid="reveal-sweep"
+              onClick={sweeping ? stopSweep : reveal}
+              className="ab-small-button mt-2"
+            >
+              {sweeping ? "Stop reveal" : "Reveal the difference"}
+            </button>
+            <p className="mt-1 text-[10px] text-zinc-400">
+              Left: observed {compareVariant.resolution_m} m / right: simulated {variant.resolution_m} m
+            </p>
+          </div>
+        </>
       )}
       <div
         key={site.id}
@@ -200,16 +275,10 @@ function SplitHandle({
   return (
     <div ref={box} className="pointer-events-none absolute inset-0">
       <div className="absolute inset-y-0 w-px bg-white/70" style={{ left: `${split * 100}%` }}>
-        <span className="absolute top-[18%] right-3 whitespace-nowrap rounded bg-teal-950/80 px-2 py-0.5 text-[11px] text-teal-100">
-          ◀ observed {left.resolution_m} m
-        </span>
-        <span className="absolute top-[18%] left-3 whitespace-nowrap rounded border border-dashed border-violet-300/70 bg-violet-950/80 px-2 py-0.5 text-[11px] text-violet-100">
-          simulated {right.resolution_m} m ▶
-        </span>
         <button
           type="button"
           role="slider"
-          aria-label="Comparison split, observed left and simulated right"
+          aria-label={`Comparison split, observed ${left.resolution_m} m left and simulated ${right.resolution_m} m right`}
           aria-valuemin={5}
           aria-valuemax={95}
           aria-valuenow={Math.round(split * 100)}
@@ -217,6 +286,10 @@ function SplitHandle({
           onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
           onPointerMove={(e) => e.buttons && move(e)}
           onKeyDown={(e) => {
+            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+              e.preventDefault();
+              e.stopPropagation();
+            }
             if (e.key === "ArrowLeft") onSplit(Math.max(split - 0.05, 0.05));
             if (e.key === "ArrowRight") onSplit(Math.min(split + 0.05, 0.95));
           }}

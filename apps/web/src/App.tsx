@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { loadIndex } from "./data/load";
 import type { SitesIndex } from "./data/types";
 import { initialState, reduce, type SceneAction, type SceneState } from "./scene/state";
@@ -54,6 +54,20 @@ function Experience({ index }: { index: SitesIndex }) {
   );
   const [selected, setSelected] = useState<string | null>(null);
   const [drawer, setDrawer] = useState(false);
+  const [scrollJourney, setScrollJourney] = useState(false);
+  const [focusLab, setFocusLab] = useState(false);
+  const journey = useRef<HTMLDivElement>(null);
+  const scrolling = scrollJourney && story.mode === "story" && !focusLab;
+  useEffect(() => {
+    const box = journey.current;
+    if (!box || !scrolling) return;
+    const position = Math.min(scenes.length - 1, Math.round(box.scrollTop / box.clientHeight));
+    if (position !== story.scene) box.scrollTop = story.scene * box.clientHeight;
+  }, [story.scene, scrolling, scenes.length]);
+  useEffect(() => {
+    if (story.mode !== "story" || scenes[story.scene]?.id !== "experiment") setFocusLab(false);
+  }, [story.mode, story.scene, scenes]);
+
   // Establishing dolly only when the experience opens on chapter 1.
   const [intro] = useState(() => story.scene === 0);
 
@@ -77,55 +91,91 @@ function Experience({ index }: { index: SitesIndex }) {
   };
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-[#090d16] text-zinc-100">
-      <div className="absolute inset-0" onPointerDownCapture={() => storyDispatch({ type: "pause" })}>
-        <Viewer
-          site={site}
-          variant={variant}
-          compareVariant={compareVariant}
-          state={state}
-          selected={selected}
-          onSelect={setSelected}
-          intro={intro}
-        />
+    <div
+      ref={journey}
+      data-testid="journey-scroll"
+      className={`ab-journey ${scrolling ? "is-scrolling" : ""}`}
+      onScroll={(event) => {
+        if (!scrolling || drawer) return;
+        const box = event.currentTarget;
+        const next = Math.min(scenes.length - 1, Math.round(box.scrollTop / box.clientHeight));
+        if (next !== story.scene) {
+          storyDispatch({ type: "pause" });
+          storyDispatch({ type: "goTo", scene: next });
+        }
+      }}
+    >
+      <div style={{ height: scrolling ? `${scenes.length * 100}dvh` : "100dvh" }}>
+        <div className="sticky top-0 h-dvh w-full overflow-hidden bg-[#090d16] text-zinc-100">
+          {scrolling && <div aria-hidden="true" className="ab-scroll-progress" />}
+
+          <div className="absolute inset-0" onPointerDownCapture={() => storyDispatch({ type: "pause" })}>
+            <Viewer
+              site={site}
+              variant={variant}
+              compareVariant={compareVariant}
+              state={state}
+              selected={selected}
+              onSelect={setSelected}
+              intro={intro}
+              navigationLocked={scrolling || focusLab}
+              focusLab={focusLab}
+            />
+          </div>
+          <TopBar
+            site={site}
+            variant={variant}
+            state={state}
+            scenes={scenes}
+            story={story}
+            storyDispatch={storyDispatch}
+            onEvidence={openEvidence}
+            scrollJourney={scrollJourney}
+            onScrollJourney={() => {
+              storyDispatch({ type: "pause" });
+              setScrollJourney(!scrollJourney);
+            }}
+          />
+          {inStory ? (
+            <StoryOverlay
+              index={index}
+              scenes={scenes}
+              story={story}
+              storyDispatch={storyDispatch}
+              scene={state}
+              sceneDispatch={dispatch}
+              onEvidence={openEvidence}
+              focusLab={focusLab}
+              onFocusLab={() => {
+                storyDispatch({ type: "pause" });
+                setFocusLab(!focusLab);
+              }}
+            />
+          ) : (
+            <ControlPanel sites={index.sites} site={site} state={state} dispatch={dispatch} />
+          )}
+          {scrolling && (
+            <p className="ab-scroll-hint">
+              Scroll to follow the evidence · {story.scene + 1} / {scenes.length}
+            </p>
+          )}
+          {landmark && <EvidenceCard site={site} landmark={landmark} onClose={() => setSelected(null)} />}
+          {drawer && (
+            <EvidenceDrawer
+              index={index}
+              site={site}
+              variant={variant}
+              state={state}
+              scene={scene}
+              onClose={() => setDrawer(false)}
+              onVariant={(variantId) => dispatch({ type: "selectVariant", variantId })}
+              onSite={(s) =>
+                dispatch({ type: "applyPreset", preset: { site: s, exaggeration: 2, view: "landmark" } })
+              }
+            />
+          )}
+        </div>
       </div>
-      <TopBar
-        site={site}
-        variant={variant}
-        state={state}
-        scenes={scenes}
-        story={story}
-        storyDispatch={storyDispatch}
-        onEvidence={openEvidence}
-      />
-      {inStory ? (
-        <StoryOverlay
-          index={index}
-          scenes={scenes}
-          story={story}
-          storyDispatch={storyDispatch}
-          scene={state}
-          sceneDispatch={dispatch}
-          onEvidence={openEvidence}
-        />
-      ) : (
-        <ControlPanel sites={index.sites} site={site} state={state} dispatch={dispatch} />
-      )}
-      {landmark && <EvidenceCard site={site} landmark={landmark} onClose={() => setSelected(null)} />}
-      {drawer && (
-        <EvidenceDrawer
-          index={index}
-          site={site}
-          variant={variant}
-          state={state}
-          scene={scene}
-          onClose={() => setDrawer(false)}
-          onVariant={(variantId) => dispatch({ type: "selectVariant", variantId })}
-          onSite={(s) =>
-            dispatch({ type: "applyPreset", preset: { site: s, exaggeration: 2, view: "landmark" } })
-          }
-        />
-      )}
     </div>
   );
 }
@@ -177,7 +227,14 @@ function useStoryDriver(
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (
+        (e.target instanceof HTMLElement &&
+          e.target.closest("input, select, textarea, [role=slider], [role=dialog]")) ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      )
+        return;
       if (e.key === "ArrowRight") storyDispatch({ type: "next" });
       else if (e.key === "ArrowLeft") storyDispatch({ type: "prev" });
       else if (e.key === " " && e.target === document.body) {

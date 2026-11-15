@@ -133,3 +133,153 @@ body {
     transform: translateY(0);
   }
 }
+
+/* A pinned scientific stage, with optional native scrolling between chapters. */
+.ab-journey {
+  height: 100dvh;
+  overflow: hidden;
+}
+.ab-journey.is-scrolling {
+  overflow-y: auto;
+  scroll-timeline: --journey block;
+}
+.ab-scroll-progress {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  height: 2px;
+  width: 100%;
+  background: #72e5d5;
+  transform-origin: left;
+}
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ab-scroll-progress {
+      animation: ab-progress linear both;
+      animation-timeline: --journey;
+      animation-range: 0% 100%;
+    }
+  }
+}
+@keyframes ab-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.ab-scroll-hint {
+  position: absolute;
+  top: 11rem;
+  left: 1rem;
+  pointer-events: none;
+  color: #9ba9b8;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.ab-volume {
+  position: fixed;
+  top: 156px;
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 220px;
+  padding: 12px;
+  border: 1px solid #5eead450;
+  border-radius: 12px;
+  background: #0b1722;
+  color: #cffaf4;
+  font-size: 11px;
+  box-shadow: 0 8px 32px #0008;
+}
+.ab-volume input {
+  min-width: 0;
+  width: 95px;
+  accent-color: #5eead4;
+}
+.ab-small-button {
+  min-height: 28px;
+  padding: 5px 12px;
+  border: 1px solid #70ded055;
+  border-radius: 999px;
+  background: #0e242be8;
+  color: #c0eee7;
+  font-size: 11px;
+}
+.ab-small-button:hover {
+  background: #23454c;
+}
+.ab-reveal-controls {
+  position: absolute;
+  z-index: 5;
+  top: 27%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 95%;
+  text-align: center;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: #090d16b8;
+}
+.ab-lab-focused {
+  background: none;
+  padding-top: 0;
+}
+.ab-lab-focused [data-testid="resolution-lab"] {
+  background: #0c111cf2;
+}
+.ab-method {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  counter-reset: method;
+  margin: 10px 0;
+}
+.ab-method li {
+  border-top: 1px solid #5eead440;
+  padding-top: 8px;
+  counter-increment: method;
+}
+.ab-method li::before {
+  content: "0" counter(method) " / ";
+  color: #72e5d5;
+}
+@media (min-width: 1024px) {
+  .ab-lab-focused {
+    display: block;
+    max-width: 26rem;
+    left: auto;
+    padding: 16px;
+  }
+  .ab-scroll-hint {
+    top: 9rem;
+    left: 2rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ab-lab-focused [data-testid="resolution-lab"] {
+    animation: ab-focus-in 0.35s ease-out;
+  }
+}
+@keyframes ab-focus-in {
+  from {
+    opacity: 0.5;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+header {
+  background: linear-gradient(#090d16e8, #090d1690 65%, transparent);
+  padding-bottom: 1.5rem;
+}
+.ab-journey.is-scrolling canvas {
+  /* biome-ignore lint/complexity/noImportantStyles: override OrbitControls inline touch-action while native story scrolling is enabled */
+  touch-action: pan-y !important;
+}

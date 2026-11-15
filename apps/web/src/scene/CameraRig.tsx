@@ -19,17 +19,23 @@ export function CameraRig({
   poseKey,
   far,
   intro = false,
+  navigationLocked = false,
 }: {
   pose: CameraPose;
   poseKey: string;
   far: number;
   /** first frame: start 60 % further out and settle in slowly (an establishing dolly) */
   intro?: boolean;
+  navigationLocked?: boolean;
 }) {
   const camera = useThree((s) => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const tween = useRef<gsap.core.Timeline | null>(null);
   const first = useRef(true);
+
+  useEffect(() => {
+    if (navigationLocked) tween.current?.kill();
+  }, [navigationLocked]);
 
   useEffect(() => {
     camera.far = far;
@@ -84,6 +90,7 @@ export function CameraRig({
     <OrbitControls
       ref={controls}
       makeDefault
+      enabled={!navigationLocked}
       enableDamping
       dampingFactor={0.08}
       maxPolarAngle={Math.PI * 0.49}

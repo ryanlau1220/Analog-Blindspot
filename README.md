@@ -75,3 +75,23 @@ uv run pytest
 - Lava Beds LiDAR: Williams, E. (2024), NCALM / OpenTopography, CC BY 4.0, NSF EAR-2324629.
 - Lanzarote: Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es.
 - Gazetteers: USGS GNIS (public domain); IGN NGBE (CC BY 4.0); LROC Pits Atlas.
+
+### Presentation controls
+
+- **Try scroll journey** pins the 3D stage while native scrolling advances through the five chapters.
+  Chapter buttons, Previous/Next, deep links, and the guided tour remain available. Turn it off to orbit
+  and zoom the terrain manually. Touch scrolling works over the terrain on mobile.
+- In **Resolution**, select **Focus experiment** to clear the headline and supporting copy from the stage.
+  **Reveal the difference** sweeps the existing observed/simulated split across the same ground in 3.6 seconds.
+  Stop it at any time or drag the split yourself; arrow keys adjust the split without changing chapter.
+  The sweep never interpolates scientific measurements or generates intermediate resolutions.
+- **Enable sound** (♪ on narrow screens) starts the original synthesized ambience at 35% volume.
+  The volume slider appears while playing. Sound stops when the tab is hidden; it never autoplays.
+  The higher register and richer harmonics are intended to be more audible on small speakers.
+- Reduced-motion preferences replace the sweep with a static midpoint comparison and disable spatial
+  presentation transitions. All results remain accessible without motion or audio.
+- **How this experiment works** expands the four-step data-to-decision explanation and scientific limitations.
+
+Suggested judging sequence: lunar question → blindspot → Earth candidates → focused resolution reveal →
+field decision and validation brief. The application still makes no claim to have measured the subsurface
+or validated a new lunar/Mars base location.

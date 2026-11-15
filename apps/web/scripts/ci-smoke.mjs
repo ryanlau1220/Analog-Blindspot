@@ -1,4 +1,5 @@
 // Browser smoke test against the production build. No network services or secrets are required.
+import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright-core";
 import { preview } from "vite";
 
@@ -11,6 +12,7 @@ const browser = await chromium.launch({
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"],
 });
 const failures = [];
+await mkdir("../../tmp/motion-review", { recursive: true });
 try {
   for (const [name, viewport] of [
     ["desktop", { width: 1366, height: 768 }],
@@ -20,6 +22,20 @@ try {
     const page = await browser.newPage({
       viewport,
       reducedMotion: name === "small mobile" ? "reduce" : "no-preference",
+    });
+    page.setDefaultTimeout(20000);
+    await page.addInitScript(() => {
+      const connect = AudioNode.prototype.connect;
+      AudioNode.prototype.connect = function (destination, ...rest) {
+        if (destination instanceof AudioDestinationNode) {
+          const meter = this.context.createAnalyser();
+          connect.call(this, meter);
+          connect.call(meter, destination);
+          window.__audioMeter = meter;
+          return destination;
+        }
+        return connect.call(this, destination, ...rest);
+      };
     });
     page.on("pageerror", (error) => failures.push(`${name}: ${error.message}`));
     page.on("console", (message) => {
@@ -40,8 +56,66 @@ try {
         throw new Error("Sound was not off initially");
       await sound.click();
       await page.getByRole("button", { name: "Turn ambient sound off" }).waitFor();
+      await page.waitForFunction(() => {
+        const meter = window.__audioMeter;
+        if (meter?.context.state !== "running") return false;
+        const samples = new Float32Array(meter.fftSize);
+        meter.getFloatTimeDomainData(samples);
+        return samples.some((value) => Math.abs(value) > 0.005);
+      });
+      await page.getByRole("slider", { name: "Ambient volume" }).fill("65");
+      if ((await page.getByRole("slider", { name: "Ambient volume" }).inputValue()) !== "65")
+        throw new Error("Audio volume did not update");
       await sound.click();
       await page.getByRole("button", { name: "Turn ambient sound on" }).waitFor();
+      await page.getByTestId("focus-lab").click();
+      if ((await page.getByTestId("focus-lab").getAttribute("aria-pressed")) !== "true")
+        throw new Error("Focus mode did not open");
+      const split = page.getByTestId("split-handle");
+      await split.focus();
+      await page.keyboard.press("ArrowRight");
+      await page.waitForFunction(
+        () => document.querySelector('[data-testid="split-handle"]')?.getAttribute("aria-valuenow") === "55",
+      );
+      if ((await page.evaluate(() => window.__ab.story.scene)) !== 3)
+        throw new Error("Split keyboard interaction navigated away from the experiment");
+      await page.getByTestId("reveal-sweep").click();
+      if (name !== "small mobile") {
+        await page.getByRole("button", { name: "Stop reveal" }).waitFor();
+        await page.waitForFunction(
+          () =>
+            Number(document.querySelector('[data-testid="split-handle"]')?.getAttribute("aria-valuenow")) <
+            85,
+        );
+        await page.getByRole("button", { name: "Stop reveal" }).click();
+      } else {
+        if ((await split.getAttribute("aria-valuenow")) !== "50")
+          throw new Error("Reduced-motion reveal should be static");
+      }
+      await page.screenshot({ path: `../../tmp/motion-review/${name}-focus.png` });
+      await page.getByTestId("focus-lab").click();
+      await page.getByTestId("scroll-toggle").click();
+      await page.waitForFunction(() => {
+        const el = document.querySelector('[data-testid="journey-scroll"]');
+        return Math.round(el.scrollTop / el.clientHeight) === 3;
+      });
+      if ((await page.locator("canvas").evaluate((el) => getComputedStyle(el).touchAction)) !== "pan-y")
+        throw new Error("Canvas blocks native touch scrolling");
+      await page.getByTestId("journey-scroll").evaluate((el) => {
+        el.scrollTop = 0;
+      });
+      await page.waitForFunction(() => window.__ab.story.scene === 0);
+      await page.getByTestId("journey-scroll").evaluate((el) => {
+        el.scrollTop = el.clientHeight * 3;
+      });
+      await page.waitForFunction(() => window.__ab.story.scene === 3);
+      await page.getByTestId("chapter-search").click();
+      await page.waitForFunction(() => {
+        const el = document.querySelector('[data-testid="journey-scroll"]');
+        return window.__ab.story.scene === 2 && Math.round(el.scrollTop / el.clientHeight) === 2;
+      });
+      await page.getByTestId("scroll-toggle").click();
+      await page.getByTestId("chapter-experiment").click();
       await page.getByTestId("exp-site-lanzarote").click();
       await page.getByTestId("variant-30m").click();
       await page.waitForFunction(() => window.__ab?.readyKey === "lanzarote/30m", null, { timeout: 60000 });
@@ -51,7 +125,9 @@ try {
       await page.getByTestId("evidence-drawer").waitFor();
       await page.goto(`${base}#brief`, { waitUntil: "networkidle" });
       await page.getByRole("heading", { name: /Field Validation Brief/ }).waitFor();
-      console.log(`${name}: terrain switching, missing-data label, evidence and brief passed`);
+      console.log(
+        `${name}: audio signal/volume, focus, reveal, scroll navigation, terrain, evidence and brief passed`,
+      );
     } finally {
       await page.close();
     }

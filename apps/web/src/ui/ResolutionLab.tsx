@@ -16,6 +16,8 @@ export function ResolutionLab({
   onSite,
   onCompare,
   onDetails,
+  focused,
+  onFocus,
 }: {
   index: SitesIndex;
   state: SceneState;
@@ -23,6 +25,8 @@ export function ResolutionLab({
   onSite: (site: SiteId) => void;
   onCompare: (on: boolean) => void;
   onDetails: () => void;
+  focused: boolean;
+  onFocus: () => void;
 }) {
   const sites = index.sites.filter((s) => s.experiment && POINTS[s.id]);
   const site = sites.find((s) => s.id === state.site) ?? sites[0];
@@ -50,6 +54,18 @@ export function ResolutionLab({
       data-testid="resolution-lab"
       className="rounded-xl border border-white/10 bg-[#0c111c]/85 p-3.5 backdrop-blur"
     >
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-teal-200">Resolution experiment</span>
+        <button
+          type="button"
+          data-testid="focus-lab"
+          aria-pressed={focused}
+          onClick={onFocus}
+          className="ab-small-button"
+        >
+          {focused ? "Exit focus ↙" : "Focus experiment ↗"}
+        </button>
+      </div>
       {sites.length > 1 && (
         <div className="mb-3 flex gap-1">
           {sites.map((s) => (
@@ -126,10 +142,19 @@ export function ResolutionLab({
         )}
       </div>
 
-      <p className="mt-2 text-[11px] leading-snug text-zinc-400">
-        Grid spacing is not effective instrument resolution. The shared display mesh and per-grid shading are
-        visualizations; block averaging is a simulation, not a lunar sensor model.
-      </p>
+      <details className="mt-2 text-[11px] leading-snug text-zinc-400">
+        <summary className="cursor-pointer py-1 text-zinc-300">How this experiment works</summary>
+        <ol className="ab-method">
+          <li>Observed LiDAR terrain</li>
+          <li>Average into computed grid cells</li>
+          <li>Measure point and background relief</li>
+          <li>Choose a field validation question</li>
+        </ol>
+        <p>
+          Grid spacing is not effective instrument resolution. The shared display mesh and per-grid shading
+          are visualizations; block averaging is a simulation, not a lunar sensor model.
+        </p>
+      </details>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
         <label className="flex items-center gap-2 text-zinc-300">
           <input
@@ -155,8 +180,8 @@ function Bar({ label, value, max, cls }: { label: string; value: number; max: nu
       <span className="text-zinc-300">{label}</span>
       <span className="h-2 rounded-full bg-white/5">
         <span
-          className={`block h-2 rounded-full ${cls} transition-[width] duration-500`}
-          style={{ width: `${(value / max) * 100}%` }}
+          className={`block h-2 rounded-full ${cls} motion-safe:transition-[transform] motion-safe:duration-500 origin-left`}
+          style={{ transform: `scaleX(${max > 0 ? value / max : 0})` }}
         />
       </span>
       <span className="text-right font-mono text-zinc-100">{value.toFixed(1)} m</span>
