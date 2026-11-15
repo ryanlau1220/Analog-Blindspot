@@ -178,6 +178,8 @@ def export_moon(man: dict, out: Path) -> dict:
                 "id": "marius_hills_pit",
                 "name": pit["name"],
                 "kind": "pit",
+                "lat": pit["lat"],
+                "lon": pit["lon_east"],
                 # local metres from the ROI north-west corner
                 "x_m": (loc["col_f"] - w["col_off"]) * cell,
                 "y_m": (loc["row_f"] - w["row_off"]) * cell,
@@ -342,6 +344,8 @@ def export_earth(man: dict, out: Path) -> dict:
                 "id": f"gnis_{lm['gnis_id']}",
                 "name": lm["name"],
                 "kind": "natural_bridge",
+                "lat": lm["lat"],
+                "lon": lm["lon"],
                 "x_m": x,
                 "y_m": y,
                 "surface_elev_m": float(native[i, j]),
@@ -392,6 +396,24 @@ CANDIDATES = [
         "elevation_product": "ALOS-PALSAR-derived DEM (12.5 m, as used in a published study)",
         "note": "Too coarse for the 0.5 m coarsening experiment; no high-resolution DTM of a tube feature confirmed.",
         "url": "https://www.mdpi.com/2073-445X/12/3/705",
+        "lat": 25.5888,
+        "lon": 39.7570,
+        "point_label": "Umm Jirsan lava tube",
+        "point_source": "Published site coordinates (pure.mpg.de item 3332917)",
+    },
+    {
+        "id": "mars_arsia_skylight",
+        "site": "Arsia Mons candidate cave entrance, Mars",
+        "body": "Mars",
+        "status": "not_verified",
+        "elevation_product": "HiRISE image PSP_003647_1745 (25 cm/px image, not elevation)",
+        "note": "A deep pit seen in a HiRISE image; no public HiRISE terrain model of it was found, so nothing is "
+        "measured here. Shown so the Mars question stays visible, not as an analysis.",
+        "url": "https://hirise.lpl.arizona.edu/PSP_003647_1745",
+        "lat": -5.532,
+        "lon": 241.396,
+        "point_label": "Image centre, PSP_003647_1745",
+        "point_source": "HiRISE observation page (image-centre latitude and east longitude)",
     },
 ]
 
@@ -424,6 +446,8 @@ def export_lanzarote(rec: dict, out: Path) -> dict:
                 "id": f"ngbe_{lm['ngbe_id']}",
                 "name": lm["name"],
                 "kind": "jameo",
+                "lat": lm["lat"],
+                "lon": lm["lon"],
                 "x_m": x,
                 "y_m": y,
                 "surface_elev_m": float(h) if np.isfinite(h) else float(np.nanmedian(native)),
@@ -500,6 +524,92 @@ def lanzarote_candidate(rec: dict | None) -> dict:
     }
 
 
+PHASE_E_PATH = MANIFEST_PATH.parent / "manifest_phase_e.json"
+NASADEM_ID = "nasadem30m"
+
+
+def search_block(search: dict) -> dict:
+    keep = ("spacing_m", "radius_m", "percentile", "match_radius_m", "note")
+    return {
+        **{k: search[k] for k in keep},
+        "levels": [
+            {
+                k: lv[k]
+                for k in (
+                    "resolution_m",
+                    "observed",
+                    "threshold_m",
+                    "lattice_points",
+                    "flagged_points",
+                    "landmarks_recovered",
+                    "landmark_count",
+                    "random_recovered_fraction",
+                    "candidates",
+                )
+            }
+            for lv in search["levels"]
+        ],
+    }
+
+
+def add_phase_e(site: dict, pe: dict, out: Path) -> None:
+    """Attach the NASADEM reference grid, NASA POWER climate and the lattice search to an Earth site."""
+    rec = pe["sites"].get(site["id"])
+    if rec is None:
+        return
+    nd = rec["nasadem_30m"]
+    z, tr, crs = read_masked(REPO_ROOT / nd["path"])
+    extent = site["extent_m"]
+    vd = out / NASADEM_ID
+    vd.mkdir(parents=True, exist_ok=True)
+    disp = to_display_grid(z, tr, crs, tr.c, tr.f, extent)
+    heights = write_heights(disp, vd / "heights.f32")
+    normal = write_normal_map(z, abs(tr.a), vd / "normal.webp")
+    meta = pe["nasadem"]
+    variant = {
+        "id": NASADEM_ID,
+        "resolution_m": 30.0,
+        "observed": False,
+        "reference": True,
+        "label": "NASA NASADEM, 1 arc-second (about 30 m): an independent radar observation, not a simulation",
+        "display": {
+            "grid": DISPLAY_N,
+            "cell_m": extent / DISPLAY_N,
+            "geometry": "NASADEM resampled (bilinear) onto the ROI 30 m grid, then area-averaged to the display grid",
+        },
+        "heights": heights,
+        "elevation": finite_stats(disp),
+        "normal_map": {**normal, "filter": "nearest", "basis": "Horn gradients of the 30 m NASADEM grid"},
+        "derived_from": {"path": nd["path"], "sha256": nd["sha256"]},
+    }
+    c = nd["comparison"]
+    site["nasa_reference"] = {
+        "variant_id": NASADEM_ID,
+        "variant": variant,
+        "title": meta["title"],
+        "product_id": meta["product_id"],
+        "tiles": [t["tile"] for t in meta["tiles"]],
+        "landing_page": meta["landing_page"],
+        "license": meta["license"],
+        "citation": meta["citation"],
+        "resolution_m": 30.0,
+        "vertical": meta["vertical"],
+        "comparison": {
+            "against_variant_id": res_tag(30.0),
+            "rmse_m": c["rmse_m"],
+            "bias_m": c["bias_m"],
+            "rmse_detrended_m": c["rmse_detrended_m"],
+            "pearson_r": c["pearson_r"],
+            "cells": c["cells"],
+            "note": f"Cell-by-cell over {c['mask']} of the ROI's 30 m grid. The bias includes the datum difference "
+            f"(EGM96 geoid vs {site['vertical']}).",
+        },
+    }
+    clim = rec["climate"]
+    site["climate"] = {k: clim[k] for k in ("source", "url", "lat", "lon", "t2m_max_c", "t2m_min_c", "period", "note")}
+    site["experiment"]["search"] = search_block(rec["search"])
+
+
 def main() -> int:
     man = json.loads(MANIFEST_PATH.read_text())
     if man["phase_a_gate"]["status"] != "pass":
@@ -510,6 +620,12 @@ def main() -> int:
     phase_d = man.get("phase_d")
     if phase_d and phase_d["dataset"]["status"] == "validated":
         sites.append(export_lanzarote(phase_d, WEB_DATA / "lanzarote"))
+    if PHASE_E_PATH.exists():
+        pe = json.loads(PHASE_E_PATH.read_text())
+        if pe["gate"]["status"] == "pass":
+            for site in sites:
+                if site["body"] == "Earth":
+                    add_phase_e(site, pe, WEB_DATA / site["id"])
     candidates = [c if c["id"] != "lanzarote" else lanzarote_candidate(phase_d) for c in CANDIDATES]
     index = {
         "asset_version": ASSET_VERSION,

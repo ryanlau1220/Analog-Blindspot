@@ -21,6 +21,7 @@ fetch-landmarks = "analog_blindspot_science.fetch_landmarks:main"
 fetch-landmarks-es = "analog_blindspot_science.fetch_landmarks_es:main"
 phase-d = "analog_blindspot_science.phase_d:main"
 phase-a = "analog_blindspot_science.phase_a:main"
+phase-e = "analog_blindspot_science.phase_e:main"
 export-web = "analog_blindspot_science.export_web:main"
 
 [build-system]

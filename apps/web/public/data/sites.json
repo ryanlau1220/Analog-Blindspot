@@ -75,6 +75,8 @@
           "id": "marius_hills_pit",
           "name": "Marius Hills Pit",
           "kind": "pit",
+          "lat": 14.0917,
+          "lon": 303.2299,
           "x_m": 514.1904432068642,
           "y_m": 512.4428278627408,
           "surface_elev_m": -1570.791015625,
@@ -295,6 +297,8 @@
           "id": "gnis_1657771",
           "name": "Garden Bridges",
           "kind": "natural_bridge",
+          "lat": 41.7084969,
+          "lon": -121.5141734,
           "x_m": 934.2481593904085,
           "y_m": 621.658546641469,
           "surface_elev_m": 1505.70849609375,
@@ -307,6 +311,8 @@
           "id": "gnis_2707991",
           "name": "Hopkins Bridge",
           "kind": "natural_bridge",
+          "lat": 41.709172,
+          "lon": -121.5139025,
           "x_m": 955.4926338271471,
           "y_m": 546.3148425891995,
           "surface_elev_m": 1503.4501953125,
@@ -319,6 +325,8 @@
           "id": "gnis_2707990",
           "name": "Chocolate Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7092616,
+          "lon": -121.5135314,
           "x_m": 986.19524889288,
           "y_m": 535.833774949424,
           "surface_elev_m": 1501.223388671875,
@@ -331,6 +339,8 @@
           "id": "gnis_2707992",
           "name": "Sentinel Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7083386,
+          "lon": -121.5114025,
           "x_m": 1165.0847952086478,
           "y_m": 635.2519890647382,
           "surface_elev_m": 1494.9892578125,
@@ -343,6 +353,8 @@
           "id": "gnis_2707989",
           "name": "Venetian Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7086164,
+          "lon": -121.5141803,
           "x_m": 933.4451213232242,
           "y_m": 608.4006612179801,
           "surface_elev_m": 1507.27978515625,
@@ -355,6 +367,8 @@
           "id": "gnis_2707988",
           "name": "Brushy Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7083386,
+          "lon": -121.5141803,
           "x_m": 933.9774117229972,
           "y_m": 639.2441149642691,
           "surface_elev_m": 1506.999267578125,
@@ -367,6 +381,8 @@
           "id": "gnis_2707987",
           "name": "Natural Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7025053,
+          "lon": -121.5186247,
           "x_m": 575.3553414803464,
           "y_m": 1293.2724251355976,
           "surface_elev_m": 1544.3153076171875,
@@ -379,6 +395,8 @@
           "id": "gnis_1670696",
           "name": "Ovis Bridge",
           "kind": "natural_bridge",
+          "lat": 41.7029413,
+          "lon": -121.5175068,
           "x_m": 667.5373146736529,
           "y_m": 1243.2636112254113,
           "surface_elev_m": 1531.4224853515625,
@@ -2132,7 +2150,314 @@
             "slope_deg_p95": 6.608067512512207
           }
         ],
-        "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark."
+        "caveat": "Eight approximate point labels; a relief comparison, not a detection-rate benchmark.",
+        "search": {
+          "spacing_m": 30.0,
+          "radius_m": 30.0,
+          "percentile": 95.0,
+          "match_radius_m": 45.0,
+          "note": "Relief within 30 m on a 30 m lattice across the ROI; points above the lattice's 95th percentile are flagged. Recovery = gazetteer points within 45 m of a flagged point; chance = the same for 400 seeded random positions. Unverified candidates may be roads, scarps, cliffs or spoil heaps.",
+          "levels": [
+            {
+              "resolution_m": 0.5,
+              "observed": true,
+              "threshold_m": 11.715,
+              "lattice_points": 3364,
+              "flagged_points": 169,
+              "landmarks_recovered": 2,
+              "landmark_count": 8,
+              "random_recovered_fraction": 0.1525,
+              "candidates": [
+                {
+                  "x_m": 285.0,
+                  "y_m": 1455.0,
+                  "relief_m": 19.85,
+                  "cells": 15
+                },
+                {
+                  "x_m": 1755.0,
+                  "y_m": 1095.0,
+                  "relief_m": 18.8,
+                  "cells": 41
+                },
+                {
+                  "x_m": 1395.0,
+                  "y_m": 915.0,
+                  "relief_m": 17.51,
+                  "cells": 19
+                },
+                {
+                  "x_m": 1545.0,
+                  "y_m": 225.0,
+                  "relief_m": 15.93,
+                  "cells": 6
+                },
+                {
+                  "x_m": 735.0,
+                  "y_m": 1095.0,
+                  "relief_m": 15.76,
+                  "cells": 13
+                },
+                {
+                  "x_m": 1485.0,
+                  "y_m": 1245.0,
+                  "relief_m": 15.38,
+                  "cells": 10
+                },
+                {
+                  "x_m": 1425.0,
+                  "y_m": 195.0,
+                  "relief_m": 15.3,
+                  "cells": 4
+                },
+                {
+                  "x_m": 945.0,
+                  "y_m": 795.0,
+                  "relief_m": 15.21,
+                  "cells": 9
+                },
+                {
+                  "x_m": 1395.0,
+                  "y_m": 1125.0,
+                  "relief_m": 13.71,
+                  "cells": 2
+                },
+                {
+                  "x_m": 1425.0,
+                  "y_m": 285.0,
+                  "relief_m": 13.25,
+                  "cells": 2
+                }
+              ]
+            },
+            {
+              "resolution_m": 4.0,
+              "observed": false,
+              "threshold_m": 10.611,
+              "lattice_points": 3364,
+              "flagged_points": 169,
+              "landmarks_recovered": 2,
+              "landmark_count": 8,
+              "random_recovered_fraction": 0.1475,
+              "candidates": [
+                {
+                  "x_m": 285.0,
+                  "y_m": 1455.0,
+                  "relief_m": 17.9,
+                  "cells": 12
+                },
+                {
+                  "x_m": 1755.0,
+                  "y_m": 1095.0,
+                  "relief_m": 16.71,
+                  "cells": 46
+                },
+                {
+                  "x_m": 1395.0,
+                  "y_m": 915.0,
+                  "relief_m": 16.42,
+                  "cells": 19
+                },
+                {
+                  "x_m": 1425.0,
+                  "y_m": 225.0,
+                  "relief_m": 14.53,
+                  "cells": 4
+                },
+                {
+                  "x_m": 1515.0,
+                  "y_m": 225.0,
+                  "relief_m": 14.5,
+                  "cells": 5
+                },
+                {
+                  "x_m": 945.0,
+                  "y_m": 795.0,
+                  "relief_m": 14.44,
+                  "cells": 8
+                },
+                {
+                  "x_m": 735.0,
+                  "y_m": 1095.0,
+                  "relief_m": 14.37,
+                  "cells": 11
+                },
+                {
+                  "x_m": 1485.0,
+                  "y_m": 1245.0,
+                  "relief_m": 14.1,
+                  "cells": 15
+                },
+                {
+                  "x_m": 1485.0,
+                  "y_m": 1455.0,
+                  "relief_m": 12.71,
+                  "cells": 3
+                },
+                {
+                  "x_m": 45.0,
+                  "y_m": 1755.0,
+                  "relief_m": 12.5,
+                  "cells": 1
+                }
+              ]
+            },
+            {
+              "resolution_m": 10.0,
+              "observed": false,
+              "threshold_m": 9.44,
+              "lattice_points": 3364,
+              "flagged_points": 169,
+              "landmarks_recovered": 2,
+              "landmark_count": 8,
+              "random_recovered_fraction": 0.1525,
+              "candidates": [
+                {
+                  "x_m": 1755.0,
+                  "y_m": 1125.0,
+                  "relief_m": 16.16,
+                  "cells": 47
+                },
+                {
+                  "x_m": 555.0,
+                  "y_m": 1365.0,
+                  "relief_m": 15.41,
+                  "cells": 18
+                },
+                {
+                  "x_m": 1395.0,
+                  "y_m": 915.0,
+                  "relief_m": 15.12,
+                  "cells": 20
+                },
+                {
+                  "x_m": 945.0,
+                  "y_m": 795.0,
+                  "relief_m": 14.04,
+                  "cells": 6
+                },
+                {
+                  "x_m": 1425.0,
+                  "y_m": 225.0,
+                  "relief_m": 13.52,
+                  "cells": 11
+                },
+                {
+                  "x_m": 315.0,
+                  "y_m": 1455.0,
+                  "relief_m": 13.08,
+                  "cells": 12
+                },
+                {
+                  "x_m": 1485.0,
+                  "y_m": 1215.0,
+                  "relief_m": 12.48,
+                  "cells": 10
+                },
+                {
+                  "x_m": 1515.0,
+                  "y_m": 225.0,
+                  "relief_m": 12.38,
+                  "cells": 4
+                },
+                {
+                  "x_m": 1395.0,
+                  "y_m": 1125.0,
+                  "relief_m": 11.68,
+                  "cells": 3
+                },
+                {
+                  "x_m": 45.0,
+                  "y_m": 1755.0,
+                  "relief_m": 11.6,
+                  "cells": 1
+                }
+              ]
+            },
+            {
+              "resolution_m": 30.0,
+              "observed": false,
+              "threshold_m": null,
+              "lattice_points": 0,
+              "flagged_points": 0,
+              "landmarks_recovered": 0,
+              "landmark_count": 8,
+              "random_recovered_fraction": null,
+              "candidates": []
+            }
+          ]
+        }
+      },
+      "nasa_reference": {
+        "variant_id": "nasadem30m",
+        "variant": {
+          "id": "nasadem30m",
+          "resolution_m": 30.0,
+          "observed": false,
+          "reference": true,
+          "label": "NASA NASADEM, 1 arc-second (about 30 m): an independent radar observation, not a simulation",
+          "display": {
+            "grid": 257,
+            "cell_m": 7.003891050583658,
+            "geometry": "NASADEM resampled (bilinear) onto the ROI 30 m grid, then area-averaged to the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "b15ea387e37e1411b0c38fa0c4023b62daf25273cee59cdb50f8895cd22a711c"
+          },
+          "elevation": {
+            "min_m": 1430.3612060546875,
+            "max_m": 1559.897216796875,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 60,
+            "m_per_px": 30.0,
+            "bytes": 3016,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 30 m NASADEM grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/earth/lavabeds_roi_nasadem_30m.tif",
+            "sha256": "dc6977a280bc287bd169ce9854eb199dbf96ab3b6ed7295d1836f9c389c45057"
+          }
+        },
+        "title": "NASADEM Merged DEM Global 1 arc second V001",
+        "product_id": "NASADEM_HGT.001",
+        "tiles": [
+          "n41w122",
+          "n29w014"
+        ],
+        "landing_page": "https://lpdaac.usgs.gov/products/nasadem_hgtv001/",
+        "license": "NASA data, no restrictions on reuse (LP DAAC data use policy)",
+        "citation": "NASA JPL (2020). NASADEM Merged DEM Global 1 arc second V001. NASA EOSDIS Land Processes DAAC. doi:10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001",
+        "resolution_m": 30.0,
+        "vertical": "EGM96 geoid (NASADEM_HGT)",
+        "comparison": {
+          "against_variant_id": "30m",
+          "rmse_m": 2.4723166387029636,
+          "bias_m": -1.9735852728949652,
+          "rmse_detrended_m": 1.4890637100606627,
+          "pearson_r": 0.9984488914555664,
+          "cells": 3600,
+          "note": "Cell-by-cell over all cells of the ROI's 30 m grid. The bias includes the datum difference (EGM96 geoid vs NAVD88 (GEOID18), EPSG:5703)."
+        }
+      },
+      "climate": {
+        "source": "NASA POWER climatology API (MERRA-2 based), T2M_MAX and T2M_MIN, annual values",
+        "url": "https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=T2M_MAX,T2M_MIN&community=RE&longitude=-121.5142&latitude=41.7085&format=JSON",
+        "lat": 41.709,
+        "lon": -121.514,
+        "t2m_max_c": 39.37,
+        "t2m_min_c": -23.88,
+        "period": "January 2001 - December 2025",
+        "note": "Highest and lowest 2 m air temperature in the POWER climatology for the grid cell (about 0.5 degree, MERRA-2 reanalysis), not the ground surface at the feature."
       }
     },
     {
@@ -2317,6 +2642,8 @@
           "id": "ngbe_2629323",
           "name": "Jameo de la Gente",
           "kind": "jameo",
+          "lat": 29.16748,
+          "lon": -13.460693,
           "x_m": 88.60000159335323,
           "y_m": 39.63250192627311,
           "surface_elev_m": 124.88639831542969,
@@ -2329,6 +2656,8 @@
           "id": "ngbe_2629326",
           "name": "Jameo Redondo",
           "kind": "jameo",
+          "lat": 29.166321,
+          "lon": -13.456909,
           "x_m": 458.32224518829025,
           "y_m": 163.24160979036242,
           "surface_elev_m": 120.23222351074219,
@@ -2341,6 +2670,8 @@
           "id": "ngbe_2629322",
           "name": "Jameo Cumplido",
           "kind": "jameo",
+          "lat": 29.165527,
+          "lon": -13.453979,
           "x_m": 744.4580743594561,
           "y_m": 247.48424453148618,
           "surface_elev_m": 101.92646789550781,
@@ -2353,6 +2684,8 @@
           "id": "ngbe_2629324",
           "name": "Jameo de Puerta Falsa",
           "kind": "jameo",
+          "lat": 29.163879,
+          "lon": -13.450684,
           "x_m": 1067.3471616030438,
           "y_m": 425.8885056646541,
           "surface_elev_m": 87.24895477294922,
@@ -2365,6 +2698,8 @@
           "id": "ngbe_2630216",
           "name": "Cueva de los Verdes",
           "kind": "jameo",
+          "lat": 29.160278,
+          "lon": -13.439392,
           "x_m": 2170.9594902615063,
           "y_m": 810.4073560214601,
           "surface_elev_m": 55.90302658081055,
@@ -2377,6 +2712,8 @@
           "id": "ngbe_2629328",
           "name": "Jameos del Agua",
           "kind": "jameo",
+          "lat": 29.156921,
+          "lon": -13.431824,
           "x_m": 2912.0494487569667,
           "y_m": 1172.6208673529327,
           "surface_elev_m": 19.638137817382812,
@@ -3432,7 +3769,314 @@
             "slope_deg_p95": 6.211407661437988
           }
         ],
-        "caveat": "Six approximate point labels; a relief comparison, not a detection-rate benchmark."
+        "caveat": "Six approximate point labels; a relief comparison, not a detection-rate benchmark.",
+        "search": {
+          "spacing_m": 30.0,
+          "radius_m": 30.0,
+          "percentile": 95.0,
+          "match_radius_m": 45.0,
+          "note": "Relief within 30 m on a 30 m lattice across the ROI; points above the lattice's 95th percentile are flagged. Recovery = gazetteer points within 45 m of a flagged point; chance = the same for 400 seeded random positions. Unverified candidates may be roads, scarps, cliffs or spoil heaps.",
+          "levels": [
+            {
+              "resolution_m": 2.0,
+              "observed": true,
+              "threshold_m": 10.57,
+              "lattice_points": 7564,
+              "flagged_points": 378,
+              "landmarks_recovered": 6,
+              "landmark_count": 6,
+              "random_recovered_fraction": 0.1487,
+              "candidates": [
+                {
+                  "x_m": 1125.0,
+                  "y_m": 2145.0,
+                  "relief_m": 20.62,
+                  "cells": 103
+                },
+                {
+                  "x_m": 375.0,
+                  "y_m": 885.0,
+                  "relief_m": 18.77,
+                  "cells": 35
+                },
+                {
+                  "x_m": 2925.0,
+                  "y_m": 195.0,
+                  "relief_m": 17.9,
+                  "cells": 18
+                },
+                {
+                  "x_m": 2385.0,
+                  "y_m": 345.0,
+                  "relief_m": 17.1,
+                  "cells": 17
+                },
+                {
+                  "x_m": 345.0,
+                  "y_m": 1605.0,
+                  "relief_m": 16.99,
+                  "cells": 12
+                },
+                {
+                  "x_m": 105.0,
+                  "y_m": 1785.0,
+                  "relief_m": 16.1,
+                  "cells": 18
+                },
+                {
+                  "x_m": 1455.0,
+                  "y_m": 75.0,
+                  "relief_m": 15.57,
+                  "cells": 7
+                },
+                {
+                  "x_m": 45.0,
+                  "y_m": 1695.0,
+                  "relief_m": 14.72,
+                  "cells": 3
+                },
+                {
+                  "x_m": 2595.0,
+                  "y_m": 135.0,
+                  "relief_m": 14.58,
+                  "cells": 23
+                },
+                {
+                  "x_m": 1005.0,
+                  "y_m": 1515.0,
+                  "relief_m": 14.24,
+                  "cells": 4
+                }
+              ]
+            },
+            {
+              "resolution_m": 4.0,
+              "observed": false,
+              "threshold_m": 10.014,
+              "lattice_points": 7564,
+              "flagged_points": 379,
+              "landmarks_recovered": 6,
+              "landmark_count": 6,
+              "random_recovered_fraction": 0.1483,
+              "candidates": [
+                {
+                  "x_m": 945.0,
+                  "y_m": 2235.0,
+                  "relief_m": 19.8,
+                  "cells": 104
+                },
+                {
+                  "x_m": 375.0,
+                  "y_m": 885.0,
+                  "relief_m": 18.71,
+                  "cells": 34
+                },
+                {
+                  "x_m": 2925.0,
+                  "y_m": 195.0,
+                  "relief_m": 17.11,
+                  "cells": 18
+                },
+                {
+                  "x_m": 2385.0,
+                  "y_m": 345.0,
+                  "relief_m": 16.52,
+                  "cells": 17
+                },
+                {
+                  "x_m": 345.0,
+                  "y_m": 1605.0,
+                  "relief_m": 16.29,
+                  "cells": 11
+                },
+                {
+                  "x_m": 1455.0,
+                  "y_m": 75.0,
+                  "relief_m": 15.09,
+                  "cells": 7
+                },
+                {
+                  "x_m": 105.0,
+                  "y_m": 1785.0,
+                  "relief_m": 14.81,
+                  "cells": 18
+                },
+                {
+                  "x_m": 45.0,
+                  "y_m": 1695.0,
+                  "relief_m": 14.15,
+                  "cells": 3
+                },
+                {
+                  "x_m": 2595.0,
+                  "y_m": 135.0,
+                  "relief_m": 13.98,
+                  "cells": 22
+                },
+                {
+                  "x_m": 255.0,
+                  "y_m": 1275.0,
+                  "relief_m": 13.78,
+                  "cells": 10
+                }
+              ]
+            },
+            {
+              "resolution_m": 10.0,
+              "observed": false,
+              "threshold_m": 9.108,
+              "lattice_points": 7565,
+              "flagged_points": 379,
+              "landmarks_recovered": 6,
+              "landmark_count": 6,
+              "random_recovered_fraction": 0.1451,
+              "candidates": [
+                {
+                  "x_m": 975.0,
+                  "y_m": 2235.0,
+                  "relief_m": 18.76,
+                  "cells": 96
+                },
+                {
+                  "x_m": 345.0,
+                  "y_m": 885.0,
+                  "relief_m": 17.15,
+                  "cells": 36
+                },
+                {
+                  "x_m": 2385.0,
+                  "y_m": 345.0,
+                  "relief_m": 15.74,
+                  "cells": 16
+                },
+                {
+                  "x_m": 2925.0,
+                  "y_m": 195.0,
+                  "relief_m": 15.48,
+                  "cells": 16
+                },
+                {
+                  "x_m": 345.0,
+                  "y_m": 1605.0,
+                  "relief_m": 14.89,
+                  "cells": 12
+                },
+                {
+                  "x_m": 45.0,
+                  "y_m": 1905.0,
+                  "relief_m": 13.99,
+                  "cells": 23
+                },
+                {
+                  "x_m": 1455.0,
+                  "y_m": 75.0,
+                  "relief_m": 13.94,
+                  "cells": 7
+                },
+                {
+                  "x_m": 1005.0,
+                  "y_m": 1515.0,
+                  "relief_m": 13.22,
+                  "cells": 3
+                },
+                {
+                  "x_m": 2595.0,
+                  "y_m": 135.0,
+                  "relief_m": 13.01,
+                  "cells": 16
+                },
+                {
+                  "x_m": 255.0,
+                  "y_m": 1275.0,
+                  "relief_m": 12.37,
+                  "cells": 13
+                }
+              ]
+            },
+            {
+              "resolution_m": 30.0,
+              "observed": false,
+              "threshold_m": null,
+              "lattice_points": 0,
+              "flagged_points": 0,
+              "landmarks_recovered": 0,
+              "landmark_count": 6,
+              "random_recovered_fraction": null,
+              "candidates": []
+            }
+          ]
+        }
+      },
+      "nasa_reference": {
+        "variant_id": "nasadem30m",
+        "variant": {
+          "id": "nasadem30m",
+          "resolution_m": 30.0,
+          "observed": false,
+          "reference": true,
+          "label": "NASA NASADEM, 1 arc-second (about 30 m): an independent radar observation, not a simulation",
+          "display": {
+            "grid": 257,
+            "cell_m": 11.673151750972762,
+            "geometry": "NASADEM resampled (bilinear) onto the ROI 30 m grid, then area-averaged to the display grid"
+          },
+          "heights": {
+            "file": "heights.f32",
+            "dtype": "float32-le",
+            "rows": 257,
+            "cols": 257,
+            "nodata": "NaN",
+            "bytes": 264196,
+            "sha256": "1e007b0eea93977f8a342917be802626a310616e9cfbcebd571ed199c727f7d0"
+          },
+          "elevation": {
+            "min_m": -4.593567848205566,
+            "max_m": 149.5935821533203,
+            "nan_count": 0
+          },
+          "normal_map": {
+            "file": "normal.webp",
+            "px": 100,
+            "m_per_px": 30.0,
+            "bytes": 8340,
+            "filter": "nearest",
+            "basis": "Horn gradients of the 30 m NASADEM grid"
+          },
+          "derived_from": {
+            "path": "datasets/derived/lanzarote/lanzarote_roi_nasadem_30m.tif",
+            "sha256": "5410ad0b01849c2bd6410b287bf84976768367d5278c02f1890292b2e8e3092f"
+          }
+        },
+        "title": "NASADEM Merged DEM Global 1 arc second V001",
+        "product_id": "NASADEM_HGT.001",
+        "tiles": [
+          "n41w122",
+          "n29w014"
+        ],
+        "landing_page": "https://lpdaac.usgs.gov/products/nasadem_hgtv001/",
+        "license": "NASA data, no restrictions on reuse (LP DAAC data use policy)",
+        "citation": "NASA JPL (2020). NASADEM Merged DEM Global 1 arc second V001. NASA EOSDIS Land Processes DAAC. doi:10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001",
+        "resolution_m": 30.0,
+        "vertical": "EGM96 geoid (NASADEM_HGT)",
+        "comparison": {
+          "against_variant_id": "30m",
+          "rmse_m": 2.3826584995966393,
+          "bias_m": -1.1751840843027932,
+          "rmse_detrended_m": 2.0726803645766307,
+          "pearson_r": 0.9985947103736851,
+          "cells": 7933,
+          "note": "Cell-by-cell over land cells above 1 m of the ROI's 30 m grid. The bias includes the datum difference (EGM96 geoid vs Orthometric (CNIG product description); geoid model not stated on the download page)."
+        }
+      },
+      "climate": {
+        "source": "NASA POWER climatology API (MERRA-2 based), T2M_MAX and T2M_MIN, annual values",
+        "url": "https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=T2M_MAX,T2M_MIN&community=RE&longitude=-13.4607&latitude=29.1675&format=JSON",
+        "lat": 29.168,
+        "lon": -13.461,
+        "t2m_max_c": 28.47,
+        "t2m_min_c": 13.0,
+        "period": "January 2001 - December 2025",
+        "note": "Highest and lowest 2 m air temperature in the POWER climatology for the grid cell (about 0.5 degree, MERRA-2 reanalysis), not the ground surface at the feature."
       }
     }
   ],
@@ -3459,7 +4103,24 @@
       "status": "not_verified",
       "elevation_product": "ALOS-PALSAR-derived DEM (12.5 m, as used in a published study)",
       "note": "Too coarse for the 0.5 m coarsening experiment; no high-resolution DTM of a tube feature confirmed.",
-      "url": "https://www.mdpi.com/2073-445X/12/3/705"
+      "url": "https://www.mdpi.com/2073-445X/12/3/705",
+      "lat": 25.5888,
+      "lon": 39.757,
+      "point_label": "Umm Jirsan lava tube",
+      "point_source": "Published site coordinates (pure.mpg.de item 3332917)"
+    },
+    {
+      "id": "mars_arsia_skylight",
+      "site": "Arsia Mons candidate cave entrance, Mars",
+      "body": "Mars",
+      "status": "not_verified",
+      "elevation_product": "HiRISE image PSP_003647_1745 (25 cm/px image, not elevation)",
+      "note": "A deep pit seen in a HiRISE image; no public HiRISE terrain model of it was found, so nothing is measured here. Shown so the Mars question stays visible, not as an analysis.",
+      "url": "https://hirise.lpl.arizona.edu/PSP_003647_1745",
+      "lat": -5.532,
+      "lon": 241.396,
+      "point_label": "Image centre, PSP_003647_1745",
+      "point_source": "HiRISE observation page (image-centre latitude and east longitude)"
     }
   ],
   "landmark_sources": [
