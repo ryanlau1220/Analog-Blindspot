@@ -1,4 +1,4 @@
-import { type Dispatch, type ReactNode, useLayoutEffect, useRef } from "react";
+import { type Dispatch, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { AmbientSound } from "../audio/AmbientSound";
 import type { Site, SitesIndex, Variant } from "../data/types";
 import type { SceneAction, SceneState } from "../scene/state";
@@ -165,6 +165,8 @@ export function StoryOverlay({
   const scene = scenes[story.scene];
   const step = scene?.steps[story.step];
   const root = useRef<HTMLDivElement>(null);
+  const [prediction, setPrediction] = useState<"above" | "below" | null>(null);
+  const [revealed, setRevealed] = useState(false);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: animate on chapter change only
   useLayoutEffect(() => {
@@ -205,27 +207,87 @@ export function StoryOverlay({
     panel = <Destinations index={index} current={sceneState.site} onGo={go} />;
     panelWidth = "lg:w-[30rem]";
   }
-  if (scene.panel === "lab")
+  if (scene.panel === "lab" && !revealed)
     panel = (
-      <ResolutionLab
-        index={index}
-        state={sceneState}
-        onVariant={(variantId) => {
-          pause();
-          sceneDispatch({ type: "selectVariant", variantId });
-        }}
-        onSite={(site) => {
-          pause();
-          sceneDispatch({
-            type: "applyPreset",
-            preset: { site, exaggeration: 2, view: "landmark", compare: true },
-          });
-        }}
-        onCompare={(enabled) => sceneDispatch({ type: "setCompare", enabled })}
-        onDetails={onEvidence}
-        focused={focusLab}
-        onFocus={onFocusLab}
-      />
+      <div className="rounded-xl border border-teal-300/30 bg-[#0c111c]/95 p-5" data-testid="prediction">
+        <p className="text-xs tracking-widest text-teal-200">YOUR PREDICTION · LAVA BEDS</p>
+        <fieldset className="mt-3">
+          <legend className="text-lg text-white">
+            At a simulated 10 m grid, will the landmark group's median relief still exceed the sampled
+            background?
+          </legend>
+          <div className="mt-4 grid gap-3 text-sm text-zinc-200">
+            <label>
+              <input
+                type="radio"
+                name="prediction"
+                checked={prediction === "above"}
+                onChange={() => setPrediction("above")}
+              />{" "}
+              Yes, still above
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="prediction"
+                checked={prediction === "below"}
+                onChange={() => setPrediction("below")}
+              />{" "}
+              No, at or below
+            </label>
+          </div>
+        </fieldset>
+        <button
+          type="button"
+          disabled={!prediction}
+          className="ab-small-button mt-4 disabled:opacity-40"
+          data-testid="prediction-reveal"
+          onClick={() => {
+            setRevealed(true);
+            pause();
+            sceneDispatch({
+              type: "applyPreset",
+              preset: { site: "earth", variantId: "10m", exaggeration: 2, view: "landmark", compare: true },
+            });
+          }}
+        >
+          Reveal the measured result →
+        </button>
+        <p className="mt-3 text-xs text-zinc-400">
+          This compares sampled surface relief, not cave detection.
+        </p>
+      </div>
+    );
+  if (scene.panel === "lab" && revealed)
+    panel = (
+      <>
+        <p
+          className="mb-2 rounded-lg bg-[#0c111c]/95 p-3 text-sm text-teal-100"
+          data-testid="prediction-result"
+        >
+          Your prediction: {prediction === "above" ? "above" : "at or below"}. At 10 m, the measured landmark
+          median is at or below the sampled background median. This is not a detection test.
+        </p>
+        <ResolutionLab
+          index={index}
+          state={sceneState}
+          onVariant={(variantId) => {
+            pause();
+            sceneDispatch({ type: "selectVariant", variantId });
+          }}
+          onSite={(site) => {
+            pause();
+            sceneDispatch({
+              type: "applyPreset",
+              preset: { site, exaggeration: 2, view: "landmark", compare: true },
+            });
+          }}
+          onCompare={(enabled) => sceneDispatch({ type: "setCompare", enabled })}
+          onDetails={onEvidence}
+          focused={focusLab}
+          onFocus={onFocusLab}
+        />
+      </>
     );
   if (scene.panel === "decision") {
     panel = <DecisionView index={index} />;
@@ -276,7 +338,11 @@ export function StoryOverlay({
           className={`ab-takeaway mt-3 max-w-md text-sm text-zinc-200 ${scene.panel === "lab" ? lgOnly : ""}`}
         >
           <span className="ab-takeaway-label">{scene.panel === "lab" ? "CURRENT VIEW" : "FIELD NOTE"}</span>
-          {scene.panel === "lab" ? labTakeaway : scene.takeaway}
+          {scene.panel === "lab"
+            ? revealed
+              ? labTakeaway
+              : "Make a prediction before inspecting the measured result."
+            : scene.takeaway}
         </p>
         {scene.panel === "legend" && (
           <div data-anim className="mt-3">
@@ -297,14 +363,16 @@ export function StoryOverlay({
         data-anim="controls"
         className={`pointer-events-auto flex flex-wrap items-center gap-3 lg:col-start-1 ${focusLab ? "hidden" : ""}`}
       >
-        <button
-          type="button"
-          data-testid="primary-action"
-          onClick={act}
-          className="ab-primary-action rounded-full bg-[#d5b293] px-5 py-2.5 text-sm font-medium text-[#090d16] shadow-lg transition hover:bg-[#e4c6aa]"
-        >
-          {scene.action.label} →
-        </button>
+        {scene.panel === "lab" && !revealed ? null : (
+          <button
+            type="button"
+            data-testid="primary-action"
+            onClick={act}
+            className="ab-primary-action rounded-full bg-[#d5b293] px-5 py-2.5 text-sm font-medium text-[#090d16] shadow-lg transition hover:bg-[#e4c6aa]"
+          >
+            {scene.action.label} →
+          </button>
+        )}
         {story.scene > 0 && (
           <button
             type="button"

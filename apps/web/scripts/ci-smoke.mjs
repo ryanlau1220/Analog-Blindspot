@@ -77,6 +77,8 @@ try {
     });
     try {
       await page.goto(`${base}?test=1#scene=experiment`, { waitUntil: "networkidle" });
+      await page.getByLabel("No, at or below").check();
+      await page.getByTestId("prediction-reveal").click();
       await page.waitForFunction(() => window.__ab?.readyKey === "earth/10m", null, { timeout: 60000 });
       const sound = page.getByTestId("ambient-toggle");
       const soundBounds = await sound.boundingBox();

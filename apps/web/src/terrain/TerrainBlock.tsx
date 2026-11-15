@@ -135,6 +135,18 @@ export function TerrainBlock({
   return (
     <group scale={[1, exaggeration, 1]}>
       <mesh geometry={surface} material={surfaceMat} name="terrain-surface" />
+      {cut.enabled && (
+        <mesh geometry={surface} name="display-grid">
+          <meshBasicMaterial
+            wireframe
+            color="#5eead4"
+            transparent
+            opacity={0.16}
+            depthWrite={false}
+            clippingPlanes={planes}
+          />
+        </mesh>
+      )}
       <mesh geometry={skirts} material={wallMat} name="terrain-skirts" />
       {capGeom && <mesh geometry={capGeom} material={capMat} name="terrain-cap" />}
       {gapGeom && <mesh geometry={gapGeom} material={gapMat} name="terrain-cap-nodata" />}

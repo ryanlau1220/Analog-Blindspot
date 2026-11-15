@@ -166,12 +166,12 @@ describe("story navigation", () => {
     expect(scenes[1]?.steps[0]?.followUp?.preset.cutaway).toBe(true);
   });
 
-  it("chapter 4 opens on a split comparison against a simulated grid", () => {
+  it("chapter 4 opens on observed terrain before the prediction", () => {
     const s = stateAt(3, 0);
-    expect(s.compare).toBe(true);
+    expect(s.compare).toBe(false);
     expect(
       index.sites.find((x) => x.id === s.site)?.variants.find((v) => v.id === s.variantId)?.observed,
-    ).toBe(false);
+    ).toBe(true);
     expect(stateAt(4, 0).compare).toBe(false);
   });
 

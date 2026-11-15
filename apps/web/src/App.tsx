@@ -220,6 +220,10 @@ function useStoryDriver(
 
   useEffect(() => {
     if (!story.playing || story.mode !== "story") return;
+    if (scenes[story.scene]?.id === "experiment" && story.step === 0) {
+      storyDispatch({ type: "pause" });
+      return;
+    }
     const { step } = currentStep(scenes, story);
     const t = window.setTimeout(() => storyDispatch({ type: "next" }), step.ms);
     return () => window.clearTimeout(t);

@@ -84,7 +84,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "mystery",
       chapter: "The Mystery",
-      headline: "We mapped the surface. Not what lies beneath.",
+      headline: "The pit is real. What lies beneath is still unmeasured.",
       sub: "One lunar opening. An incomplete map. A mystery we cannot resolve from orbit.",
       takeaway: `Real LROC terrain, ${obs(moon)?.resolution_m} m between elevation posts. Inside the magenta edge the model has no elevation at all.`,
       action: { label: "Reveal the blind spot", kind: "next" },
@@ -103,7 +103,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       id: "blindspot",
       chapter: "The Blindspot",
       headline: "A visible opening doesn't reveal what lies beneath.",
-      sub: "Slice the terrain model through the pit and see what was actually measured.",
+      sub: "The display mesh traces the measured surface; magenta marks missing elevation. The grid is a display mesh, not individual source pixels.",
       takeaway: `The walls are measured to at least ${m(f.depression_lower_bound_m, 1)} below the rim. The ${m(f.gap_extent_ew_m)} × ${m(f.gap_extent_ns_m)} interior has no data. Below that, nothing is measured.`,
       action: { label: "Search Earth for clues", kind: "next" },
       body: [
@@ -159,8 +159,8 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "experiment",
       chapter: "Resolution",
-      headline: "Change the grid. Watch the terrain change.",
-      sub: "Drag the split. Left: the observed LiDAR. Right: the same ground on a coarser, simulated grid.",
+      headline: "Can the surface clues keep their distinction?",
+      sub: "Predict the outcome, then compare observed terrain with a simulated coarser grid.",
       takeaway:
         loss !== null && kept !== null
           ? `Median bridge-point relief exceeds background through ${kept} m; at ${loss} m it does not.`
@@ -183,10 +183,10 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
         {
           preset: {
             site: "earth",
-            variantId: (earth.variants.find((v) => v.resolution_m === loss) ?? simulated[0])?.id,
+            variantId: obs(earth)?.id,
             exaggeration: 2,
             view: "landmark",
-            compare: true,
+            compare: false,
           },
           ms: 4000,
           caption: "Vertical exaggeration ×2.",
@@ -210,7 +210,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "decision",
       chapter: "Field Decision",
-      headline: "Choose the test. Then choose the site.",
+      headline: "One Moon. Two Earth sites. Different questions.",
       sub: "Two known candidate environments, two measurement questions, and one crucial unknown.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",
       action: { label: "View Field Validation Brief", kind: "brief" },
