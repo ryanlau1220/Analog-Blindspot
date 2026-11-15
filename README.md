@@ -1,7 +1,7 @@
 # Analog Blindspot
 
 A five-chapter, visual-first story about what orbital terrain models measure at Marius Hills Pit (Moon), and how
-how relief around known surface features changes as Earth terrain grids are coarsened. Every number shown comes from
+relief around known surface features changes as Earth terrain grids are coarsened. Every number shown comes from
 real, checked elevation data. Nothing in it shows subsurface geometry as measured.
 
 **Decision:** use Lava Beds to investigate smaller surface clues, and Lanzarote to investigate larger collapse
@@ -24,6 +24,23 @@ pnpm build          # static site in apps/web/dist; BASE_PATH=/sub/ pnpm build f
 ```
 
 The app reads only `apps/web/public/data` (9.4 MB, committed) and makes no remote API calls at runtime.
+
+## Cloudflare deployment
+
+This is a static-only Cloudflare Worker; no Worker code, secrets, or backend are required. After pushing these
+files, import the repository in **Workers & Pages → Create → Import a repository**, select `main` as the
+production branch, and use the repository root with these Workers Builds settings:
+
+- Build command: `pnpm build`
+- Deploy command: `pnpm exec wrangler deploy`
+- Preview command: `pnpm exec wrangler preview`
+- Build output: `apps/web/dist` (configured in `wrangler.jsonc`)
+
+Cloudflare installs dependencies before running the build. `.node-version` and `packageManager` pin the tested
+Node and pnpm versions. Leave `BASE_PATH` unset when serving from the domain root. Once connected, pushes to
+`main` deploy production; confirm the build and check the live site, the resolution comparison, the evidence
+drawer, and `#brief`. You can validate the configuration locally without deploying with
+`pnpm build && pnpm exec wrangler deploy --dry-run`.
 
 ## Rebuild the data
 

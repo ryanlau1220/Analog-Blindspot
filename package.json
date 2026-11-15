@@ -1,11 +1,15 @@
 {
   "name": "analog-blindspot",
   "private": true,
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "test": "pnpm --filter web test",
     "check": "pnpm --filter web check",
     "perf": "pnpm --filter web perf"
+  },
+  "devDependencies": {
+    "wrangler": "4.162.0"
   }
 }
