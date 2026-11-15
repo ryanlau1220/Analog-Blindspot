@@ -385,7 +385,7 @@ export function StoryOverlay({
         >
           <span className="ab-takeaway-label">{scene.panel === "lab" ? "CURRENT VIEW" : "FIELD NOTE"}</span>
           {scene.panel === "lab"
-            ? revealed
+            ? revealed || !target
               ? labTakeaway
               : "Make a prediction before inspecting the measured result."
             : scene.takeaway}
@@ -410,7 +410,7 @@ export function StoryOverlay({
         data-anim="controls"
         className={`pointer-events-auto flex flex-wrap items-center gap-3 lg:col-start-1 ${focusLab ? "hidden" : ""}`}
       >
-        {scene.panel === "lab" && !revealed ? null : (
+        {scene.panel === "lab" && !revealed && target ? null : (
           <button
             type="button"
             data-testid="primary-action"

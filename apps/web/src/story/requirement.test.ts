@@ -31,10 +31,10 @@ describe("resolution requirement", () => {
   it("states the limit and the global lunar product from data and citation", () => {
     expect(SLDEM2015.equator_m).toBeCloseTo(59.2, 1);
     const s = requirementStatement(index) ?? "";
-    expect(s).toContain("4 m or finer and not at 10 m");
-    expect(s).toContain("still stand out at 10 m");
+    expect(s).toContain("tested 4 m grid, but not at 10 m");
+    expect(s).toContain("background at the tested 10 m grid");
     expect(s).toContain("about 59 m");
-    expect(buildFindings(index).supported[0]).toContain("Resolution requirement");
+    expect(buildFindings(index).supported[0]).toContain("Sampled relief comparison");
   });
 });
 

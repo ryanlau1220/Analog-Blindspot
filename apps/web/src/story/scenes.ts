@@ -255,9 +255,9 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       chapter: "Field Decision",
       headline:
         kept !== null
-          ? `Small surface clues need a ${kept} m map. The global lunar map is about ${SLDEM2015.equator_m.toFixed(0)} m.`
+          ? `At Lava Beds, sampled point relief remains above background through the tested ${kept} m grid.`
           : "One Moon. Two Earth sites. Different questions.",
-      sub: "A resolution requirement you can test: choose a grid and see which surface clues still stand out.",
+      sub: "Choose the investigation. Compare the sampled relief at the computed grids.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",
       action: { label: "View Field Validation Brief", kind: "brief" },
       body: [

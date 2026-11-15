@@ -5,7 +5,7 @@ import { lastVisibleResolution, lossResolution } from "./scenes";
 export { SLDEM2015 };
 
 /**
- * The resolution requirement that the Earth experiment supports, and where
+ * The sampled relief comparison and where
  * lunar terrain products sit against it. Grids and verdicts come from
  * sites.json; the global lunar product is a cited constant.
  */
@@ -88,7 +88,7 @@ export function marsContext(index: SitesIndex): string | null {
   return `Mars: candidate cave skylights near Arsia Mons are ${lo}–${hi} m across, smaller than one cell of the global ${MOLA_MEGDR.name} (about ${cell.toFixed(0)} m). Only targeted HiRISE stereo models (1–2 m) approach the grids where Earth tube clues stood out.`;
 }
 
-/** One-sentence requirement for the decision chapter and the brief. */
+/** One-sentence summary of the sampled comparison for the decision chapter and brief. */
 export function requirementStatement(index: SitesIndex): string | null {
   const reqs = siteRequirements(index);
   const lb = reqs.find((r) => r.siteId === "earth");
@@ -98,12 +98,14 @@ export function requirementStatement(index: SitesIndex): string | null {
   const nac = products[0];
   const global = products[products.length - 1];
   const parts = [
-    `On this relief measure, ${lb.features} (Lava Beds) stand out on grids of ${lb.keptThrough} m or finer and not at ${lb.lostAt} m`,
+    `At Lava Beds, the sampled landmark median relief exceeds the background median through the tested ${lb.keptThrough} m grid, but not at ${lb.lostAt} m`,
   ];
   if (lz?.keptThrough != null)
-    parts.push(`${lz.features} (Lanzarote) still stand out at ${lz.keptThrough} m`);
+    parts.push(
+      `at Lanzarote, the sampled landmark median exceeds background at the tested ${lz.keptThrough} m grid`,
+    );
   let s = `${parts.join("; ")}.`;
   if (nac && global)
-    s += ` The Marius Hills NAC terrain model (${nac.grid_m} m) sits at the bridge-scale limit; the global ${global.name} (about ${global.grid_m.toFixed(0)} m) is coarser than every grid where either feature type stood out.`;
+    s += ` For context, the Marius Hills NAC terrain model uses ${nac.grid_m} m posts and global ${global.name} uses about ${global.grid_m.toFixed(0)} m pixels at the equator. Grid spacing alone does not establish detectability or equivalent instrument performance.`;
   return s;
 }

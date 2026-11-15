@@ -29,7 +29,7 @@ export function buildFindings(index: SitesIndex): Findings {
 
   const requirement = requirementStatement(index);
   const supported = [
-    ...(requirement ? [`Resolution requirement (simulated coarsening): ${requirement}`] : []),
+    ...(requirement ? [`Sampled relief comparison (simulated coarsening): ${requirement}`] : []),
     `The LROC 4 m terrain model resolves the funnel of Marius Hills Pit: wall posts reach at least ${f.depression_lower_bound_m.toFixed(1)} m below the rim.`,
     `It has no elevation for the pit interior (${f.gap_posts} posts, about ${f.gap_extent_ew_m.toFixed(0)} × ${f.gap_extent_ns_m.toFixed(0)} m). The atlas depth of ${f.atlas_depth_m} m comes from separate stereo modelling.`,
   ];
@@ -69,11 +69,11 @@ export function buildFindings(index: SitesIndex): Findings {
   return {
     supported,
     hypotheses: [
-      "Finding new lunar pits and tube clues from orbit needs terrain grids at or below the limits above; global lunar terrain is far coarser. This transfers Earth block-mean results to lunar stereo models, which is not tested here.",
-      "Surface clues at the scale of the Lava Beds bridges would be hard to recognise in a lunar terrain model with 4 m posts. This assumes block averaging mimics a stereo DTM, which it does not exactly.",
+      "A finer lunar terrain product may help investigate small surface clues. The relationship between the Earth block-mean results and lunar stereo models has not been tested.",
+      "Whether Lava Beds-scale surface clues are distinguishable in a lunar terrain model with 4 m posts remains untested; block averaging does not reproduce a stereo DTM.",
       ...(lexp
         ? [
-            "Collapse features with tens of metres of relief, like the Lanzarote jameos, would remain recognisable at coarser lunar grids. Not tested against lunar data.",
+            "Whether larger collapse features like the Lanzarote jameos remain distinguishable on lunar terrain models is an untested hypothesis.",
           ]
         : []),
     ],

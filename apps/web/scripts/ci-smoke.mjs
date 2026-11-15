@@ -161,6 +161,22 @@ try {
       await page.waitForFunction(() => window.__ab?.readyKey === "lanzarote/30m", null, { timeout: 60000 });
       await page.getByText("Not measurable at 30 m", { exact: false }).first().waitFor();
       if (name === "desktop") await page.getByText("30 m grid: too few cells", { exact: false }).waitFor();
+      await page.getByTestId("chapter-decision").click();
+      await page.getByTestId("decision-view").waitFor();
+      const comparison = page.getByTestId("what-if");
+      if (await comparison.evaluate((el) => el.open))
+        throw new Error("Grid comparison should start collapsed");
+      await comparison.locator("summary").click();
+      const radios = comparison.getByRole("radio");
+      const checked = comparison.locator('input[type="radio"]:checked');
+      const before = await checked.inputValue();
+      await checked.focus();
+      await page.keyboard.press("ArrowRight");
+      if ((await checked.count()) !== 1 || (await checked.inputValue()) === before)
+        throw new Error("Arrow key did not change the selected terrain grid");
+      if ((await page.evaluate(() => window.__ab.story.scene)) !== 4)
+        throw new Error("Radio arrow key navigated away from the decision");
+      if ((await radios.count()) < 2) throw new Error("Missing grid choices");
       await page.getByRole("button", { name: "Evidence", exact: true }).click();
       await page.getByTestId("evidence-drawer").waitFor();
       await page.goto(`${base}#brief`, { waitUntil: "networkidle" });

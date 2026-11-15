@@ -1,8 +1,8 @@
 # Analog Blindspot
 
 A five-chapter, visual-first story about what orbital terrain models measure at Marius Hills Pit (Moon), and how
-relief around known surface features changes as Earth terrain grids are coarsened. Every number shown comes from
-real, checked elevation data. Nothing in it shows subsurface geometry as measured.
+relief around known surface features changes as Earth terrain grids are coarsened. The terrain comparisons use checked elevation products and explicitly labelled simulated coarsening.
+Published planetary context and climatology are separately attributed. Nothing in it shows subsurface geometry as measured.
 
 **Decision:** use Lava Beds to investigate smaller surface clues, and Lanzarote to investigate larger collapse
 features. These are known sites chosen for different test questions, not newly discovered analogs or proven lunar
@@ -15,6 +15,21 @@ detection rates. Field access and subsurface correspondence remain unverified.
 - **Earth 2:** Lanzarote, Malpaís de La Corona, CNIG PNOA-LiDAR MDT02 (2 m), tile 1080-4.
 - **Not verified:** Harrat Khaybar (shown only as a candidate, with no measurements).
 
+## What the prototype does
+
+Follow the lunar pit from an orbital image to the gap in the elevation model, examine two established
+Earth analog sites, predict a sampled relief comparison, and choose a field investigation. A lattice
+search highlights unverified relief anomalies and compares proximity to named points and a separate
+OpenStreetMap entrance set. These are leads for further checking, not newly validated analog sites.
+The printable brief and evidence drawer document sources, methods, and uncertainty.
+
+Earth LiDAR is block-averaged to simulate coarser grids. A difference between sampled landmark and
+background medians is **not** a detection rate, a resolution requirement, or proof of lunar or
+Martian subsurface geometry. NASADEM is a separate real observation, not a simulated grid.
+Diviner's 0.5° bin describes the pit's surroundings, not its interior; Mars grid comparisons are
+context, not an analysis of Martian terrain or a validated base recommendation. Field access,
+candidate anomalies, and underground correspondence still require investigation.
+
 ## Run
 
 ```sh
@@ -23,7 +38,7 @@ pnpm dev            # http://localhost:5173  (#scene=<id> deep links, #brief = p
 pnpm build          # static site in apps/web/dist; BASE_PATH=/sub/ pnpm build for subpath hosting
 ```
 
-The app reads only `apps/web/public/data` (9.4 MB, committed) and makes no remote API calls at runtime.
+The app reads only `apps/web/public/data` (committed) and makes no remote API calls at runtime.
 The optional ambient soundtrack is synthesized locally, starts only when the sound control is selected, and
 stops when the tab is hidden or the experience is closed. The story remains usable without audio.
 
@@ -58,15 +73,17 @@ uv run fetch-landmarks-es   # IGN NGBE (Lanzarote)
 uv run phase-a              # Moon + Lava Beds gate -> datasets/manifest.json
 # Lanzarote tile: manual browser download (CNIG uses reCAPTCHA), see docs/science.md
 uv run phase-d              # Lanzarote gate -> datasets/manifest_phase_d.json
+uv run phase-e              # NASADEM, climate, lattice search, OSM hold-out and Diviner -> manifest_phase_e.json
+                            # add --refresh to refetch POWER, OSM and Diviner inputs
 uv run export-web           # -> apps/web/public/data
 uv run pytest
 ```
 
 ## Docs
 
-- `docs/science.md`: data validation (Phases A, B and D), measured values, limitations.
+- `docs/science.md`: terrain validation, measured values, methods and limitations.
+- `datasets/manifest_phase_e.json`: NASADEM, climate, search and hold-out results.
 - `docs/storytelling.md`: chapters, interaction rules, the printable brief.
-- `docs/judging.md`: demo script, evidence, and submission checklist.
 - `datasets/manifest.json`: provenance, licences, checksums and gate results.
 
 ## Credits and licences
@@ -75,6 +92,7 @@ uv run pytest
 - Lava Beds LiDAR: Williams, E. (2024), NCALM / OpenTopography, CC BY 4.0, NSF EAR-2324629.
 - Lanzarote: Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es.
 - Gazetteers: USGS GNIS (public domain); IGN NGBE (CC BY 4.0); LROC Pits Atlas.
+- OpenStreetMap contributors: cave entrance points, ODbL. NASA POWER, NASADEM and LRO Diviner: NASA data; see the evidence drawer and Phase E manifest for provenance.
 
 ### Presentation controls
 
