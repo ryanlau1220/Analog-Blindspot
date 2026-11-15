@@ -1,5 +1,4 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import gsap from "gsap";
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Site, Variant } from "../data/types";
@@ -7,6 +6,7 @@ import { TerrainBlock } from "../terrain/TerrainBlock";
 import { useVariantAssets } from "../terrain/useVariantAssets";
 import { CameraRig } from "./CameraRig";
 import { type LabelRegistry, LandmarkLabels, Landmarks } from "./Landmarks";
+import { startReveal } from "./reveal";
 import { cameraPreset, poseKey, type SceneState, siteDatum } from "./state";
 
 const SURFACE: Record<Site["id"], string> = { moon: "#bdb6ab", earth: "#a99b86", lanzarote: "#948c84" };
@@ -59,10 +59,10 @@ export function Viewer({
   const cmp = useVariantAssets(site, cmpVariant);
   const [labels] = useState<LabelRegistry>(() => new Map());
   const [split, setSplit] = useState(0.5);
-  const sweep = useRef<gsap.core.Tween | null>(null);
+  const sweep = useRef<(() => void) | null>(null);
   const [sweeping, setSweeping] = useState(false);
   const stopSweep = useCallback(() => {
-    sweep.current?.kill();
+    sweep.current?.();
     sweep.current = null;
     setSweeping(false);
   }, []);
@@ -72,7 +72,7 @@ export function Viewer({
     stopSweep();
     setSplit(0.5);
     return () => {
-      sweep.current?.kill();
+      sweep.current?.();
     };
   }, [site.id, variant.id, compareVariant?.id]);
   useEffect(() => {
@@ -88,18 +88,10 @@ export function Viewer({
       setSplit(0.5);
       return;
     }
-    const cursor = { value: 0.92 };
-    setSplit(cursor.value);
     setSweeping(true);
-    sweep.current = gsap.to(cursor, {
-      value: 0.08,
-      duration: 3.6,
-      ease: "power2.inOut",
-      onUpdate: () => setSplit(cursor.value),
-      onComplete: () => {
-        setSweeping(false);
-        sweep.current = null;
-      },
+    sweep.current = startReveal(setSplit, () => {
+      setSweeping(false);
+      sweep.current = null;
     });
   };
   const datum = siteDatum(site);

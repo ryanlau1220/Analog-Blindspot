@@ -81,13 +81,21 @@ try {
         throw new Error("Split keyboard interaction navigated away from the experiment");
       await page.getByTestId("reveal-sweep").click();
       if (name !== "small mobile") {
-        await page.getByRole("button", { name: "Stop reveal" }).waitFor();
+        // Assert the durable end state, not a transient frame or a Stop button
+        // that may already be gone when a slow CI renderer delivers its next frame.
         await page.waitForFunction(
           () =>
-            Number(document.querySelector('[data-testid="split-handle"]')?.getAttribute("aria-valuenow")) <
-            85,
+            document.querySelector('[data-testid="split-handle"]')?.getAttribute("aria-valuenow") === "8" &&
+            document.querySelector('[data-testid="reveal-sweep"]')?.textContent === "Reveal the difference",
         );
-        await page.getByRole("button", { name: "Stop reveal" }).click();
+        // Test cancellation in the same browser task so frame speed cannot race the click.
+        await page.getByTestId("reveal-sweep").evaluate(async (button) => {
+          button.click();
+          await Promise.resolve(); // Let React commit before another animation frame.
+          if (button.textContent !== "Stop reveal") throw new Error("Reveal did not start");
+          button.click();
+        });
+        await page.getByRole("button", { name: "Reveal the difference" }).waitFor();
       } else {
         if ((await split.getAttribute("aria-valuenow")) !== "50")
           throw new Error("Reduced-motion reveal should be static");
@@ -128,6 +136,21 @@ try {
       console.log(
         `${name}: audio signal/volume, focus, reveal, scroll navigation, terrain, evidence and brief passed`,
       );
+    } catch (error) {
+      console.error(
+        name,
+        await page
+          .evaluate(() => ({
+            ready: window.__ab?.readyKey,
+            story: window.__ab?.story,
+            split: document.querySelector('[data-testid="split-handle"]')?.getAttribute("aria-valuenow"),
+            reveal: document.querySelector('[data-testid="reveal-sweep"]')?.textContent,
+            visibility: document.visibilityState,
+          }))
+          .catch(() => "Page unavailable"),
+      );
+      await page.screenshot({ path: `../../tmp/motion-review/${name}-failure.png` }).catch(() => {});
+      throw error;
     } finally {
       await page.close();
     }
