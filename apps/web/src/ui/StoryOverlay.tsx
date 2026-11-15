@@ -399,6 +399,7 @@ export function StoryOverlay({
       </div>
       {panel && (
         <div
+          key={story.scene}
           data-anim="controls"
           className={`ab-panel-scroll pointer-events-auto w-full lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-10rem)] lg:justify-self-end lg:overflow-y-auto ${panelWidth}`}
         >

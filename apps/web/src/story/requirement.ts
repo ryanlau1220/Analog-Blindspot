@@ -1,5 +1,5 @@
 import type { Experiment, SitesIndex } from "../data/types";
-import { SLDEM2015 } from "./lunarProducts";
+import { MOLA_MEGDR, SLDEM2015 } from "./lunarProducts";
 import { lastVisibleResolution, lossResolution } from "./scenes";
 
 export { SLDEM2015 };
@@ -77,6 +77,15 @@ export function lunarProducts(index: SitesIndex): { name: string; grid_m: number
       note: "global terrain model, pixel size at the equator",
     },
   ];
+}
+
+/** Mars: published skylight sizes against the global MOLA grid, or null without a sized Mars candidate. */
+export function marsContext(index: SitesIndex): string | null {
+  const mars = index.candidates.find((c) => c.body === "Mars" && c.size_m);
+  if (!mars?.size_m) return null;
+  const [lo, hi] = mars.size_m;
+  const cell = MOLA_MEGDR.equator_m;
+  return `Mars: candidate cave skylights near Arsia Mons are ${lo}–${hi} m across, smaller than one cell of the global ${MOLA_MEGDR.name} (about ${cell.toFixed(0)} m). Only targeted HiRISE stereo models (1–2 m) approach the grids where Earth tube clues stood out.`;
 }
 
 /** One-sentence requirement for the decision chapter and the brief. */

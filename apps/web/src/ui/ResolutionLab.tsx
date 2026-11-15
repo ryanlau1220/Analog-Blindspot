@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { AnomalySearch, AnomalySearchLevel, NasaReference, SiteId, SitesIndex } from "../data/types";
 import type { SceneState } from "../scene/state";
+import { holdoutSentence } from "../story/scenes";
 import { levelUncertainty, type Range } from "./uncertainty";
 
 const POINTS: Partial<Record<SiteId, string>> = { earth: "Bridges", lanzarote: "Jameos" };
@@ -302,6 +303,11 @@ function SearchLine({
           Not measurable at {level.resolution_m} m with this radius.
         </p>
       )}
+      {holdoutSentence(level, search.match_radius_m) && (
+        <p className="mt-1 text-[11px] leading-snug text-emerald-200/90" data-testid="lab-holdout">
+          {holdoutSentence(level, search.match_radius_m)}
+        </p>
+      )}
       {measurable && level.candidates.length > 0 && (
         <label className="mt-1.5 flex items-center gap-2 text-xs text-zinc-300">
           <input
@@ -311,7 +317,8 @@ function SearchLine({
             className="accent-amber-300"
             data-testid="search-toggle"
           />
-          Show unverified anomalies (amber rings) — may be roads, scarps or cliffs
+          Show unverified anomalies (amber rings; green = next to a mapped cave entrance). Many may be roads,
+          scarps or cliffs
         </label>
       )}
     </div>

@@ -1,4 +1,4 @@
-import type { Experiment, MoonFacts, Site, SitesIndex } from "../data/types";
+import type { AnomalySearchLevel, Experiment, MoonFacts, Site, SitesIndex } from "../data/types";
 import type { ScenePreset } from "../scene/state";
 import { CITATIONS, kToC, LUNAR_THERMAL } from "./analogy";
 import { SLDEM2015 } from "./lunarProducts";
@@ -74,6 +74,15 @@ function nasaCheck(site: Site): string[] {
   ];
 }
 
+/** "5 of 16 OpenStreetMap cave entrances … (random positions: 15%)" for a search level, or null. */
+export function holdoutSentence(lv: AnomalySearchLevel, matchRadius: number): string | null {
+  if (!lv.holdout_count || lv.threshold_m === null) return null;
+  const chance = lv.random_recovered_fraction;
+  const near = lv.candidates_near_holdout ?? 0;
+  const clusters = lv.candidate_clusters ?? lv.candidates.length;
+  return `Independent check: ${lv.holdout_recovered ?? 0} of ${lv.holdout_count} cave entrances mapped in OpenStreetMap (never used to set up the test) lie within ${matchRadius} m of a flagged point${chance !== null ? ` (random positions: ${Math.round(chance * 100)}%)` : ""}; ${near} of ${clusters} unverified anomaly clusters sit next to one.`;
+}
+
 /** Evidence-drawer sentence on the lattice search at the observed grid, from sites.json. */
 function searchSummary(site: Site, noun: string): string[] {
   const s = site.experiment?.search;
@@ -82,6 +91,7 @@ function searchSummary(site: Site, noun: string): string[] {
   const chance = lv.random_recovered_fraction;
   return [
     `Systematic search at ${site.name.split(",")[0]}: relief on a ${s.spacing_m} m lattice across the whole ROI. ${lv.landmarks_recovered} of ${lv.landmark_count} named ${noun} points lie within ${s.match_radius_m} m of a top-${100 - s.percentile}% point${chance !== null ? `, against ${Math.round(chance * 100)}% of random positions` : ""}. Flagged clusters away from named points are unverified anomalies, not discoveries.`,
+    ...(holdoutSentence(lv, s.match_radius_m) ? [holdoutSentence(lv, s.match_radius_m) as string] : []),
   ];
 }
 
@@ -114,7 +124,11 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       body: [
         `Marius Hills Pit opens in a sinuous rille on the lunar nearside (${f.pit_lat.toFixed(2)}° N, ${f.pit_lon_east.toFixed(2)}° E). The LROC Pits Atlas lists a ${range(f.atlas_funnel_diameter_m)} funnel and a depth of about ${m(f.atlas_depth_m)}.`,
         `Kaguya (SELENE) found this opening in 2009 and it may be a skylight into a lava tube (${CITATIONS.haruyama2009}).`,
-        `Why it matters for a base: Diviner shows the equatorial surface swings from about ${LUNAR_THERMAL.surface_predawn_k} K (${kToC(LUNAR_THERMAL.surface_predawn_k).toFixed(0)} °C) before dawn to ${LUNAR_THERMAL.surface_day_k[0]}–${LUNAR_THERMAL.surface_day_k[1]} K at noon (${CITATIONS.williams2017}). Models built on Diviner observations of other lunar pits put shadowed cave interiors near ${LUNAR_THERMAL.shadowed_cave_k} K, about ${kToC(LUNAR_THERMAL.shadowed_cave_k).toFixed(0)} °C, all lunar day (${CITATIONS.horvath2022}). Whether this pit leads to such a cave is unknown.`,
+        `Why it matters for a base: ${
+          f.diviner
+            ? `in the Diviner bin around the pit (${f.diviner.bin_size_deg}°, about 15 km), the surface swings from ${f.diviner.tbol_min_k.toFixed(0)} K (${kToC(f.diviner.tbol_min_k).toFixed(0)} °C) to ${f.diviner.tbol_max_k.toFixed(0)} K (${kToC(f.diviner.tbol_max_k).toFixed(0)} °C) over a lunar day (${CITATIONS.diviner_gcp}).`
+            : `Diviner shows the equatorial surface swings from about ${LUNAR_THERMAL.surface_predawn_k} K before dawn to ${LUNAR_THERMAL.surface_day_k[0]}–${LUNAR_THERMAL.surface_day_k[1]} K at noon (${CITATIONS.williams2017}).`
+        } Models built on Diviner observations of other lunar pits put shadowed cave interiors near ${LUNAR_THERMAL.shadowed_cave_k} K, about ${kToC(LUNAR_THERMAL.shadowed_cave_k).toFixed(0)} °C, all lunar day (${CITATIONS.horvath2022}). Whether this pit leads to such a cave is unknown.`,
         "You are looking at the real LROC NAC terrain model at true vertical scale, draped with the verified 4 m LROC orthophoto. The magenta outline marks where measured elevation stops.",
       ],
       steps: [

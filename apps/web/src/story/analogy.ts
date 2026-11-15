@@ -28,6 +28,8 @@ export const CITATIONS = {
   pangaea:
     "ESA PANGAEA: astronaut geology training in the La Corona lava tube and volcanic terrain of Lanzarote (esa.int)",
   power: "NASA POWER climatology API (MERRA-2), power.larc.nasa.gov",
+  diviner_gcp:
+    "Paige, D. A. et al. (2017). LRO DLRE Level 5 Global Cumulative Products, LRO-L-DLRE-5-GCP-V1.0, NASA Planetary Data System (bin processed here)",
 } as const;
 
 /** Diviner equatorial surface range (Williams et al. 2017) and modelled shadowed-cave temperature (Horvath et al. 2022). */
@@ -56,8 +58,9 @@ export function analogyRows(index: SitesIndex, site: Site): AnalogyRow[] {
   const f = moon?.facts;
   const obs = site.experiment?.levels.find((l) => l.observed);
   const clim = site.climate;
-  const day = LUNAR_THERMAL.surface_day_k.map(kToC);
-  const night = kToC(LUNAR_THERMAL.surface_predawn_k);
+  const dv = f?.diviner;
+  const day = dv ? [kToC(dv.tbol_max_k), kToC(dv.tbol_max_k)] : LUNAR_THERMAL.surface_day_k.map(kToC);
+  const night = kToC(dv ? dv.tbol_min_k : LUNAR_THERMAL.surface_predawn_k);
   const cave = kToC(LUNAR_THERMAL.shadowed_cave_k);
   const tube = SITE_TUBE[site.id];
   const caveInRange = clim ? cave >= clim.t2m_min_c && cave <= clim.t2m_max_c : null;
@@ -83,12 +86,14 @@ export function analogyRows(index: SitesIndex, site: Site): AnalogyRow[] {
     },
     {
       dimension: "Surface temperature swing",
-      moon: `${c0(night)} before dawn to ${c0(day[0] ?? 0)}–${c0(day[1] ?? 0)} at noon (equatorial surface)`,
+      moon: dv
+        ? `${c0(night)} to ${c0(day[0] ?? 0)} across the lunar day (Diviner, ${dv.bin_size_deg}° bin around the pit)`
+        : `${c0(night)} before dawn to ${c0(day[0] ?? 0)}–${c0(day[1] ?? 0)} at noon (equatorial surface)`,
       earth: clim
         ? `${c0(clim.t2m_min_c)} to ${c0(clim.t2m_max_c)} air temperature (${clim.period})`
         : "Not measured",
       status: "breaks",
-      cites: clim ? ["williams2017", "power"] : ["williams2017"],
+      cites: [dv ? "diviner_gcp" : "williams2017", ...(clim ? (["power"] as const) : [])],
     },
     {
       dimension: "Shadowed interior temperature",

@@ -6,8 +6,9 @@ import type { SitesIndex } from "../data/types";
 import { initialState, reduce, siteVariants } from "../scene/state";
 import { analogyRows } from "./analogy";
 import { buildFindings } from "./findings";
-import { SLDEM2015 } from "./lunarProducts";
-import { computedGrids, requirementStatement, siteRequirements, verdictAt } from "./requirement";
+import { MOLA_MEGDR, SLDEM2015 } from "./lunarProducts";
+import { computedGrids, marsContext, requirementStatement, siteRequirements, verdictAt } from "./requirement";
+import { holdoutSentence } from "./scenes";
 
 const raw = JSON.parse(readFileSync(join(__dirname, "../../public/data/sites.json"), "utf8"));
 const index: SitesIndex = validateIndex(raw);
@@ -95,5 +96,36 @@ describe("analogy matrix", () => {
     expect(mars?.status).toBe("not_verified");
     expect(mars?.lat).toBeTypeOf("number");
     for (const s of index.sites) expect(s.landmarks[0]?.lat).toBeTypeOf("number");
+  });
+});
+
+describe("independent checks", () => {
+  it("validates the search against hold-out entrances that are not gazetteer points", () => {
+    for (const site of [earth, lanz]) {
+      const search = site?.experiment?.search;
+      if (!site || !search?.holdout) throw new Error(`${site?.id}: no hold-out`);
+      for (const h of search.holdout.points)
+        for (const lm of site.landmarks)
+          expect(Math.hypot(h.x_m - lm.x_m, h.y_m - lm.y_m)).toBeGreaterThan(search.match_radius_m);
+      const obs = search.levels.find((l) => l.observed);
+      expect(obs?.holdout_count).toBe(search.holdout.points.length);
+      expect(holdoutSentence(obs as NonNullable<typeof obs>, search.match_radius_m)).toContain(
+        "OpenStreetMap",
+      );
+    }
+  });
+
+  it("uses the processed Diviner bin for the lunar temperature swing", () => {
+    const dv = index.sites.find((s) => s.id === "moon")?.facts?.diviner;
+    if (!dv || !earth) throw new Error("no Diviner bin");
+    expect(dv.bin_center_lat).toBeCloseTo(14.25);
+    expect(dv.tbol_min_k).toBeLessThan(dv.tbol_max_k);
+    const row = analogyRows(index, earth).find((r) => r.dimension === "Surface temperature swing");
+    expect(row?.cites).toContain("diviner_gcp");
+  });
+
+  it("places Mars skylights against the global MOLA grid", () => {
+    expect(MOLA_MEGDR.equator_m).toBeCloseTo(463, 0);
+    expect(marsContext(index)).toMatch(/100–225 m across.*about 463 m/);
   });
 });

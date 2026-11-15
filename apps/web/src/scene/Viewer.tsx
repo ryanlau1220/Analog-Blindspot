@@ -6,6 +6,7 @@ import { TerrainBlock } from "../terrain/TerrainBlock";
 import { useVariantAssets } from "../terrain/useVariantAssets";
 import { Anomalies } from "./Anomalies";
 import { CameraRig } from "./CameraRig";
+import { FrameMeter, showFrameMeter } from "./FrameMeter";
 import { type LabelRegistry, LandmarkLabels, Landmarks } from "./Landmarks";
 import { startReveal } from "./reveal";
 import { cameraPreset, poseKey, type SceneState, siteDatum } from "./state";
@@ -62,6 +63,8 @@ export function Viewer({
   const cmpVariant = compareVariant ?? variant;
   const cmp = useVariantAssets(site, cmpVariant);
   const [labels] = useState<LabelRegistry>(() => new Map());
+  const [meter] = useState(showFrameMeter);
+  const meterEl = useRef<HTMLDivElement>(null);
   const [split, setSplit] = useState(0.5);
   const sweep = useRef<(() => void) | null>(null);
   const [sweeping, setSweeping] = useState(false);
@@ -179,6 +182,7 @@ export function Viewer({
           navigationLocked={navigationLocked || sweeping}
         />
         <ReadySignal readyKey={ready} />
+        {meter && <FrameMeter target={meterEl} />}
       </Canvas>
       {/* Compositional depth: darken the frame edges so the block's rectangle recedes. */}
       <div
@@ -188,6 +192,15 @@ export function Viewer({
           background: `radial-gradient(ellipse 75% 70% at ${wide ? "62%" : "50%"} 48%, transparent 45%, ${BG}cc 85%, ${BG} 100%)`,
         }}
       />
+      {meter && (
+        <div
+          ref={meterEl}
+          data-testid="frame-meter"
+          className="pointer-events-none absolute bottom-2 left-1/2 z-40 -translate-x-1/2 rounded bg-black/70 px-2 py-0.5 font-mono text-[10px] text-lime-200"
+        >
+          measuring…
+        </div>
+      )}
       <LandmarkLabels site={site} selected={selected} onSelect={onSelect} labels={labels} />
       {cmpShown && compareVariant && (
         <>

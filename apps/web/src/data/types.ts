@@ -86,6 +86,8 @@ export interface AnomalyCandidate {
   relief_m: number;
   /** lattice cells in this connected anomaly cluster */
   cells: number;
+  /** an independent (hold-out) mapped cave entrance lies within the match radius */
+  near_holdout_entrance?: boolean;
 }
 
 export interface AnomalySearchLevel {
@@ -102,6 +104,13 @@ export interface AnomalySearchLevel {
   random_recovered_fraction: number | null;
   /** clusters not near any gazetteer point, highest relief first (unverified) */
   candidates: AnomalyCandidate[];
+  /** all clusters away from gazetteer points (candidates lists the top ones) */
+  candidate_clusters?: number;
+  /** independent hold-out entrances inside the ROI, and how many lie near a flagged point */
+  holdout_count?: number;
+  holdout_recovered?: number;
+  /** clusters (of candidate_clusters) within the match radius of a hold-out entrance */
+  candidates_near_holdout?: number;
 }
 
 /** Systematic search: relief on a regular lattice across the whole ROI, not only at named points. */
@@ -112,6 +121,11 @@ export interface AnomalySearch {
   match_radius_m: number;
   note: string;
   levels: AnomalySearchLevel[];
+  holdout?: {
+    source: string;
+    note: string;
+    points: { osm_id: number; name: string | null; x_m: number; y_m: number }[];
+  };
 }
 
 export interface Landmark {
@@ -180,6 +194,20 @@ export interface MoonFacts {
   socet_precision_m: number;
   product_valid_fraction: number;
   effective_resolution_note: string;
+  /** Diviner GCP bin containing the pit (processed here from the PDS table) */
+  diviner?: {
+    product: string;
+    url: string;
+    bin_center_lat: number;
+    bin_center_lon: number;
+    bin_size_deg: number;
+    local_time_bins_with_data: number;
+    tbol_max_k: number;
+    tbol_min_k: number;
+    tbol_max_local_time_h: number;
+    citation: string;
+    note: string;
+  };
 }
 
 export interface ExperimentLevel {
@@ -220,6 +248,9 @@ export interface Candidate {
   point_label?: string;
   /** source of the point coordinates */
   point_source?: string;
+  /** published feature size (e.g. Mars skylight diameters), metres */
+  size_m?: [number, number];
+  size_note?: string;
 }
 
 export interface SitesIndex {

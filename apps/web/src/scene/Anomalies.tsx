@@ -25,6 +25,18 @@ export function Anomalies({
 }) {
   const half = site.extent_m / 2;
   const geom = useMemo(() => new THREE.RingGeometry(radius * 0.86, radius, 40, 1), [radius]);
+  const near = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: "#86efac",
+        transparent: true,
+        opacity: 0.95,
+        side: THREE.DoubleSide,
+        depthTest: false,
+      }),
+    [],
+  );
+  useEffect(() => () => near.dispose(), [near]);
   const mat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
@@ -45,11 +57,10 @@ export function Anomalies({
           const x = c.x_m - half;
           const z = c.y_m - half;
           const h = sampleHeight(grid, x, z);
-          return Number.isFinite(h)
-            ? { i, x, z, y: (h - datum) * exaggeration + site.extent_m * 0.004 }
-            : null;
+          const y = (h - datum) * exaggeration + site.extent_m * 0.004;
+          return Number.isFinite(h) ? { i, x, z, y, near: !!c.near_holdout_entrance } : null;
         })
-        .filter((p): p is { i: number; x: number; z: number; y: number } => p !== null),
+        .filter((p): p is { i: number; x: number; z: number; y: number; near: boolean } => p !== null),
     [candidates, grid, datum, exaggeration, half, site.extent_m],
   );
   return (
@@ -58,7 +69,7 @@ export function Anomalies({
         <mesh
           key={p.i}
           geometry={geom}
-          material={mat}
+          material={p.near ? near : mat}
           position={[p.x, p.y, p.z]}
           rotation={[-Math.PI / 2, 0, 0]}
           renderOrder={10}

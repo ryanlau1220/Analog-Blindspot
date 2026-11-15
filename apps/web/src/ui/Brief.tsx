@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Site, SitesIndex } from "../data/types";
 import { CITATIONS } from "../story/analogy";
 import { buildFindings } from "../story/findings";
-import { SLDEM2015 } from "../story/lunarProducts";
+import { MOLA_MEGDR, SLDEM2015 } from "../story/lunarProducts";
 
 /**
  * One-page printable Field Validation Brief (#brief). Built from sites.json
@@ -163,6 +163,15 @@ export function Brief({ index }: { index: SitesIndex }) {
                 <li key={c}>{c}, power.larc.nasa.gov</li>
               ))}
               <li>{SLDEM2015.citation}</li>
+              <li>{MOLA_MEGDR.citation}</li>
+              {index.candidates
+                .filter((c) => c.size_note)
+                .map((c) => (
+                  <li key={c.id}>{c.size_note}</li>
+                ))}
+              {earthSites[0]?.experiment?.search?.holdout && (
+                <li>Search hold-out labels: {earthSites[0].experiment.search.holdout.source}</li>
+              )}
               {Object.values(CITATIONS)
                 .filter((c) => !c.startsWith("NASA POWER"))
                 .map((c) => (

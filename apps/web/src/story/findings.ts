@@ -1,6 +1,6 @@
 import type { SitesIndex } from "../data/types";
 import { requirementStatement } from "./requirement";
-import { lastVisibleResolution, lossResolution } from "./scenes";
+import { holdoutSentence, lastVisibleResolution, lossResolution } from "./scenes";
 
 /**
  * Statements shared by the chapter-5 card and the printable brief. Conclusions
@@ -62,7 +62,7 @@ export function buildFindings(index: SitesIndex): Findings {
     if (!site || !s || !lv || lv.threshold_m === null) continue;
     const chance = lv.random_recovered_fraction;
     supported.push(
-      `A systematic relief search across the ${site.name.split(",")[0]} ROI puts ${lv.landmarks_recovered} of ${lv.landmark_count} named ${noun} points within ${s.match_radius_m} m of a top-${100 - s.percentile}% relief point${chance !== null ? ` (random positions: ${Math.round(chance * 100)}%)` : ""}.`,
+      `A systematic relief search across the ${site.name.split(",")[0]} ROI puts ${lv.landmarks_recovered} of ${lv.landmark_count} named ${noun} points within ${s.match_radius_m} m of a top-${100 - s.percentile}% relief point${chance !== null ? ` (random positions: ${Math.round(chance * 100)}%)` : ""}. ${holdoutSentence(lv, s.match_radius_m) ?? ""}`.trim(),
     );
   }
 
@@ -83,7 +83,8 @@ export function buildFindings(index: SitesIndex): Findings {
       "Coarsened grids are simulations made by block averaging, not observations at those resolutions.",
       "A difference between medians does not establish detection rates or distinguishability of individual features; points are few and may not be independent.",
       "None of the datasets measures the subsurface. No void or cave geometry is shown as fact.",
-      "Relief anomalies flagged by the lattice search are unverified: many will be roads, scarps, cliffs or spoil heaps. Lunar temperatures are published Diviner results, not processed here.",
+      "Relief anomalies flagged by the lattice search are unverified: many will be roads, scarps, cliffs or spoil heaps. The hold-out cave entrances are volunteered OpenStreetMap points, so recovery is still measured at points, not outlines.",
+      "The Diviner bin around the pit is 0.5° (about 15 km) wide, so it describes the surroundings, not the pit. The shadowed-cave temperature is a published model result.",
     ],
     next: [
       "Elevation data for the Marius Hills Pit floor and overhangs, rather than a single depth estimate.",

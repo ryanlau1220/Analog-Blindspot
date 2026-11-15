@@ -3,6 +3,7 @@ import type { SitesIndex } from "../data/types";
 import {
   computedGrids,
   lunarProducts,
+  marsContext,
   requirementStatement,
   siteRequirements,
   type Verdict,
@@ -83,6 +84,11 @@ export function DecisionView({ index }: { index: SitesIndex }) {
             {p.name}: about {p.grid_m.toFixed(0)} m ({p.note}), coarser than every grid tested here.
           </p>
         ))}
+        {marsContext(index) && (
+          <p className="mt-2 text-[11px] text-zinc-400" data-testid="mars-context">
+            {marsContext(index)}
+          </p>
+        )}
         <p className="mt-1 text-[10px] text-zinc-500">
           Point medians against sampled background on block-averaged grids; a stereo DTM is not a block mean.
         </p>
@@ -114,8 +120,9 @@ export function DecisionView({ index }: { index: SitesIndex }) {
         <b>Still unknown:</b> whether the pit opens into a cave. No dataset here measures the subsurface.
       </p>
       <p className="mt-2 text-xs text-zinc-400">
-        Next: mapped feature outlines to score detection, and a subsurface survey of a known tube. These are
-        established sites, not newly discovered analogs.
+        Next: field-check the unverified relief anomalies from the lattice search, map feature outlines to
+        score detection, and survey the inside of a known tube. Lava Beds and Lanzarote are known analog
+        sites; the anomalies are where new clues could be.
       </p>
     </section>
   );
