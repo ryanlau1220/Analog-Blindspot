@@ -51,7 +51,7 @@ def write_fake_tile(path, cfg, depressions=True):
     """2 m EPSG:4083 grid around the ROI with 8 m deep bowls at each landmark."""
     crs = CRS.from_epsg(4083).to_wkt()
     rc = cfg["roi"]
-    roi = earth.snapped_roi(rc["center_lon"], rc["center_lat"], rc["size_m"], rc["snap_m"], crs=crs)
+    roi = earth.Roi(rc["left"], rc["top"] - rc["size_m"], rc["left"] + rc["size_m"], rc["top"])
     pad = 600.0
     left, top = roi.left - pad, roi.top + pad
     n = int((roi.size_m + 2 * pad) / 2)

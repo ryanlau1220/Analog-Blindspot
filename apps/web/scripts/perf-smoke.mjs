@@ -183,7 +183,7 @@ const storyDispatch = (a) => page.evaluate((x) => window.__ab.storyDispatch(x), 
 const chapterKeys = [
   [4, "moon/4m"],
   [0, "moon/4m"],
-  [3, "earth/0p5m"],
+  [3, "earth/10m"],
   [1, "moon/4m"],
   [2, "earth/0p5m"],
 ];

@@ -26,14 +26,14 @@ export function DecisionView({ index }: { index: SitesIndex }) {
       </Tile>
       <Tile n="2" title="Where each Earth site helps" tone="border-teal-300/70 text-teal-200">
         <span className="block">
-          <b className="font-medium text-white">Lava Beds:</b> small bridges (median relief{" "}
-          {median(earth.experiment)} m) stand out up to {ek} m{el !== null ? `, not from ${el} m` : ""}. Tests
-          how fine a grid must be.
+          <b className="font-medium text-white">Lava Beds:</b> start here to test smaller surface clues.
+          Native median relief {median(earth.experiment)} m; the point median exceeds background through {ek}{" "}
+          m{el !== null ? `, but not at ${el} m` : ""}.
         </span>
         {lanz?.experiment && lk !== null && (
           <span className="mt-1 block">
-            <b className="font-medium text-white">Lanzarote:</b> larger jameos (median{" "}
-            {median(lanz.experiment)} m) still stand out at {lk} m. Tests what survives coarser grids.
+            <b className="font-medium text-white">Lanzarote:</b> investigate larger collapse features. Native
+            median {median(lanz.experiment)} m; its point median exceeds background at {lk} m.
           </span>
         )}
       </Tile>
@@ -42,8 +42,8 @@ export function DecisionView({ index }: { index: SitesIndex }) {
         floor.
       </Tile>
       <Tile n="4" title="Observation that would resolve it" tone="border-zinc-300/60 text-zinc-200">
-        Elevation of the pit floor and overhangs; a subsurface survey of a mapped Earth tube to test what
-        surface relief predicts.
+        Map the surface features and survey a known tube interior. Verify field access before planning a
+        visit; access has not been assessed. Neither site is a verified lunar subsurface match.
       </Tile>
     </ol>
   );

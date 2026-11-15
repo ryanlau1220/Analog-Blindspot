@@ -1,8 +1,13 @@
 # Analog Blindspot
 
 A five-chapter, visual-first story about what orbital terrain models measure at Marius Hills Pit (Moon), and how
-much lava-tube surface evidence disappears as Earth terrain grids are coarsened. Every number shown comes from
+how relief around known surface features changes as Earth terrain grids are coarsened. Every number shown comes from
 real, checked elevation data. Nothing in it shows subsurface geometry as measured.
+
+**Decision:** use Lava Beds to investigate smaller surface clues, and Lanzarote to investigate larger collapse
+features. These are known sites chosen for different test questions, not newly discovered analogs or proven lunar
+matches. The statistics compare median local relief at named points with a sampled background; they do not measure
+detection rates. Field access and subsurface correspondence remain unverified.
 
 - **Moon:** LROC NAC DTM `NAC_DTM_MARIUSPIT01` (4 m). The pit interior has no elevation data and is shown as a
   hole.
@@ -39,6 +44,7 @@ uv run pytest
 
 - `docs/science.md`: data validation (Phases A, B and D), measured values, limitations.
 - `docs/storytelling.md`: chapters, interaction rules, the printable brief.
+- `docs/judging.md`: demo script, evidence, and submission checklist.
 - `datasets/manifest.json`: provenance, licences, checksums and gate results.
 
 ## Credits and licences

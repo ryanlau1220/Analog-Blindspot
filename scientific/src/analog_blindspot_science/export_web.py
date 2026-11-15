@@ -305,6 +305,9 @@ def experiment_block(roi: dict, observed_res: float, bg_points: int, caveat: str
                 "observed": lv["resolution_m"] == observed_res,
                 "landmark_relief_median_m": lv["landmark_relief_median_m"],
                 "background_relief_median_m": lv["background_relief_p50_m"],
+                "landmark_relief_m": lv.get("landmark_relief_m", {}),
+                "background_relief_samples_m": lv.get("background_relief_samples_m", []),
+                "background_seed_medians_m": lv.get("background_seed_medians_m", []),
                 "slope_deg_p95": lv["slope_deg_p95"],
             }
             for lv in roi["resolution_levels"]

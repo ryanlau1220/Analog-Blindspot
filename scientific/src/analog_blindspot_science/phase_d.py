@@ -290,6 +290,11 @@ def main() -> int:
             lm_rel[lm["name"]] = None if lr["relief_m"] is None else round(lr["relief_m"], 3)
         land = vl & (np.nan_to_num(zl, nan=-1e9) > cfg["landmark_check"]["background_min_elev_m"])
         base = earth.relief_baseline(zl, land, trl, radius, BG_POINTS, seed=BG_SEED, min_valid=0.9)
+        seed_medians = [float(np.median(base))] if base.size else []
+        for seed in (20261115, 20261116):
+            sample = earth.relief_baseline(zl, land, trl, radius, BG_POINTS, seed=seed, min_valid=0.9)
+            if sample.size:
+                seed_medians.append(float(np.median(sample)))
         vals = [v for v in lm_rel.values() if v is not None]
         sl = slope_deg(zl, r)
         rows.append(
@@ -300,6 +305,8 @@ def main() -> int:
                 "valid_fraction": float(vl.mean()),
                 "slope_deg_p95": float(np.nanpercentile(sl, 95)),
                 "landmark_relief_m": lm_rel,
+                "background_relief_samples_m": np.round(base, 3).tolist(),
+                "background_seed_medians_m": seed_medians,
                 "landmark_relief_median_m": float(np.median(vals)) if vals else None,
                 "background_relief_p50_m": float(np.median(base)) if base.size else None,
                 "background_points_used": int(base.size),

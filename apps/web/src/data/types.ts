@@ -99,6 +99,9 @@ export interface ExperimentLevel {
   observed: boolean;
   landmark_relief_median_m: number | null;
   background_relief_median_m: number | null;
+  landmark_relief_m: Record<string, number | null>;
+  background_relief_samples_m: number[];
+  background_seed_medians_m: number[];
   slope_deg_p95: number;
 }
 

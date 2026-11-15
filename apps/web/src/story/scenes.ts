@@ -41,8 +41,7 @@ const range = ([a, b]: [number, number]) => `${a}–${b} m`;
 /** First coarsened grid at which landmark relief no longer exceeds background relief. */
 export function lossResolution(exp: Experiment): number | null {
   for (const lv of exp.levels) {
-    if (lv.landmark_relief_median_m === null || lv.background_relief_median_m === null)
-      return lv.resolution_m;
+    if (lv.landmark_relief_median_m === null || lv.background_relief_median_m === null) continue;
     if (lv.landmark_relief_median_m <= lv.background_relief_median_m) return lv.resolution_m;
   }
   return null;
@@ -126,9 +125,9 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       id: "search",
       chapter: "Search Earth",
       headline: "Earth holds clues to landscapes we cannot fully explore.",
-      sub: "Lava tubes we can walk into leave marks on the surface. Choose a site.",
+      sub: "Choose a known Earth site for a specific surface-measurement question.",
       takeaway:
-        "Each site has verified airborne LiDAR of the surface above known lava tubes. Neither is a proven universal analog.",
+        "Two sites have checked airborne LiDAR of surfaces above known lava tubes. Neither is a proven universal analog.",
       action: { label: "Run the resolution experiment", kind: "next" },
       body: [
         "Lava Beds National Monument, California, is a region where lava tubes are particularly abundant. NCALM flew this 0.5 m airborne LiDAR survey in 2023 to look for their surface expression.",
@@ -160,21 +159,21 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "experiment",
       chapter: "Resolution",
-      headline: "Reduce the resolution. Watch the evidence fade.",
+      headline: "Change the grid. Watch the terrain change.",
       sub: "Drag the split. Left: the observed LiDAR. Right: the same ground on a coarser, simulated grid.",
       takeaway:
         loss !== null && kept !== null
-          ? `On this relief measure the bridges stand out up to ${kept} m and not from ${loss} m.`
+          ? `Median bridge-point relief exceeds background through ${kept} m; at ${loss} m it does not.`
           : "Compare the bridges with random ground at each grid.",
       action: { label: "See what we can conclude", kind: "next" },
       body: [
         "The coarser grids are SIMULATED from the observed LiDAR by averaging blocks of real pixels. They are not observations at those resolutions, and no grid between the computed ones is shown.",
         loss !== null && kept !== null
-          ? `Measured as relief (${exp.measure}), the bridge points stand out from ${exp.background_points} random points up to ${kept} m. From ${loss} m on, they do not. This is loss of distinguishability on one measure, not proof that a feature detector fails.`
+          ? `Measured as relief (${exp.measure}), the median for bridge points exceeds the median for ${exp.background_points} random points through ${kept} m; at ${loss} m it does not. This is not a detection benchmark.`
           : `Measured as relief (${exp.measure}), compare the bridge points with ${exp.background_points} random points at each grid.`,
         ...(lanz && lexp && lKept !== null
           ? [
-              `At Lanzarote the jameos have more relief (median ${median(lexp)?.toFixed(1)} m against ${median(exp)?.toFixed(1)} m for the bridges) and still stand out at ${lKept} m${lLoss === null ? ", the coarsest grid where this measure works" : `, but not from ${lLoss} m`}.`,
+              `At Lanzarote the median point relief is ${median(lexp)?.toFixed(1)} m, against ${median(exp)?.toFixed(1)} m for Lava Beds. Its median exceeds the sampled background at ${lKept} m${lLoss === null ? "; coarser grids are not measurable with this method" : `, but not at ${lLoss} m`}.`,
             ]
           : []),
         "The 3D mesh uses the same 257 × 257 display grid for every variant; the shading comes from each grid at its own resolution.",
@@ -211,12 +210,12 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "decision",
       chapter: "The Discovery",
-      headline: "The next discovery begins where our observations end.",
-      sub: "What the data establishes, where each Earth site helps, and what would close the gap.",
+      headline: "Choose the test. Then choose the site.",
+      sub: "Two known candidate environments, two measurement questions, and one crucial unknown.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",
       action: { label: "View Field Validation Brief", kind: "brief" },
       body: [
-        "Marius Hills Pit is measured at its rim and walls but not inside. On Earth, a known lava-tube surface clue fades once the grid gets coarse enough.",
+        "Marius Hills Pit is measured at its rim and walls but not inside. Earth site recommendations are conditional on the measurement question, not proof of a lunar match or a newly discovered site.",
       ],
       panel: "decision",
       steps: [{ preset: { site: "moon", exaggeration: 1, drape: "orthophoto", view: "landmark" }, ms: 9000 }],

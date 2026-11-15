@@ -505,6 +505,11 @@ def run_earth(cfg: dict, gate: Gate) -> dict:
             r = earth.local_relief(zl, vl, trl, lm["utm_x"], lm["utm_y"], radius)
             lm_rel[lm["name"]] = None if r["relief_m"] is None else round(r["relief_m"], 3)
         base = earth.relief_baseline(zl, vl, trl, radius, 400, seed=20261114)
+        seed_medians = [float(np.median(base))] if base.size else []
+        for seed in (20261115, 20261116):
+            sample = earth.relief_baseline(zl, vl, trl, radius, 400, seed=seed)
+            if sample.size:
+                seed_medians.append(float(np.median(sample)))
         vals = [v for v in lm_rel.values() if v is not None]
         level_rows.append(
             {
@@ -518,6 +523,8 @@ def run_earth(cfg: dict, gate: Gate) -> dict:
                 "slope_deg_p95": float(np.nanpercentile(sl, 95)),
                 "slope_deg_max": float(np.nanmax(sl)),
                 "landmark_relief_m": lm_rel,
+                "background_relief_samples_m": np.round(base, 3).tolist(),
+                "background_seed_medians_m": seed_medians,
                 "landmark_relief_median_m": float(np.median(vals)) if vals else None,
                 "background_relief_p50_m": float(np.median(base)) if base.size else None,
                 "background_relief_p90_m": float(np.percentile(base, 90)) if base.size else None,

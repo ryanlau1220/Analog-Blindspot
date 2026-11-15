@@ -1,19 +1,33 @@
 import { DATA_ROOT } from "../data/load";
 import type { SiteId, SitesIndex } from "../data/types";
 
-/** Qualitative context only; every number on the card comes from sites.json. */
-const PLACES: Record<string, { region: string; feature: string; site?: SiteId }> = {
+/** Representative landmark coordinates are from the committed gazetteers or cited publication. */
+const PLACES: Record<
+  string,
+  { region: string; feature: string; site?: SiteId; location?: string; purpose?: string; map?: string }
+> = {
   lava_beds: {
     region: "California, USA",
     feature: "Natural bridges over a collapsed lava tube",
     site: "earth",
+    location: "Garden Bridges · 41.70850° N, 121.51417° W",
+    purpose: "Investigate smaller surface clues",
+    map: "https://www.openstreetmap.org/?mlat=41.7084969&mlon=-121.5141734#map=13/41.7085/-121.5142",
   },
   lanzarote: {
     region: "Canary Islands, Spain",
     feature: "Jameos: collapse openings into one long tube",
     site: "lanzarote",
+    location: "Jameo de la Gente · 29.16748° N, 13.46069° W",
+    purpose: "Investigate larger collapse features",
+    map: "https://www.openstreetmap.org/?mlat=29.16748&mlon=-13.460693#map=13/29.16748/-13.460693",
   },
-  harrat_khaybar: { region: "Saudi Arabia", feature: "Large lava-tube field" },
+  harrat_khaybar: {
+    region: "Saudi Arabia",
+    feature: "Umm Jirsan lava tube",
+    location: "25.5888° N, 39.7570° E",
+    map: "https://www.openstreetmap.org/?mlat=25.5888&mlon=39.7570#map=13/25.5888/39.7570",
+  },
 };
 
 /**
@@ -31,7 +45,7 @@ export function Destinations({
   onGo: (site: SiteId) => void;
 }) {
   return (
-    <ul data-testid="destinations" className="grid grid-cols-3 gap-2">
+    <ul data-testid="destinations" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
       {index.candidates.map((c) => {
         const place = PLACES[c.id];
         const site = place?.site ? index.sites.find((s) => s.id === place.site) : undefined;
@@ -49,8 +63,24 @@ export function Destinations({
                 <p>{place?.region}</p>
               </div>
               <p className="mt-2 text-amber-200/90">
-                Not verified. No checked high-resolution terrain, so no measurements are shown.
+                {place?.location}. Our terrain analysis and field access are unverified. No measurements are
+                shown.
               </p>
+              {c.id === "harrat_khaybar" && (
+                <a
+                  className="mt-2 text-sky-300 underline"
+                  href="https://pure.mpg.de/rest/items/item_3332917_3/component/file_3332918/content"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Published site coordinates ↗
+                </a>
+              )}
+              {place?.map && (
+                <a className="mt-2 text-sky-300 underline" href={place.map} target="_blank" rel="noreferrer">
+                  Open locator map ↗
+                </a>
+              )}
             </li>
           );
         }
@@ -78,12 +108,25 @@ export function Destinations({
                 <span className="block text-[13px] text-white">{site.name.split(",")[0]}</span>
                 <span className="block">{place?.region}</span>
                 <span className="mt-1 block text-zinc-400">{place?.feature}</span>
+                <span className="mt-1 block text-teal-200">{place?.purpose}</span>
+                <span className="mt-1 block text-zinc-400">{place?.location}</span>
+                <span className="mt-1 block text-zinc-400">Field access not assessed.</span>
                 <span className="mt-1.5 flex items-center gap-1.5 text-teal-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-teal-300" />
                   {obs?.resolution_m} m LiDAR · {site.landmarks.length} named features
                 </span>
               </span>
             </button>
+            {place?.map && (
+              <a
+                className="mt-1 inline-block px-1 text-[11px] text-sky-300 underline"
+                href={place.map}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open locator map ↗
+              </a>
+            )}
           </li>
         );
       })}

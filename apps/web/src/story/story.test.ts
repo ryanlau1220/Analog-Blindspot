@@ -68,8 +68,25 @@ describe("scenes", () => {
     if (!exp) throw new Error("no experiment");
     expect(lastVisibleResolution(exp)).toBe(4);
     expect(lossResolution(exp)).toBe(10);
-    expect(text).toContain("up to 4 m");
+    expect(text).toContain("through 4 m");
     expect(text).toMatch(/SIMULATED/);
+  });
+
+  it("does not treat an unmeasurable grid as a negative result", () => {
+    const exp = index.sites.find((s) => s.id === "lanzarote")?.experiment;
+    if (!exp) throw new Error("no Lanzarote experiment");
+    expect(exp.levels.find((l) => l.resolution_m === 30)?.landmark_relief_median_m).toBeNull();
+    expect(lossResolution(exp)).toBeNull();
+    expect(scenes[3]?.body.join(" ")).toContain("coarser grids are not measurable");
+  });
+
+  it("exports individual evidence and repeat-sampling medians for measurable grids", () => {
+    for (const site of index.sites.filter((s) => s.experiment)) {
+      const level = site.experiment?.levels.find((l) => l.observed);
+      expect(Object.keys(level?.landmark_relief_m ?? {})).toHaveLength(site.experiment?.landmark_count ?? 0);
+      expect(level?.background_relief_samples_m.length).toBeGreaterThan(0);
+      expect(level?.background_seed_medians_m).toHaveLength(3);
+    }
   });
 
   it("presents unverified candidates as unverified", () => {

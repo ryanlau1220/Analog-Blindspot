@@ -81,7 +81,7 @@ Relief is the maximum minus the minimum elevation within 30 m of each point. Bac
 | 30 m (simulated) | not measurable (too few cells) | n/a | 7.4° |
 | 60 m (simulated) | not measurable | n/a | 6.6° |
 
-From 10 m onward, the bridge points no longer stand out from the background on this measure, and the trench
+At 10 m, the median relief around the bridge points is below the background median, and the trench
 cannot be seen in the 30 m preview. This result describes a relief statistic at eight point labels. It is not a
 detection-rate benchmark: there are no mapped outline labels.
 
@@ -89,6 +89,15 @@ detection-rate benchmark: there are no mapped outline labels.
 - None of these products measure subsurface void geometry, on the Moon or on Earth.
 - Coarsened Earth rasters are simulations and must never be labelled as LROC or any other observation.
 - The 1.10 m LROC orthophotos give image resolution, not elevation resolution.
+
+## Distribution and sensitivity (2026-11-15)
+
+The pipelines retain the individual landmark relief values and the original seeded background samples for each
+measurable grid. The evidence panel reports the 10th–90th percentiles of the sampled background and the landmark
+values. Two additional samples use seeds 20261115 and 20261116 with the same sample size and filters; their
+medians and the original seed's median provide a simple sampling sensitivity range. These samples can overlap,
+and the range is not a confidence interval, a feature-detection rate, or independent site validation. Grid levels
+with too few cells are not measurable, and must not be interpreted as negative results.
 
 # Phase B: 3D vertical slice
 
@@ -193,7 +202,7 @@ paths returned 404.
 | 10 m (simulated) | 13.0 m | 4.3 m |
 | 30 / 60 m (simulated) | not measurable | not measurable |
 
-Unlike the Lava Beds bridges (lost from 10 m), the jameos still stand out at 10 m. The web export adds
+At 10 m, the Lanzarote point median remains above the background median; the Lava Beds point median does not. The web export adds
 Lanzarote as a third site (2 m observed; 4, 10 and 30 m simulated), and chapters 3–5 now include it.
 
 To rerun: `cd scientific && uv run phase-d && uv run export-web`.

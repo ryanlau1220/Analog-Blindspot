@@ -51,13 +51,12 @@ export function ResolutionLab({
       className="rounded-xl border border-white/10 bg-[#0c111c]/85 p-3.5 backdrop-blur"
     >
       {sites.length > 1 && (
-        <div className="mb-3 flex gap-1" role="tablist" aria-label="Site">
+        <div className="mb-3 flex gap-1">
           {sites.map((s) => (
             <button
               key={s.id}
               type="button"
-              role="tab"
-              aria-selected={s.id === site.id}
+              aria-pressed={s.id === site.id}
               data-testid={`exp-site-${s.id}`}
               onClick={() => onSite(s.id)}
               className={`rounded-full px-2.5 py-0.5 text-xs ${
@@ -116,8 +115,8 @@ export function ResolutionLab({
               data-testid="lab-verdict"
             >
               {stands
-                ? `${label} stand out from random ground at ${v.resolution_m} m.`
-                : `${label} no longer stand out on this measure at ${v.resolution_m} m.`}
+                ? `Point median is above the sampled background median at ${v.resolution_m} m.`
+                : `Point median is at or below the sampled background median at ${v.resolution_m} m.`}
             </p>
           </>
         ) : (
@@ -127,6 +126,10 @@ export function ResolutionLab({
         )}
       </div>
 
+      <p className="mt-2 text-[11px] leading-snug text-zinc-400">
+        Grid spacing is not effective instrument resolution. The shared display mesh and per-grid shading are
+        visualizations; block averaging is a simulation, not a lunar sensor model.
+      </p>
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
         <label className="flex items-center gap-2 text-zinc-300">
           <input

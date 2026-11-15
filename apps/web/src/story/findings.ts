@@ -32,14 +32,14 @@ export function buildFindings(index: SitesIndex): Findings {
   ];
   if (kept !== null && loss !== null) {
     supported.push(
-      `At Lava Beds, relief around ${exp.landmark_count} named bridge points exceeds relief at random points from 0.5 m to ${kept} m and not from ${loss} m on (simulated coarsening).`,
+      `At Lava Beds, median relief around ${exp.landmark_count} named bridge points exceeds the sampled background median through ${kept} m, but not at ${loss} m (simulated coarsening).`,
     );
   }
   if (lexp && lKept !== null) {
     supported.push(
-      `At Lanzarote, relief around ${lexp.landmark_count} named jameos exceeds relief at random land points from 2 m to ${lKept} m${
-        lLoss === null ? " (coarser grids are too coarse for this measure)" : ` and not from ${lLoss} m on`
-      }. The jameos, with larger relief than the bridges, stay distinguishable at a coarser grid.`,
+      `At Lanzarote, median relief around ${lexp.landmark_count} named points exceeds the sampled land background median through ${lKept} m${
+        lLoss === null ? "; coarser grids are not measurable with this method" : `, but not at ${lLoss} m`
+      }. This does not establish individual detectability.`,
     );
   }
 
@@ -57,6 +57,7 @@ export function buildFindings(index: SitesIndex): Findings {
       f.effective_resolution_note,
       `${exp.caveat} Gazetteer positions (GNIS, NGBE) are approximate.`,
       "Coarsened grids are simulations made by block averaging, not observations at those resolutions.",
+      "A difference between medians does not establish detection rates or distinguishability of individual features; points are few and may not be independent.",
       "None of the datasets measures the subsurface. No void or cave geometry is shown as fact.",
     ],
     next: [

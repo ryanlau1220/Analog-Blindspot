@@ -39,9 +39,15 @@ export function Brief({ index }: { index: SitesIndex }) {
         </header>
 
         <p className="mt-2">
-          <b>Question.</b> What do orbital terrain models measure at Marius Hills Pit, and how much surface
-          evidence of lava tubes is lost as terrain grids get coarser? Earth sites are surface analogs only;
-          nothing here measures a subsurface void.
+          <b>Question.</b> What does the Marius Hills terrain model measure, and how does relief near known
+          Earth features change when terrain grids are coarsened? These are candidate surface test sites;
+          nothing here measures a subsurface void or establishes a lunar match.
+        </p>
+
+        <p className="mt-2">
+          <b>Proposed test sites.</b> Lava Beds: investigate smaller surface clues (Garden Bridges, 41.70850°
+          N, 121.51417° W). Lanzarote: investigate larger collapse features (Jameo de la Gente, 29.16748° N,
+          13.46069° W). Field access is not assessed. Both are previously known sites.
         </p>
 
         <div className="mt-2 grid grid-cols-2 gap-x-5">
