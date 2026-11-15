@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { Site, SitesIndex } from "../data/types";
+import { CITATIONS } from "../story/analogy";
 import { buildFindings } from "../story/findings";
+import { SLDEM2015 } from "../story/lunarProducts";
 
 /**
  * One-page printable Field Validation Brief (#brief). Built from sites.json
@@ -45,9 +47,22 @@ export function Brief({ index }: { index: SitesIndex }) {
         </p>
 
         <p className="mt-2">
-          <b>Proposed test sites.</b> Lava Beds: investigate smaller surface clues (Garden Bridges, 41.70850°
-          N, 121.51417° W). Lanzarote: investigate larger collapse features (Jameo de la Gente, 29.16748° N,
-          13.46069° W). Field access is not assessed. Both are previously known sites.
+          <b>Proposed test sites.</b>{" "}
+          {earthSites.map((s, k) => {
+            const lm = s.landmarks[0];
+            const at =
+              lm?.lat !== undefined && lm.lon !== undefined
+                ? ` (${lm.name}, ${Math.abs(lm.lat).toFixed(5)}° ${lm.lat < 0 ? "S" : "N"}, ${Math.abs(lm.lon).toFixed(5)}° ${lm.lon < 0 ? "W" : "E"})`
+                : "";
+            return (
+              <span key={s.id}>
+                {s.name.split(",")[0]}:{" "}
+                {k === 0 ? "investigate smaller surface clues" : "investigate larger collapse features"}
+                {at}.{" "}
+              </span>
+            );
+          })}
+          Field access is not assessed. Both are previously known sites.
         </p>
 
         <div className="mt-2 grid grid-cols-2 gap-x-5">
@@ -102,6 +117,21 @@ export function Brief({ index }: { index: SitesIndex }) {
                 </Td>
               </tr>
             ))}
+            {earthSites
+              .filter((s) => s.nasa_reference)
+              .map((s) => (
+                <tr key={`${s.id}-nasa`} className="border-b border-zinc-200 align-top">
+                  <Td>{s.name} (independent check)</Td>
+                  <Td>
+                    <a href={s.nasa_reference?.landing_page} className="underline">
+                      {s.nasa_reference?.product_id}
+                    </a>
+                  </Td>
+                  <Td>{s.nasa_reference?.resolution_m} m</Td>
+                  <Td>{s.nasa_reference?.vertical}</Td>
+                  <Td>{s.nasa_reference?.license}</Td>
+                </tr>
+              ))}
             {index.candidates
               .filter((c) => c.status !== "validated")
               .map((c) => (
@@ -128,6 +158,16 @@ export function Brief({ index }: { index: SitesIndex }) {
                 .map((c) => (
                   <li key={c}>{c}</li>
                 ))}
+              {earthSites[0]?.nasa_reference && <li>{earthSites[0].nasa_reference.citation}</li>}
+              {[...new Set(earthSites.map((s) => s.climate?.source).filter(Boolean))].map((c) => (
+                <li key={c}>{c}, power.larc.nasa.gov</li>
+              ))}
+              <li>{SLDEM2015.citation}</li>
+              {Object.values(CITATIONS)
+                .filter((c) => !c.startsWith("NASA POWER"))
+                .map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
               {index.landmark_sources?.map((l) => (
                 <li key={l.site}>
                   Landmarks: {l.source}. {l.url}
@@ -140,7 +180,7 @@ export function Brief({ index }: { index: SitesIndex }) {
         <footer className="mt-3 border-t border-zinc-300 pt-1 text-[7pt] text-zinc-500">
           Coarsened grids are simulations derived from the observed terrain models; they are not LROC or other
           observations. Gazetteer points are approximate. Reproduce: scientific/ → uv run fetch-sources,
-          fetch-landmarks, fetch-landmarks-es, phase-a, phase-d, export-web.
+          fetch-landmarks, fetch-landmarks-es, phase-a, phase-d, phase-e, export-web.
         </footer>
       </article>
     </div>

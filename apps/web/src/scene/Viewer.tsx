@@ -1,9 +1,10 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import type { Site, Variant } from "../data/types";
+import type { AnomalyCandidate, Site, Variant } from "../data/types";
 import { TerrainBlock } from "../terrain/TerrainBlock";
 import { useVariantAssets } from "../terrain/useVariantAssets";
+import { Anomalies } from "./Anomalies";
 import { CameraRig } from "./CameraRig";
 import { type LabelRegistry, LandmarkLabels, Landmarks } from "./Landmarks";
 import { startReveal } from "./reveal";
@@ -40,6 +41,7 @@ export function Viewer({
   intro,
   navigationLocked = false,
   focusLab = false,
+  anomalies = null,
 }: {
   site: Site;
   variant: Variant;
@@ -52,6 +54,8 @@ export function Viewer({
   intro?: boolean;
   navigationLocked?: boolean;
   focusLab?: boolean;
+  /** unverified lattice-search clusters for the grid on screen */
+  anomalies?: { candidates: AnomalyCandidate[]; radius: number } | null;
 }) {
   const wide = useWideLayout();
   const { assets, loading, error } = useVariantAssets(site, variant);
@@ -149,6 +153,16 @@ export function Viewer({
           />
         )}
         {cmpShown && <SplitPlanes split={split} left={planes.left} right={planes.right} />}
+        {shown && anomalies && anomalies.candidates.length > 0 && (
+          <Anomalies
+            site={site}
+            grid={shown.grid}
+            datum={datum}
+            exaggeration={state.exaggeration}
+            candidates={anomalies.candidates}
+            radius={anomalies.radius}
+          />
+        )}
         <Landmarks
           site={site}
           datum={datum}
@@ -199,7 +213,8 @@ export function Viewer({
               {sweeping ? "Stop reveal" : "Reveal the difference"}
             </button>
             <p className="mt-1 text-[10px] text-zinc-400">
-              Left: observed {compareVariant.resolution_m} m / right: simulated {variant.resolution_m} m
+              Left: observed {compareVariant.resolution_m} m / right:{" "}
+              {variant.reference ? "NASA NASADEM" : "simulated"} {variant.resolution_m} m
             </p>
           </div>
         </>

@@ -1,4 +1,4 @@
-import type { Site, SiteId, SitesIndex } from "../data/types";
+import type { Site, SiteId, SitesIndex, Variant } from "../data/types";
 
 /**
  * Camera framing. "overview" frames the whole block; "landmark" frames the
@@ -18,6 +18,8 @@ export interface SceneState {
   view: View;
   /** split-screen comparison of the shown variant against the site's observed grid */
   compare: boolean;
+  /** show the unverified relief anomalies of the lattice search for the shown grid */
+  search: boolean;
 }
 
 export const EXAGGERATIONS = [1, 2, 4] as const;
@@ -33,6 +35,7 @@ export type SceneAction =
   | { type: "setDrape"; drape: SceneState["drape"] }
   | { type: "setView"; view: View }
   | { type: "setCompare"; enabled: boolean }
+  | { type: "setSearch"; enabled: boolean }
   | { type: "applyPreset"; preset: ScenePreset };
 
 /** A partial target state, e.g. one story step. Applied field by field through the reducer. */
@@ -46,12 +49,19 @@ export interface ScenePreset {
   drape?: SceneState["drape"];
   view?: View;
   compare?: boolean;
+  search?: boolean;
 }
 
 export function findSite(index: SitesIndex, id: SiteId): Site {
   const s = index.sites.find((x) => x.id === id);
   if (!s) throw new Error(`unknown site ${id}`);
   return s;
+}
+
+/** Every grid that can be shown for a site: its observed/simulated series plus an optional NASA reference. */
+export function siteVariants(site: Site): Variant[] {
+  const ref = site.nasa_reference?.variant;
+  return ref ? [...site.variants, ref] : site.variants;
 }
 
 export function observedVariantId(site: Site): string {
@@ -75,6 +85,7 @@ export function initialState(index: SitesIndex, site: SiteId = "moon"): SceneSta
     drape: "relief",
     view: "overview",
     compare: false,
+    search: false,
   };
 }
 
@@ -96,6 +107,7 @@ function presetActions(index: SitesIndex, state: SceneState, p: ScenePreset): Sc
   if (p.drape) out.push({ type: "setDrape", drape: p.drape });
   if (p.view) out.push({ type: "setView", view: p.view });
   if (p.compare !== undefined) out.push({ type: "setCompare", enabled: p.compare });
+  if (p.search !== undefined) out.push({ type: "setSearch", enabled: p.search });
   return out;
 }
 
@@ -118,7 +130,7 @@ export function reduce(index: SitesIndex, state: SceneState, action: SceneAction
     }
     case "selectVariant": {
       const site = findSite(index, state.site);
-      if (!site.variants.some((v) => v.id === action.variantId)) return state;
+      if (!siteVariants(site).some((v) => v.id === action.variantId)) return state;
       return { ...state, variantId: action.variantId };
     }
     case "setExaggeration":
@@ -140,6 +152,8 @@ export function reduce(index: SitesIndex, state: SceneState, action: SceneAction
       return (VIEWS as readonly string[]).includes(action.view) ? { ...state, view: action.view } : state;
     case "setCompare":
       return state.compare === action.enabled ? state : { ...state, compare: action.enabled };
+    case "setSearch":
+      return state.search === action.enabled ? state : { ...state, search: action.enabled };
     case "applyPreset":
       return presetActions(index, state, action.preset).reduce((s, a) => reduce(index, s, a), state);
   }

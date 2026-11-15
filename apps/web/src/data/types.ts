@@ -31,6 +31,87 @@ export interface Variant {
   elevation: { min_m: number; max_m: number; nan_count: number };
   normal_map: NormalMapAsset;
   derived_from: { path: string; sha256: string };
+  /**
+   * An independent observation by a different instrument (NASA NASADEM), shown
+   * for comparison only. It is neither the site's observed grid nor a simulation,
+   * and it is never part of the coarsening scrubber.
+   */
+  reference?: boolean;
+}
+
+/** Independent NASA elevation product over the same ROI, compared with the simulated grid. */
+export interface NasaReference {
+  variant_id: string;
+  /** the NASADEM grid on the site's display grid (``reference: true``) */
+  variant: Variant;
+  title: string;
+  product_id: string;
+  tiles: string[];
+  landing_page: string;
+  license: string;
+  citation: string;
+  resolution_m: number;
+  vertical: string;
+  comparison: {
+    /** id of the simulated variant compared against */
+    against_variant_id: string;
+    rmse_m: number;
+    /** mean of (NASADEM - simulated), metres; includes the datum difference */
+    bias_m: number;
+    /** RMSE after removing the mean offset */
+    rmse_detrended_m: number;
+    pearson_r: number;
+    cells: number;
+    note: string;
+  };
+}
+
+/** NASA POWER climatology at the site (2 m air temperature extremes). */
+export interface SurfaceClimate {
+  source: string;
+  url: string;
+  lat: number;
+  lon: number;
+  /** highest 2 m air temperature in the POWER climatology, deg C */
+  t2m_max_c: number;
+  /** lowest 2 m air temperature in the POWER climatology, deg C */
+  t2m_min_c: number;
+  period: string;
+  note: string;
+}
+
+export interface AnomalyCandidate {
+  x_m: number;
+  y_m: number;
+  relief_m: number;
+  /** lattice cells in this connected anomaly cluster */
+  cells: number;
+}
+
+export interface AnomalySearchLevel {
+  resolution_m: number;
+  observed: boolean;
+  /** relief threshold (the lattice percentile), null when not measurable */
+  threshold_m: number | null;
+  lattice_points: number;
+  flagged_points: number;
+  /** gazetteer points within match_radius_m of a flagged lattice point */
+  landmarks_recovered: number;
+  landmark_count: number;
+  /** same test for the seeded random background points (chance level) */
+  random_recovered_fraction: number | null;
+  /** clusters not near any gazetteer point, highest relief first (unverified) */
+  candidates: AnomalyCandidate[];
+}
+
+/** Systematic search: relief on a regular lattice across the whole ROI, not only at named points. */
+export interface AnomalySearch {
+  spacing_m: number;
+  radius_m: number;
+  percentile: number;
+  match_radius_m: number;
+  note: string;
+  levels: AnomalySearchLevel[];
 }
 
 export interface Landmark {
@@ -42,6 +123,9 @@ export interface Landmark {
   /** metres south of the ROI north-west corner */
   y_m: number;
   surface_elev_m: number;
+  /** geographic position from the gazetteer (degrees; Moon: planetocentric, lon east 0-360) */
+  lat?: number;
+  lon?: number;
   source: string;
   notes: string[];
 }
@@ -74,6 +158,10 @@ export interface Site {
   subsurface: "not measured";
   facts?: MoonFacts;
   experiment?: Experiment;
+  /** Earth sites: independent NASA elevation observation over the same ROI */
+  nasa_reference?: NasaReference;
+  /** Earth sites: NASA POWER air-temperature climatology */
+  climate?: SurfaceClimate;
 }
 
 export interface MoonFacts {
@@ -114,15 +202,24 @@ export interface Experiment {
   method: string;
   levels: ExperimentLevel[];
   caveat: string;
+  search?: AnomalySearch;
 }
 
 export interface Candidate {
   id: string;
   site: string;
+  body?: "Earth" | "Mars";
   status: "validated" | "not_verified";
   elevation_product: string;
   note: string;
   url: string;
+  /** representative point (degrees; Mars: lon east 0-360) */
+  lat?: number;
+  lon?: number;
+  /** what the point is, e.g. "Garden Bridges (USGS GNIS)" */
+  point_label?: string;
+  /** source of the point coordinates */
+  point_source?: string;
 }
 
 export interface SitesIndex {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { loadIndex } from "./data/load";
 import type { SitesIndex } from "./data/types";
-import { initialState, reduce, type SceneAction, type SceneState } from "./scene/state";
+import { initialState, reduce, type SceneAction, type SceneState, siteVariants } from "./scene/state";
 import { Viewer } from "./scene/Viewer";
 import { buildScenes, type StoryScene } from "./story/scenes";
 import {
@@ -75,7 +75,7 @@ function Experience({ index }: { index: SitesIndex }) {
   useTestHooks(state, dispatch, story, storyDispatch);
 
   const site = index.sites.find((s) => s.id === state.site);
-  const variant = site?.variants.find((v) => v.id === state.variantId);
+  const variant = site ? siteVariants(site).find((v) => v.id === state.variantId) : undefined;
   // biome-ignore lint/correctness/useExhaustiveDependencies: clear selection when the site changes
   useEffect(() => setSelected(null), [state.site]);
   if (!site || !variant)
@@ -85,6 +85,12 @@ function Experience({ index }: { index: SitesIndex }) {
   const observed = site.variants.find((v) => v.observed) ?? null;
   const compareVariant = state.compare && !variant.observed ? observed : null;
   const scene = inStory ? (scenes[story.scene] ?? null) : null;
+  const search = site.experiment?.search;
+  const searchLevel = state.search
+    ? search?.levels.find((l) => l.resolution_m === variant.resolution_m && !variant.reference)
+    : undefined;
+  const anomalies =
+    search && searchLevel ? { candidates: searchLevel.candidates, radius: search.radius_m } : null;
   const openEvidence = () => {
     storyDispatch({ type: "pause" });
     setDrawer(true);
@@ -120,6 +126,7 @@ function Experience({ index }: { index: SitesIndex }) {
               intro={intro}
               navigationLocked={scrolling || focusLab}
               focusLab={focusLab}
+              anomalies={anomalies}
             />
           </div>
           <TopBar

@@ -1,9 +1,10 @@
 import { type Dispatch, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { AmbientSound } from "../audio/AmbientSound";
-import type { Site, SitesIndex, Variant } from "../data/types";
+import type { ExperimentLevel, Site, SitesIndex, Variant } from "../data/types";
 import type { SceneAction, SceneState } from "../scene/state";
-import type { StoryScene } from "../story/scenes";
+import { lossResolution, type StoryScene } from "../story/scenes";
 import type { StoryAction, StoryState } from "../story/story";
+import { AnalogyMatrix } from "./AnalogyMatrix";
 import { DataChip } from "./DataChip";
 import { DecisionView } from "./DecisionView";
 import { Destinations } from "./Destinations";
@@ -140,6 +141,34 @@ function IconButton({
   );
 }
 
+/**
+ * The Lava Beds grid the prediction asks about: the first coarsened grid where the
+ * point median is not above background, else the coarsest measurable simulated grid.
+ */
+function predictionTarget(index: SitesIndex): { variant: Variant; level: ExperimentLevel } | null {
+  const site = index.sites.find((s) => s.id === "earth");
+  const exp = site?.experiment;
+  if (!site || !exp) return null;
+  const pair = (grid: number | null) => {
+    if (grid === null) return null;
+    const variant = site.variants.find((v) => v.resolution_m === grid);
+    const level = exp.levels.find((l) => l.resolution_m === grid);
+    return variant && level ? { variant, level } : null;
+  };
+  const loss = pair(lossResolution(exp));
+  if (loss) return loss;
+  const measurable = exp.levels
+    .filter(
+      (l) => !l.observed && l.landmark_relief_median_m !== null && l.background_relief_median_m !== null,
+    )
+    .map((l) => pair(l.resolution_m))
+    .filter((x) => x !== null && !x.variant.observed);
+  return measurable.reduce<{ variant: Variant; level: ExperimentLevel } | null>(
+    (best, x) => (x && (!best || x.level.resolution_m > best.level.resolution_m) ? x : best),
+    null,
+  );
+}
+
 /** Layer 1 of story mode: one headline, one supporting line, one takeaway, one action, one panel. */
 export function StoryOverlay({
   index,
@@ -201,20 +230,27 @@ export function StoryOverlay({
     else storyDispatch({ type: "goTo", scene: story.scene + 1 });
   };
 
+  const target = scene.panel === "lab" ? predictionTarget(index) : null;
   let panel: ReactNode = null;
   let panelWidth = "lg:w-[24rem]";
   if (scene.panel === "destinations") {
-    panel = <Destinations index={index} current={sceneState.site} onGo={go} />;
-    panelWidth = "lg:w-[30rem]";
+    const here = index.sites.find((x) => x.id === sceneState.site && x.body === "Earth");
+    panel = (
+      <>
+        <Destinations index={index} current={sceneState.site} onGo={go} />
+        {here && <AnalogyMatrix index={index} site={here} />}
+      </>
+    );
+    panelWidth = "lg:w-[34rem]";
   }
-  if (scene.panel === "lab" && !revealed)
+  if (scene.panel === "lab" && !revealed && target)
     panel = (
       <div className="rounded-xl border border-teal-300/30 bg-[#0c111c]/95 p-5" data-testid="prediction">
         <p className="text-xs tracking-widest text-teal-200">YOUR PREDICTION · LAVA BEDS</p>
         <fieldset className="mt-3">
           <legend className="text-lg text-white">
-            At a simulated 10 m grid, will the landmark group's median relief still exceed the sampled
-            background?
+            At a simulated {target.variant.resolution_m} m grid, will the landmark group's median relief still
+            exceed the sampled background?
           </legend>
           <div className="mt-4 grid gap-3 text-sm text-zinc-200">
             <label>
@@ -247,7 +283,13 @@ export function StoryOverlay({
             pause();
             sceneDispatch({
               type: "applyPreset",
-              preset: { site: "earth", variantId: "10m", exaggeration: 2, view: "landmark", compare: true },
+              preset: {
+                site: "earth",
+                variantId: target.variant.id,
+                exaggeration: 2,
+                view: "landmark",
+                compare: true,
+              },
             });
           }}
         >
@@ -258,16 +300,10 @@ export function StoryOverlay({
         </p>
       </div>
     );
-  if (scene.panel === "lab" && revealed)
+  if (scene.panel === "lab" && (revealed || !target))
     panel = (
       <>
-        <p
-          className="mb-2 rounded-lg bg-[#0c111c]/95 p-3 text-sm text-teal-100"
-          data-testid="prediction-result"
-        >
-          Your prediction: {prediction === "above" ? "above" : "at or below"}. At 10 m, the measured landmark
-          median is at or below the sampled background median. This is not a detection test.
-        </p>
+        {target && <PredictionResult target={target} prediction={prediction} />}
         <ResolutionLab
           index={index}
           state={sceneState}
@@ -286,6 +322,16 @@ export function StoryOverlay({
           onDetails={onEvidence}
           focused={focusLab}
           onFocus={onFocusLab}
+          onSearch={(enabled) => {
+            pause();
+            sceneDispatch({ type: "setSearch", enabled });
+          }}
+          onReference={() => {
+            pause();
+            const ref = index.sites.find((x) => x.id === sceneState.site)?.nasa_reference;
+            if (ref)
+              sceneDispatch({ type: "applyPreset", preset: { variantId: ref.variant_id, compare: true } });
+          }}
         />
       </>
     );
@@ -354,7 +400,7 @@ export function StoryOverlay({
       {panel && (
         <div
           data-anim="controls"
-          className={`pointer-events-auto w-full lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:justify-self-end ${panelWidth}`}
+          className={`ab-panel-scroll pointer-events-auto w-full lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-10rem)] lg:justify-self-end lg:overflow-y-auto ${panelWidth}`}
         >
           {panel}
         </div>
@@ -391,5 +437,31 @@ export function StoryOverlay({
         </button>
       </div>
     </div>
+  );
+}
+
+function PredictionResult({
+  target,
+  prediction,
+}: {
+  target: { variant: Variant; level: ExperimentLevel };
+  prediction: "above" | "below" | null;
+}) {
+  const lm = target.level.landmark_relief_median_m;
+  const bg = target.level.background_relief_median_m;
+  if (lm === null || bg === null) return null;
+  const above = lm > bg;
+  const matched = prediction === (above ? "above" : "below");
+  return (
+    <p
+      className="mb-2 rounded-lg bg-[#0c111c]/95 p-2.5 text-xs leading-snug text-teal-100"
+      data-testid="prediction-result"
+    >
+      Your prediction: {prediction === "above" ? "above" : "at or below"}. At {target.variant.resolution_m} m
+      the bridge-point median is {lm.toFixed(1)} m and the sampled background median is {bg.toFixed(1)} m:{" "}
+      {above ? "above" : "not above"}.{" "}
+      {matched ? "Your prediction matched the measurement." : "The measurement differs from your prediction."}{" "}
+      This is not a detection test.
+    </p>
   );
 }

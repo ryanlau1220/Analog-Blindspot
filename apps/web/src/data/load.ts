@@ -14,8 +14,17 @@ export function validateIndex(raw: unknown): SitesIndex {
   for (const s of idx.sites) {
     if (s.subsurface !== "not measured") throw new Error(`${s.id}: unexpected subsurface claim`);
     if (!s.variants.some((v) => v.observed)) throw new Error(`${s.id}: no observed variant`);
-    for (const v of s.variants) {
-      if (!v.observed && !v.label.includes("SIMULATED")) {
+    const ref = s.nasa_reference?.variant;
+    if (
+      ref &&
+      (!ref.reference || ref.observed || ref.label.includes("SIMULATED") || !ref.label.includes("NASA"))
+    ) {
+      throw new Error(
+        `${s.id}/${ref.id}: reference grid must be labelled as an independent NASA observation`,
+      );
+    }
+    for (const v of [...s.variants, ...(ref ? [ref] : [])]) {
+      if (!v.observed && !v.reference && !v.label.includes("SIMULATED")) {
         throw new Error(`${s.id}/${v.id}: simulated variant is not labelled SIMULATED`);
       }
       if (v.heights.rows * v.heights.cols * 4 !== v.heights.bytes) {

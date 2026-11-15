@@ -1,5 +1,7 @@
-import type { Experiment, MoonFacts, SitesIndex } from "../data/types";
+import type { Experiment, MoonFacts, Site, SitesIndex } from "../data/types";
 import type { ScenePreset } from "../scene/state";
+import { CITATIONS, kToC, LUNAR_THERMAL } from "./analogy";
+import { SLDEM2015 } from "./lunarProducts";
 
 /**
  * The five chapters. Every number in the text comes from sites.json (and so
@@ -62,6 +64,27 @@ export function lastVisibleResolution(exp: Experiment): number | null {
   return last;
 }
 
+/** Evidence-drawer sentence on the independent NASADEM check, from sites.json. */
+function nasaCheck(site: Site): string[] {
+  const r = site.nasa_reference;
+  if (!r) return [];
+  const c = r.comparison;
+  return [
+    `Real-data check: NASA ${r.product_id} (${r.resolution_m} m, radar) over the same ground agrees with our simulated ${r.resolution_m} m grid cell by cell (r = ${c.pearson_r.toFixed(3)}, RMSE ${c.rmse_m.toFixed(1)} m, ${c.rmse_detrended_m.toFixed(1)} m after removing a ${Math.abs(c.bias_m).toFixed(1)} m offset that includes the datum difference).`,
+  ];
+}
+
+/** Evidence-drawer sentence on the lattice search at the observed grid, from sites.json. */
+function searchSummary(site: Site, noun: string): string[] {
+  const s = site.experiment?.search;
+  const lv = s?.levels.find((l) => l.observed);
+  if (!s || !lv || lv.threshold_m === null) return [];
+  const chance = lv.random_recovered_fraction;
+  return [
+    `Systematic search at ${site.name.split(",")[0]}: relief on a ${s.spacing_m} m lattice across the whole ROI. ${lv.landmarks_recovered} of ${lv.landmark_count} named ${noun} points lie within ${s.match_radius_m} m of a top-${100 - s.percentile}% point${chance !== null ? `, against ${Math.round(chance * 100)}% of random positions` : ""}. Flagged clusters away from named points are unverified anomalies, not discoveries.`,
+  ];
+}
+
 export function buildScenes(index: SitesIndex): StoryScene[] {
   const moon = index.sites.find((s) => s.id === "moon");
   const earth = index.sites.find((s) => s.id === "earth");
@@ -85,11 +108,13 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       id: "mystery",
       chapter: "The Mystery",
       headline: "The pit is real. What lies beneath is still unmeasured.",
-      sub: "One lunar opening. An incomplete map. A mystery we cannot resolve from orbit.",
+      sub: "You are scouting shelter for a permanent Moon base. Pits like this may open into lava tubes, out of the radiation and the temperature swings.",
       takeaway: `Real LROC terrain, ${obs(moon)?.resolution_m} m between elevation posts. Inside the magenta edge the model has no elevation at all.`,
       action: { label: "Reveal the blind spot", kind: "next" },
       body: [
         `Marius Hills Pit opens in a sinuous rille on the lunar nearside (${f.pit_lat.toFixed(2)}° N, ${f.pit_lon_east.toFixed(2)}° E). The LROC Pits Atlas lists a ${range(f.atlas_funnel_diameter_m)} funnel and a depth of about ${m(f.atlas_depth_m)}.`,
+        `Kaguya (SELENE) found this opening in 2009 and it may be a skylight into a lava tube (${CITATIONS.haruyama2009}).`,
+        `Why it matters for a base: Diviner shows the equatorial surface swings from about ${LUNAR_THERMAL.surface_predawn_k} K (${kToC(LUNAR_THERMAL.surface_predawn_k).toFixed(0)} °C) before dawn to ${LUNAR_THERMAL.surface_day_k[0]}–${LUNAR_THERMAL.surface_day_k[1]} K at noon (${CITATIONS.williams2017}). Models built on Diviner observations of other lunar pits put shadowed cave interiors near ${LUNAR_THERMAL.shadowed_cave_k} K, about ${kToC(LUNAR_THERMAL.shadowed_cave_k).toFixed(0)} °C, all lunar day (${CITATIONS.horvath2022}). Whether this pit leads to such a cave is unknown.`,
         "You are looking at the real LROC NAC terrain model at true vertical scale, draped with the verified 4 m LROC orthophoto. The magenta outline marks where measured elevation stops.",
       ],
       steps: [
@@ -125,13 +150,14 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       id: "search",
       chapter: "Search Earth",
       headline: "Earth holds clues to landscapes we cannot fully explore.",
-      sub: "Choose a known Earth site for a specific surface-measurement question.",
+      sub: "To find more pits from orbit, test what a map must resolve. Pick an Earth site, and see where its analogy holds and where it breaks.",
       takeaway:
-        "Two sites have checked airborne LiDAR of surfaces above known lava tubes. Neither is a proven universal analog.",
+        "Two sites have checked airborne LiDAR of surfaces above known lava tubes. They match the Moon in rock and landform, not in gravity, vacuum or radiation.",
       action: { label: "Run the resolution experiment", kind: "next" },
       body: [
         "Lava Beds National Monument, California, is a region where lava tubes are particularly abundant. NCALM flew this 0.5 m airborne LiDAR survey in 2023 to look for their surface expression.",
         `The Lava Beds markers are ${exp.landmark_count} named natural bridges from the USGS GNIS gazetteer, along a collapsed lava-tube trench. Their positions are approximate. The LiDAR measures the surface only.`,
+        "Both are already used for planetary work (NASA BRAILLE at Lava Beds, ESA PANGAEA at La Corona). Here they answer a different question: how fine a terrain grid must be to see surface clues of a lava tube.",
         ...(lanz && lexp
           ? [
               `At Lanzarote the markers are ${lexp.landmark_count} named jameos (collapse openings into a lava tube) from the IGN gazetteer, on the ${obs(lanz)?.resolution_m} m CNIG LiDAR terrain model.`,
@@ -176,6 +202,9 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
               `At Lanzarote the median point relief is ${median(lexp)?.toFixed(1)} m, against ${median(exp)?.toFixed(1)} m for Lava Beds. Its median exceeds the sampled background at ${lKept} m${lLoss === null ? "; coarser grids are not measurable with this method" : `, but not at ${lLoss} m`}.`,
             ]
           : []),
+        ...nasaCheck(earth),
+        ...searchSummary(earth, "bridge"),
+        ...(lanz ? searchSummary(lanz, "jameo") : []),
         "The 3D mesh uses the same 257 × 257 display grid for every variant; the shading comes from each grid at its own resolution.",
       ],
       panel: "lab",
@@ -210,12 +239,16 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "decision",
       chapter: "Field Decision",
-      headline: "One Moon. Two Earth sites. Different questions.",
-      sub: "Two known candidate environments, two measurement questions, and one crucial unknown.",
+      headline:
+        kept !== null
+          ? `Small surface clues need a ${kept} m map. The global lunar map is about ${SLDEM2015.equator_m.toFixed(0)} m.`
+          : "One Moon. Two Earth sites. Different questions.",
+      sub: "A resolution requirement you can test: choose a grid and see which surface clues still stand out.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",
       action: { label: "View Field Validation Brief", kind: "brief" },
       body: [
         "Marius Hills Pit is measured at its rim and walls but not inside. Earth site recommendations are conditional on the measurement question, not proof of a lunar match or a newly discovered site.",
+        `The global lunar figure is ${SLDEM2015.name} at ${SLDEM2015.ppd} pixels per degree, about ${SLDEM2015.equator_m.toFixed(1)} m at the equator (${SLDEM2015.citation}). Targeted LROC NAC terrain models, like the one at Marius Hills, exist only where NAC stereo pairs were taken.`,
       ],
       panel: "decision",
       steps: [{ preset: { site: "moon", exaggeration: 1, drape: "orthophoto", view: "landmark" }, ms: 9000 }],
@@ -234,6 +267,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
       drape: "relief",
       view: "overview",
       compare: false,
+      search: false,
       ...first.preset,
     };
   }

@@ -16,6 +16,7 @@ export function DataChip({
   onOpen: () => void;
 }) {
   const obs = variant.observed;
+  const ref = !!variant.reference;
   return (
     <button
       type="button"
@@ -25,13 +26,21 @@ export function DataChip({
       className={`flex max-w-full items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1 text-[11px] backdrop-blur transition hover:bg-white/10 ${
         obs
           ? "border-teal-300/40 bg-teal-950/40 text-teal-50"
-          : "border-dashed border-violet-300/70 bg-violet-950/50 text-violet-50"
+          : ref
+            ? "border-sky-300/60 bg-sky-950/50 text-sky-50"
+            : "border-dashed border-violet-300/70 bg-violet-950/50 text-violet-50"
       }`}
     >
-      <span className={`h-2 w-2 shrink-0 rounded-full ${obs ? "bg-teal-300" : "bg-violet-300"}`} />
-      <span className="font-semibold tracking-wider">{obs ? "OBSERVED" : "SIMULATED"}</span>
+      <span
+        className={`h-2 w-2 shrink-0 rounded-full ${obs ? "bg-teal-300" : ref ? "bg-sky-300" : "bg-violet-300"}`}
+      />
+      <span className="font-semibold tracking-wider">
+        {obs ? "OBSERVED" : ref ? "NASA REFERENCE" : "SIMULATED"}
+      </span>
       <span className="truncate opacity-85">
-        <span className="hidden sm:inline">{site.provenance.product_id.split(",")[0]} · </span>
+        <span className="hidden sm:inline">
+          {ref ? site.nasa_reference?.product_id : site.provenance.product_id.split(",")[0]} ·{" "}
+        </span>
         {variant.resolution_m} m grid
       </span>
       <span className={exaggeration === 1 ? "opacity-70" : "font-semibold text-amber-200"}>
