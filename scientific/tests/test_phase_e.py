@@ -38,3 +38,16 @@ def test_search_recovers_a_planted_pit_and_reports_chance():
     assert lv["random_recovered_fraction"] is not None and lv["random_recovered_fraction"] < 0.5
     for c in lv["candidates"]:
         assert np.hypot(c["x_m"] - 300, c["y_m"] - 300) > 45
+
+
+def test_holdout_points_far_from_gazetteer_are_scored():
+    rng = np.random.default_rng(1)
+    z = rng.normal(0, 0.2, (600, 600)).astype(np.float32)
+    z[290:310, 290:310] -= 20
+    z[90:110, 490:510] -= 20  # a second pit that is not a gazetteer point
+    tr = Affine(1.0, 0, 0.0, 0, -1.0, 600.0)
+    lm = [{"utm_x": 300.0, "utm_y": 300.0}]
+    ho = [{"x": 500.0, "y": 500.0}]
+    lv = search_level(z, np.isfinite(z), tr, lm, 30.0, False, True, ho)
+    assert lv["holdout_count"] == 1 and lv["holdout_recovered"] == 1
+    assert lv["candidates_near_holdout"] >= 1

@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-15T07:49:30+00:00",
+  "generated_utc": "2026-11-15T08:19:23+00:00",
   "pipeline_version": "phase-e-1",
   "nasadem": {
     "title": "NASADEM Merged DEM Global 1 arc second V001",
@@ -54,6 +54,104 @@
         "period": "January 2001 - December 2025",
         "note": "Highest and lowest 2 m air temperature in the POWER climatology for the grid cell (about 0.5 degree, MERRA-2 reanalysis), not the ground surface at the feature."
       },
+      "holdout": [
+        {
+          "osm_id": 59950611,
+          "name": "Golden Dome",
+          "x_m": 988.3194370981073,
+          "y_m": 400.51408425625414
+        },
+        {
+          "osm_id": 59950615,
+          "name": "Blue Grotto",
+          "x_m": 926.5362310218625,
+          "y_m": 740.4598894119263
+        },
+        {
+          "osm_id": 59950617,
+          "name": "Catacombs",
+          "x_m": 854.3942396906205,
+          "y_m": 1005.6841819658875
+        },
+        {
+          "osm_id": 59950618,
+          "name": "Paradise Alleys",
+          "x_m": 756.5357590467902,
+          "y_m": 1107.1033170996234
+        },
+        {
+          "osm_id": 59950620,
+          "name": "Ovis",
+          "x_m": 709.8802334109787,
+          "y_m": 1120.756748193875
+        },
+        {
+          "osm_id": 59950621,
+          "name": "Sunshine",
+          "x_m": 505.6845984701067,
+          "y_m": 1257.5209700558335
+        },
+        {
+          "osm_id": 59950622,
+          "name": "Hercules Leg",
+          "x_m": 834.7348904877435,
+          "y_m": 1219.947848581709
+        },
+        {
+          "osm_id": 59950623,
+          "name": "Juniper",
+          "x_m": 1161.9856838714331,
+          "y_m": 835.3148513231426
+        },
+        {
+          "osm_id": 59950625,
+          "name": "Sentinel Cave (Lower Entrance)",
+          "x_m": 1377.9876990050543,
+          "y_m": 427.3156146602705
+        },
+        {
+          "osm_id": 59950626,
+          "name": "Thunderbolt",
+          "x_m": 1196.919993398944,
+          "y_m": 136.91577792912722
+        },
+        {
+          "osm_id": 59950627,
+          "name": "Lava Brook",
+          "x_m": 1300.3124071487691,
+          "y_m": 77.50821788143367
+        },
+        {
+          "osm_id": 59950629,
+          "name": "Mushpot Cave",
+          "x_m": 1376.4657750237966,
+          "y_m": 43.99286730028689
+        },
+        {
+          "osm_id": 773021768,
+          "name": "Labyrinth",
+          "x_m": 1320.017889533192,
+          "y_m": 32.32063561305404
+        },
+        {
+          "osm_id": 3717878982,
+          "name": "Indian Well Cave (Upper Entrance)",
+          "x_m": 1528.9078267954756,
+          "y_m": 152.81141978595406
+        },
+        {
+          "osm_id": 3717879897,
+          "name": "Labyrinth Cave (historic entrance)",
+          "x_m": 1210.054398080334,
+          "y_m": 155.83547202777117
+        },
+        {
+          "osm_id": 3717882219,
+          "name": "Indian Well Cave",
+          "x_m": 1532.1023105497006,
+          "y_m": 68.30517408065498
+        }
+      ],
       "search": {
         "spacing_m": 30.0,
         "radius_m": 30.0,
@@ -78,63 +176,76 @@
                 "x_m": 285.0,
                 "y_m": 1455.0,
                 "relief_m": 19.85,
-                "cells": 15
+                "cells": 15,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1755.0,
                 "y_m": 1095.0,
                 "relief_m": 18.8,
-                "cells": 41
+                "cells": 41,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1395.0,
                 "y_m": 915.0,
                 "relief_m": 17.51,
-                "cells": 19
+                "cells": 19,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1545.0,
                 "y_m": 225.0,
                 "relief_m": 15.93,
-                "cells": 6
+                "cells": 6,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 735.0,
                 "y_m": 1095.0,
                 "relief_m": 15.76,
-                "cells": 13
+                "cells": 13,
+                "near_holdout_entrance": true
               },
               {
                 "x_m": 1485.0,
                 "y_m": 1245.0,
                 "relief_m": 15.38,
-                "cells": 10
+                "cells": 10,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1425.0,
                 "y_m": 195.0,
                 "relief_m": 15.3,
-                "cells": 4
+                "cells": 4,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 945.0,
                 "y_m": 795.0,
                 "relief_m": 15.21,
-                "cells": 9
+                "cells": 9,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1395.0,
                 "y_m": 1125.0,
                 "relief_m": 13.71,
-                "cells": 2
+                "cells": 2,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1425.0,
                 "y_m": 285.0,
                 "relief_m": 13.25,
-                "cells": 2
+                "cells": 2,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 16,
+            "holdout_recovered": 5,
+            "candidates_near_holdout": 1
           },
           {
             "resolution_m": 4.0,
@@ -152,63 +263,76 @@
                 "x_m": 285.0,
                 "y_m": 1455.0,
                 "relief_m": 17.9,
-                "cells": 12
+                "cells": 12,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1755.0,
                 "y_m": 1095.0,
                 "relief_m": 16.71,
-                "cells": 46
+                "cells": 46,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1395.0,
                 "y_m": 915.0,
                 "relief_m": 16.42,
-                "cells": 19
+                "cells": 19,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1425.0,
                 "y_m": 225.0,
                 "relief_m": 14.53,
-                "cells": 4
+                "cells": 4,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1515.0,
                 "y_m": 225.0,
                 "relief_m": 14.5,
-                "cells": 5
+                "cells": 5,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 945.0,
                 "y_m": 795.0,
                 "relief_m": 14.44,
-                "cells": 8
+                "cells": 8,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 735.0,
                 "y_m": 1095.0,
                 "relief_m": 14.37,
-                "cells": 11
+                "cells": 11,
+                "near_holdout_entrance": true
               },
               {
                 "x_m": 1485.0,
                 "y_m": 1245.0,
                 "relief_m": 14.1,
-                "cells": 15
+                "cells": 15,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1485.0,
                 "y_m": 1455.0,
                 "relief_m": 12.71,
-                "cells": 3
+                "cells": 3,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 45.0,
                 "y_m": 1755.0,
                 "relief_m": 12.5,
-                "cells": 1
+                "cells": 1,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 16,
+            "holdout_recovered": 6,
+            "candidates_near_holdout": 2
           },
           {
             "resolution_m": 10.0,
@@ -226,63 +350,76 @@
                 "x_m": 1755.0,
                 "y_m": 1125.0,
                 "relief_m": 16.16,
-                "cells": 47
+                "cells": 47,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 555.0,
                 "y_m": 1365.0,
                 "relief_m": 15.41,
-                "cells": 18
+                "cells": 18,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1395.0,
                 "y_m": 915.0,
                 "relief_m": 15.12,
-                "cells": 20
+                "cells": 20,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 945.0,
                 "y_m": 795.0,
                 "relief_m": 14.04,
-                "cells": 6
+                "cells": 6,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1425.0,
                 "y_m": 225.0,
                 "relief_m": 13.52,
-                "cells": 11
+                "cells": 11,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 315.0,
                 "y_m": 1455.0,
                 "relief_m": 13.08,
-                "cells": 12
+                "cells": 12,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1485.0,
                 "y_m": 1215.0,
                 "relief_m": 12.48,
-                "cells": 10
+                "cells": 10,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1515.0,
                 "y_m": 225.0,
                 "relief_m": 12.38,
-                "cells": 4
+                "cells": 4,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1395.0,
                 "y_m": 1125.0,
                 "relief_m": 11.68,
-                "cells": 3
+                "cells": 3,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 45.0,
                 "y_m": 1755.0,
                 "relief_m": 11.6,
-                "cells": 1
+                "cells": 1,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 16,
+            "holdout_recovered": 5,
+            "candidates_near_holdout": 2
           },
           {
             "resolution_m": 30.0,
@@ -294,6 +431,9 @@
             "landmarks_recovered": 0,
             "random_recovered_fraction": null,
             "candidates": [],
+            "holdout_count": 16,
+            "holdout_recovered": 0,
+            "candidates_near_holdout": 0,
             "not_measurable": "radius 30 m covers fewer than 9 cells at 30 m"
           }
         ]
@@ -326,6 +466,38 @@
         "period": "January 2001 - December 2025",
         "note": "Highest and lowest 2 m air temperature in the POWER climatology for the grid cell (about 0.5 degree, MERRA-2 reanalysis), not the ground surface at the feature."
       },
+      "holdout": [
+        {
+          "osm_id": 2959559992,
+          "name": "Cueva de Los Siete Lagos",
+          "x_m": 2238.7163995119045,
+          "y_m": 1062.9549161279574
+        },
+        {
+          "osm_id": 8628376634,
+          "name": null,
+          "x_m": 1018.035026737256,
+          "y_m": 398.5636525293812
+        },
+        {
+          "osm_id": 9660456002,
+          "name": null,
+          "x_m": 869.2915352073032,
+          "y_m": 1125.868887597695
+        },
+        {
+          "osm_id": 9660456003,
+          "name": null,
+          "x_m": 1344.4121805361938,
+          "y_m": 1413.0972096221521
+        },
+        {
+          "osm_id": 12329722486,
+          "name": "Jameos del Agua",
+          "x_m": 2873.3711323044263,
+          "y_m": 1140.0744120324962
+        }
+      ],
       "search": {
         "spacing_m": 30.0,
         "radius_m": 30.0,
@@ -350,63 +522,76 @@
                 "x_m": 1125.0,
                 "y_m": 2145.0,
                 "relief_m": 20.62,
-                "cells": 103
+                "cells": 103,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 375.0,
                 "y_m": 885.0,
                 "relief_m": 18.77,
-                "cells": 35
+                "cells": 35,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2925.0,
                 "y_m": 195.0,
                 "relief_m": 17.9,
-                "cells": 18
+                "cells": 18,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2385.0,
                 "y_m": 345.0,
                 "relief_m": 17.1,
-                "cells": 17
+                "cells": 17,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 345.0,
                 "y_m": 1605.0,
                 "relief_m": 16.99,
-                "cells": 12
+                "cells": 12,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 105.0,
                 "y_m": 1785.0,
                 "relief_m": 16.1,
-                "cells": 18
+                "cells": 18,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1455.0,
                 "y_m": 75.0,
                 "relief_m": 15.57,
-                "cells": 7
+                "cells": 7,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 45.0,
                 "y_m": 1695.0,
                 "relief_m": 14.72,
-                "cells": 3
+                "cells": 3,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2595.0,
                 "y_m": 135.0,
                 "relief_m": 14.58,
-                "cells": 23
+                "cells": 23,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1005.0,
                 "y_m": 1515.0,
                 "relief_m": 14.24,
-                "cells": 4
+                "cells": 4,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 5,
+            "holdout_recovered": 3,
+            "candidates_near_holdout": 1
           },
           {
             "resolution_m": 4.0,
@@ -424,63 +609,76 @@
                 "x_m": 945.0,
                 "y_m": 2235.0,
                 "relief_m": 19.8,
-                "cells": 104
+                "cells": 104,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 375.0,
                 "y_m": 885.0,
                 "relief_m": 18.71,
-                "cells": 34
+                "cells": 34,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2925.0,
                 "y_m": 195.0,
                 "relief_m": 17.11,
-                "cells": 18
+                "cells": 18,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2385.0,
                 "y_m": 345.0,
                 "relief_m": 16.52,
-                "cells": 17
+                "cells": 17,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 345.0,
                 "y_m": 1605.0,
                 "relief_m": 16.29,
-                "cells": 11
+                "cells": 11,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1455.0,
                 "y_m": 75.0,
                 "relief_m": 15.09,
-                "cells": 7
+                "cells": 7,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 105.0,
                 "y_m": 1785.0,
                 "relief_m": 14.81,
-                "cells": 18
+                "cells": 18,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 45.0,
                 "y_m": 1695.0,
                 "relief_m": 14.15,
-                "cells": 3
+                "cells": 3,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2595.0,
                 "y_m": 135.0,
                 "relief_m": 13.98,
-                "cells": 22
+                "cells": 22,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 255.0,
                 "y_m": 1275.0,
                 "relief_m": 13.78,
-                "cells": 10
+                "cells": 10,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 5,
+            "holdout_recovered": 3,
+            "candidates_near_holdout": 1
           },
           {
             "resolution_m": 10.0,
@@ -498,63 +696,76 @@
                 "x_m": 975.0,
                 "y_m": 2235.0,
                 "relief_m": 18.76,
-                "cells": 96
+                "cells": 96,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 345.0,
                 "y_m": 885.0,
                 "relief_m": 17.15,
-                "cells": 36
+                "cells": 36,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2385.0,
                 "y_m": 345.0,
                 "relief_m": 15.74,
-                "cells": 16
+                "cells": 16,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2925.0,
                 "y_m": 195.0,
                 "relief_m": 15.48,
-                "cells": 16
+                "cells": 16,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 345.0,
                 "y_m": 1605.0,
                 "relief_m": 14.89,
-                "cells": 12
+                "cells": 12,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 45.0,
                 "y_m": 1905.0,
                 "relief_m": 13.99,
-                "cells": 23
+                "cells": 23,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1455.0,
                 "y_m": 75.0,
                 "relief_m": 13.94,
-                "cells": 7
+                "cells": 7,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 1005.0,
                 "y_m": 1515.0,
                 "relief_m": 13.22,
-                "cells": 3
+                "cells": 3,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 2595.0,
                 "y_m": 135.0,
                 "relief_m": 13.01,
-                "cells": 16
+                "cells": 16,
+                "near_holdout_entrance": false
               },
               {
                 "x_m": 255.0,
                 "y_m": 1275.0,
                 "relief_m": 12.37,
-                "cells": 13
+                "cells": 13,
+                "near_holdout_entrance": false
               }
-            ]
+            ],
+            "holdout_count": 5,
+            "holdout_recovered": 2,
+            "candidates_near_holdout": 0
           },
           {
             "resolution_m": 30.0,
@@ -566,19 +777,59 @@
             "landmarks_recovered": 0,
             "random_recovered_fraction": null,
             "candidates": [],
+            "holdout_count": 5,
+            "holdout_recovered": 0,
+            "candidates_near_holdout": 0,
             "not_measurable": "radius 30 m covers fewer than 9 cells at 30 m"
           }
         ]
       }
     }
   },
+  "osm_cave_entrances": {
+    "file": "scientific/config/landmarks/osm_cave_entrances.geojson",
+    "sha256": "f843a9a00d7e3d24093be669f23b6a0d85189a10d454057be98070a296e379cd",
+    "name": "OpenStreetMap natural=cave_entrance (Overpass API)",
+    "license": "ODbL 1.0, (c) OpenStreetMap contributors",
+    "retrieved_utc": "2026-11-15T08:18:29+00:00",
+    "positional_note": "Volunteered positions; approximate. Independent of the LiDAR and gazetteers."
+  },
+  "diviner": {
+    "product": "LRO-L-DLRE-5-GCP-V1.0, GLOBAL_CUMUL_AVG_CYL_10N20N_002",
+    "url": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_10n20n_002.tab",
+    "byte_range": [
+      53459057,
+      53469904
+    ],
+    "file": "scientific/config/diviner/gcp_marius_hills_bin.tab",
+    "sha256": "e7090525755dceaebb4f7d82cdbafd048320d1322bf3a8c5a190b0d573410561",
+    "bin_center_lat": 14.25,
+    "bin_center_lon": -56.75,
+    "bin_size_deg": 0.5,
+    "local_time_bins_with_data": 48,
+    "tbol_max_k": 392.0,
+    "tbol_min_k": 96.7,
+    "tbol_max_local_time_h": 12.62,
+    "citation": "Paige, D. A. et al. (2017). LRO DLRE Level 5 GCP V1.0. NASA Planetary Data System. Williams, J.-P. et al. (2017). Icarus 283, 300-325. doi:10.1016/j.icarus.2016.08.012",
+    "note": "Bolometric brightness temperature binned at 0.5 degree (about 15 km) and 0.25 h of local time from nadir observations 2009-2015; it averages the pit with its surroundings."
+  },
   "gate": {
     "status": "pass",
     "checks": [
       {
+        "id": "earth:nasadem_sha256_pinned",
+        "passed": true,
+        "detail": "30e750b1fe9f964034a628c12caae1d0310e01781f615d97e20f9b2f0d78350e"
+      },
+      {
         "id": "earth:nasadem_covers_roi",
         "passed": true,
         "detail": "3600/3600 cells"
+      },
+      {
+        "id": "lanzarote:nasadem_sha256_pinned",
+        "passed": true,
+        "detail": "396329b8a96f3ff7d9b8e627b3582c234ff7270af515698c7f48e87e1909c88c"
       },
       {
         "id": "lanzarote:nasadem_covers_roi",

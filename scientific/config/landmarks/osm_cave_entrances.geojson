@@ -1,0 +1,418 @@
+{
+ "type": "FeatureCollection",
+ "source": {
+  "name": "OpenStreetMap natural=cave_entrance (Overpass API)",
+  "query": "[out:json][timeout:60];(node[\"natural\"=\"cave_entrance\"](41.69803,-121.52564,41.71396,-121.50364);node[\"natural\"=\"cave_entrance\"](29.14078,-13.46200,29.16749,-13.43076););out body;",
+  "license": "ODbL 1.0, (c) OpenStreetMap contributors",
+  "retrieved_utc": "2026-11-15T08:18:29+00:00",
+  "positional_note": "Volunteered positions; approximate. Independent of the LiDAR and gazetteers."
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5134778,
+     41.7104797
+    ]
+   },
+   "properties": {
+    "osm_id": 59950611,
+    "name": "Golden Dome"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5140063,
+     41.7091239
+    ]
+   },
+   "properties": {
+    "osm_id": 59950612,
+    "name": "Hopkins Chocolate Cave"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5142907,
+     41.7074284
+    ]
+   },
+   "properties": {
+    "osm_id": 59950615,
+    "name": "Blue Grotto"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5152125,
+     41.7050515
+    ]
+   },
+   "properties": {
+    "osm_id": 59950617,
+    "name": "Catacombs"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5164093,
+     41.7041535
+    ]
+   },
+   "properties": {
+    "osm_id": 59950618,
+    "name": "Paradise Alleys"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5169727,
+     41.7040378
+    ]
+   },
+   "properties": {
+    "osm_id": 59950620,
+    "name": "Ovis"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5194544,
+     41.702838
+    ]
+   },
+   "properties": {
+    "osm_id": 59950621,
+    "name": "Sunshine"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5154931,
+     41.7031253
+    ]
+   },
+   "properties": {
+    "osm_id": 59950622,
+    "name": "Hercules Leg"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5114813,
+     41.7065377
+    ]
+   },
+   "properties": {
+    "osm_id": 59950623,
+    "name": "Juniper"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5111533,
+     41.7084975
+    ]
+   },
+   "properties": {
+    "osm_id": 59950624,
+    "name": "Sentinel Cave (Upper Entrance)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.508801,
+     41.7101777
+    ]
+   },
+   "properties": {
+    "osm_id": 59950625,
+    "name": "Sentinel Cave (Lower Entrance)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5109164,
+     41.7128207
+    ]
+   },
+   "properties": {
+    "osm_id": 59950626,
+    "name": "Thunderbolt"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5096616,
+     41.7133395
+    ]
+   },
+   "properties": {
+    "osm_id": 59950627,
+    "name": "Lava Brook"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5087395,
+     41.7136294
+    ]
+   },
+   "properties": {
+    "osm_id": 59950629,
+    "name": "Mushpot Cave"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5094154,
+     41.7137433
+    ]
+   },
+   "properties": {
+    "osm_id": 773021768,
+    "name": "Labyrinth"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.43873,
+     29.1579913
+    ]
+   },
+   "properties": {
+    "osm_id": 2959559992,
+    "name": "Cueva de Los Siete Lagos"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5069303,
+     41.7126258
+    ]
+   },
+   "properties": {
+    "osm_id": 3717878982,
+    "name": "Indian Well Cave (Upper Entrance)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5107625,
+     41.7126483
+    ]
+   },
+   "properties": {
+    "osm_id": 3717879897,
+    "name": "Labyrinth Cave (historic entrance)"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5068743,
+     41.7133862
+    ]
+   },
+   "properties": {
+    "osm_id": 3717882219,
+    "name": "Indian Well Cave"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -121.5113379,
+     41.7083839
+    ]
+   },
+   "properties": {
+    "osm_id": 3717884225,
+    "name": "Sentinel Bridge"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.439447,
+     29.1605188
+    ]
+   },
+   "properties": {
+    "osm_id": 4704117589,
+    "name": "Jameo de Cinco Dedos"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4506583,
+     29.1636435
+    ]
+   },
+   "properties": {
+    "osm_id": 7972773687,
+    "name": "Cueva de La Paloma"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4536734,
+     29.1653927
+    ]
+   },
+   "properties": {
+    "osm_id": 8628376632,
+    "name": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4511872,
+     29.1641314
+    ]
+   },
+   "properties": {
+    "osm_id": 8628376634,
+    "name": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4528146,
+     29.157587
+    ]
+   },
+   "properties": {
+    "osm_id": 9660456002,
+    "name": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4479699,
+     29.154939
+    ]
+   },
+   "properties": {
+    "osm_id": 9660456003,
+    "name": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4503197,
+     29.1636781
+    ]
+   },
+   "properties": {
+    "osm_id": 11608513935,
+    "name": null
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4322171,
+     29.1572193
+    ]
+   },
+   "properties": {
+    "osm_id": 12329722486,
+    "name": "Jameos del Agua"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -13.4393652,
+     29.1604234
+    ]
+   },
+   "properties": {
+    "osm_id": 12329752473,
+    "name": "Cueva de los Verdes"
+   }
+  }
+ ]
+}

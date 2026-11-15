@@ -407,6 +407,9 @@ CANDIDATES = [
         "body": "Mars",
         "status": "not_verified",
         "elevation_product": "HiRISE image PSP_003647_1745 (25 cm/px image, not elevation)",
+        "size_note": "THEMIS skylight candidates around Arsia Mons are 100-225 m across (Cushing et al. 2007, "
+        "Geophys. Res. Lett. 34, L17201, doi:10.1029/2007GL030709)",
+        "size_m": [100, 225],
         "note": "A deep pit seen in a HiRISE image; no public HiRISE terrain model of it was found, so nothing is "
         "measured here. Shown so the Mars question stays visible, not as an analysis.",
         "url": "https://hirise.lpl.arizona.edu/PSP_003647_1745",
@@ -545,7 +548,12 @@ def search_block(search: dict) -> dict:
                     "landmark_count",
                     "random_recovered_fraction",
                     "candidates",
+                    "candidate_clusters",
+                    "holdout_count",
+                    "holdout_recovered",
+                    "candidates_near_holdout",
                 )
+                if k in lv
             }
             for lv in search["levels"]
         ],
@@ -607,7 +615,16 @@ def add_phase_e(site: dict, pe: dict, out: Path) -> None:
     }
     clim = rec["climate"]
     site["climate"] = {k: clim[k] for k in ("source", "url", "lat", "lon", "t2m_max_c", "t2m_min_c", "period", "note")}
-    site["experiment"]["search"] = search_block(rec["search"])
+    site["experiment"]["search"] = {
+        **search_block(rec["search"]),
+        "holdout": {
+            "source": "OpenStreetMap natural=cave_entrance, ODbL 1.0, (c) OpenStreetMap contributors",
+            "note": f"Cave entrances mapped in OpenStreetMap inside the ROI and more than "
+            f"{rec['search']['match_radius_m']:g} m from every gazetteer point, so they were not used to define the "
+            "test. Volunteered, approximate positions.",
+            "points": rec["holdout"],
+        },
+    }
 
 
 def main() -> int:
@@ -623,6 +640,23 @@ def main() -> int:
     if PHASE_E_PATH.exists():
         pe = json.loads(PHASE_E_PATH.read_text())
         if pe["gate"]["status"] == "pass":
+            dv = pe["diviner"]
+            sites[0]["facts"]["diviner"] = {
+                k: dv[k]
+                for k in (
+                    "product",
+                    "url",
+                    "bin_center_lat",
+                    "bin_center_lon",
+                    "bin_size_deg",
+                    "local_time_bins_with_data",
+                    "tbol_max_k",
+                    "tbol_min_k",
+                    "tbol_max_local_time_h",
+                    "citation",
+                    "note",
+                )
+            }
             for site in sites:
                 if site["body"] == "Earth":
                     add_phase_e(site, pe, WEB_DATA / site["id"])
@@ -649,6 +683,11 @@ def main() -> int:
                 "site": "lanzarote",
                 "source": "IGN Nomenclátor Geográfico Básico de España (NGBE), CC BY 4.0",
                 "url": "https://www.ign.es/wfs-inspire/ngbe",
+            },
+            {
+                "site": "earth",
+                "source": "Hold-out labels: OpenStreetMap cave entrances, ODbL 1.0, (c) OpenStreetMap contributors",
+                "url": "https://www.openstreetmap.org/copyright",
             },
         ],
     }

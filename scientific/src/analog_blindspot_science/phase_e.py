@@ -21,6 +21,18 @@ Usage: ``uv run phase-e`` (after ``phase-a`` and ``phase-d``), then ``uv run exp
    is gazetteer-point recovery, not a detection benchmark: no mapped outlines
    exist, and relief anomalies include roads, scarps and coastal cliffs.
 
+4. **Hold-out validation** of the search against an independent label set: cave
+   entrances mapped in OpenStreetMap (``natural=cave_entrance``, ODbL). Entrances
+   within ``MATCH_RADIUS_M`` of a gazetteer point are dropped, so the remaining
+   ones were never used to define or tune anything. We report how many hold-out
+   entrances lie near a flagged point (against chance) and how many unverified
+   candidate clusters lie near a hold-out entrance. OSM positions are volunteered
+   and approximate; this is still point recovery, not outline-level detection.
+5. **Diviner** Global Cumulative Product (LRO-L-DLRE-5-GCP-V1.0): the 0.5 degree
+   bin containing Marius Hills Pit, all 96 local-time bins, read with an HTTP
+   range request from the fixed-width table. The bin is about 15 km across, so it
+   describes the surroundings of the pit, not the pit itself.
+
 Writes ``datasets/manifest_phase_e.json``.
 """
 
@@ -46,6 +58,19 @@ OUT = DATASETS_DIR / "manifest_phase_e.json"
 NASADEM_URL = "https://opentopography.s3.sdsc.edu/raster/NASADEM/NASADEM_be/NASADEM_HGT_{tile}.tif"
 # Content-Length observed on 2026-11-15; a different file aborts the download.
 NASADEM_SIZES = {"n41w122": 11909285, "n29w014": 867773}
+NASADEM_SHA256 = {
+    "n41w122": "30e750b1fe9f964034a628c12caae1d0310e01781f615d97e20f9b2f0d78350e",
+    "n29w014": "396329b8a96f3ff7d9b8e627b3582c234ff7270af515698c7f48e87e1909c88c",
+}
+OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OSM_FILE = CONFIG_DIR / "landmarks" / "osm_cave_entrances.geojson"
+DIVINER_GCP_URL = (
+    "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/"
+    "global_cumul_avg_cyl_10n20n_002.tab"
+)
+DIVINER_FILE = CONFIG_DIR / "diviner" / "gcp_marius_hills_bin.tab"
+GCP_ROW_BYTES = 113
+GCP_LAT0, GCP_NLAT, GCP_NTIME = 10.25, 20, 96  # this file: 10-20 N, 0.5 degree bins, 0.25 h local time
 POWER_URL = (
     "https://power.larc.nasa.gov/api/temporal/climatology/point"
     "?parameters=T2M_MAX,T2M_MIN&community=RE&longitude={lon}&latitude={lat}&format=JSON"
@@ -165,7 +190,7 @@ def clusters(flag_xy: np.ndarray, relief: np.ndarray) -> list[dict]:
     return out
 
 
-def search_level(z, valid, tr, landmarks, radius, land_filter, observed) -> dict:
+def search_level(z, valid, tr, landmarks, radius, land_filter, observed, holdout=None) -> dict:
     if land_filter:
         valid = valid & (np.nan_to_num(z, nan=-1e9) > LAND_MIN_ELEV_M)
     pts = lattice(tr, z.shape, radius)
@@ -194,6 +219,9 @@ def search_level(z, valid, tr, landmarks, radius, land_filter, observed) -> dict
             "landmarks_recovered": 0,
             "random_recovered_fraction": None,
             "candidates": [],
+            "holdout_count": len(holdout or []),
+            "holdout_recovered": 0,
+            "candidates_near_holdout": 0,
             "not_measurable": f"radius {radius:g} m covers fewer than {earth.MIN_RELIEF_CELLS} cells at {res:g} m",
         }
     rel_a, xy_a = np.array(rel), np.array(xy)
@@ -225,6 +253,14 @@ def search_level(z, valid, tr, landmarks, radius, land_filter, observed) -> dict
             }
         )
     cands.sort(key=lambda c: -c["relief_m"])
+    ho = holdout or []
+    ho_xy = np.array([(h["x"], h["y"]) for h in ho]).reshape(-1, 2)
+
+    def near_holdout(x: float, y: float) -> bool:
+        return bool(len(ho_xy) and (np.hypot(ho_xy[:, 0] - x, ho_xy[:, 1] - y) <= MATCH_RADIUS_M).any())
+
+    for c in cands:
+        c["near_holdout_entrance"] = near_holdout(c["x_m"] + tr.c, tr.f - c["y_m"])
     return {
         **base,
         "threshold_m": round(thr, 3),
@@ -234,6 +270,116 @@ def search_level(z, valid, tr, landmarks, radius, land_filter, observed) -> dict
         "random_points": len(rnd),
         "candidate_clusters": len(cands),
         "candidates": cands[:MAX_CANDIDATES],
+        "holdout_count": len(ho),
+        "holdout_recovered": int(sum(near_flag(p) for p in ho_xy)),
+        "candidates_near_holdout": int(sum(c["near_holdout_entrance"] for c in cands)),
+    }
+
+
+def roi_lonlat(b: dict) -> tuple[float, float, float, float]:
+    from pyproj import Transformer
+
+    t = Transformer.from_crs(b["crs"], "EPSG:4326", always_xy=True)
+    lo0, la0 = t.transform(b["left"], b["bottom"])
+    lo1, la1 = t.transform(b["right"], b["top"])
+    return la0, lo0, la1, lo1
+
+
+def fetch_osm(bboxes: dict[str, tuple[float, float, float, float]], refresh: bool) -> dict:
+    """OSM cave entrances inside each ROI (committed so the analysis is reproducible offline)."""
+    if refresh or not OSM_FILE.exists():
+        parts = "".join(
+            f'node["natural"="cave_entrance"]({a:.5f},{b:.5f},{c:.5f},{d:.5f});' for a, b, c, d in bboxes.values()
+        )
+        q = f"[out:json][timeout:60];({parts});out body;"
+        r = requests.post(
+            OVERPASS_URL,
+            data={"data": q},
+            headers={"User-Agent": "analog-blindspot-science/0.1 (research)", "Accept": "application/json"},
+            timeout=90,
+        )
+        r.raise_for_status()
+        feats = [
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
+                "properties": {"osm_id": e["id"], "name": e.get("tags", {}).get("name")},
+            }
+            for e in sorted(r.json()["elements"], key=lambda e: e["id"])
+        ]
+        OSM_FILE.write_text(
+            json.dumps(
+                {
+                    "type": "FeatureCollection",
+                    "source": {
+                        "name": "OpenStreetMap natural=cave_entrance (Overpass API)",
+                        "query": q,
+                        "license": "ODbL 1.0, (c) OpenStreetMap contributors",
+                        "retrieved_utc": datetime.now(UTC).isoformat(timespec="seconds"),
+                        "positional_note": "Volunteered, approximate positions; not from the LiDAR or gazetteers.",
+                    },
+                    "features": feats,
+                },
+                indent=1,
+            )
+            + "\n"
+        )
+    return json.loads(OSM_FILE.read_text())
+
+
+def holdout_points(osm: dict, crs: str, tr: Affine, shape: tuple[int, int], landmarks: list[dict]) -> list[dict]:
+    """OSM entrances inside the ROI and farther than MATCH_RADIUS_M from every gazetteer point."""
+    lm = np.array([(m["utm_x"], m["utm_y"]) for m in landmarks])
+    left, top = tr.c, tr.f
+    right, bottom = left + shape[1] * tr.a, top + shape[0] * tr.e
+    out = []
+    for f in osm["features"]:
+        lon, lat = f["geometry"]["coordinates"]
+        x, y = earth.to_utm(lon, lat, crs)
+        if not (left <= x <= right and bottom <= y <= top):
+            continue
+        if (np.hypot(lm[:, 0] - x, lm[:, 1] - y) <= MATCH_RADIUS_M).any():
+            continue
+        out.append({"osm_id": f["properties"]["osm_id"], "name": f["properties"]["name"], "x": x, "y": y})
+    return out
+
+
+def fetch_diviner(lat: float, lon_east: float, refresh: bool) -> dict:
+    """The GCP bin containing (lat, lon) over all local times, via an HTTP range request."""
+    lon = ((lon_east + 180) % 360) - 180
+    lon_i = int(np.floor((lon + 180) / 0.5))
+    lat_i = int(np.floor((lat - (GCP_LAT0 - 0.25)) / 0.5))
+    first = (lon_i * GCP_NLAT + lat_i) * GCP_NTIME + 1  # +1 header row
+    rng = (first * GCP_ROW_BYTES, (first + GCP_NTIME) * GCP_ROW_BYTES - 1)
+    if refresh or not DIVINER_FILE.exists():
+        r = requests.get(DIVINER_GCP_URL, headers={"Range": f"bytes={rng[0]}-{rng[1]}"}, timeout=60)
+        if r.status_code != 206:
+            raise RuntimeError(f"Diviner GCP range request returned HTTP {r.status_code}")
+        DIVINER_FILE.parent.mkdir(parents=True, exist_ok=True)
+        DIVINER_FILE.write_bytes(r.content)
+    rows = [[float(v) for v in ln.split(",")] for ln in DIVINER_FILE.read_text().splitlines() if ln.strip()]
+    clon, clat = rows[0][0], rows[0][1]
+    if abs(clon - lon) > 0.25 or abs(clat - lat) > 0.25 or len(rows) != GCP_NTIME:
+        raise RuntimeError(f"Diviner bin ({clon}, {clat}) does not contain ({lon}, {lat})")
+    tb = [(row[2], row[10]) for row in rows if row[10] > 0]
+    temps = [t for _, t in tb]
+    return {
+        "product": "LRO-L-DLRE-5-GCP-V1.0, GLOBAL_CUMUL_AVG_CYL_10N20N_002",
+        "url": DIVINER_GCP_URL,
+        "byte_range": list(rng),
+        "file": str(DIVINER_FILE.relative_to(REPO_ROOT)),
+        "sha256": sha256_file(DIVINER_FILE),
+        "bin_center_lat": clat,
+        "bin_center_lon": clon,
+        "bin_size_deg": 0.5,
+        "local_time_bins_with_data": len(tb),
+        "tbol_max_k": round(max(temps), 1),
+        "tbol_min_k": round(min(temps), 1),
+        "tbol_max_local_time_h": next(t for t, v in tb if v == max(temps)),
+        "citation": "Paige, D. A. et al. (2017). LRO DLRE Level 5 GCP V1.0. NASA Planetary Data System. "
+        "Williams, J.-P. et al. (2017). Icarus 283, 300-325. doi:10.1016/j.icarus.2016.08.012",
+        "note": "Bolometric brightness temperature binned at 0.5 degree (about 15 km) and 0.25 h of local time "
+        "from nadir observations 2009-2015; it averages the pit with its surroundings.",
     }
 
 
@@ -266,7 +412,7 @@ def fetch_power(site: str, lat: float, lon: float, refresh: bool) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--refresh", action="store_true", help="re-fetch NASA POWER climatology")
+    ap.add_argument("--refresh", action="store_true", help="re-fetch NASA POWER, OSM and Diviner inputs")
     args = ap.parse_args(argv)
     man = json.loads(MANIFEST_PATH.read_text())
     if man["phase_a_gate"]["status"] != "pass":
@@ -291,11 +437,27 @@ def main(argv: list[str] | None = None) -> int:
         "sites": {},
     }
     checks = []
+    bounds = {site: site_inputs(man, site)[0] for site in SITES}
+    osm = fetch_osm({k: roi_lonlat(b) for k, b in bounds.items()}, args.refresh)
+    result["osm_cave_entrances"] = {
+        "file": str(OSM_FILE.relative_to(REPO_ROOT)),
+        "sha256": sha256_file(OSM_FILE),
+        **{k: osm["source"][k] for k in ("name", "license", "retrieved_utc", "positional_note")},
+    }
+    pit = next(r for r in man["rois"] if r["id"] == "moon_marius_hills_pit")["landmark"]
+    result["diviner"] = fetch_diviner(pit["lat"], pit["lon_east"], args.refresh)
     for site, cfg in SITES.items():
-        _bounds, landmarks, radius, assets = site_inputs(man, site)
+        b, landmarks, radius, assets = site_inputs(man, site)
         tile = cfg["tile"]
         dest = RAW_DIR / "nasadem" / f"NASADEM_HGT_{tile}.tif"
         rec = fetch(NASADEM_URL.format(tile=tile), dest, expected_size=NASADEM_SIZES[tile])
+        checks.append(
+            {
+                "id": f"{site}:nasadem_sha256_pinned",
+                "passed": rec.sha256 == NASADEM_SHA256[tile],
+                "detail": rec.sha256,
+            }
+        )
         result["nasadem"]["tiles"].append(
             {
                 "tile": tile,
@@ -331,10 +493,11 @@ def main(argv: list[str] | None = None) -> int:
                 "detail": f"{int(np.isfinite(ref).sum())}/{ref.size} cells",
             }
         )
+        ho = holdout_points(osm, b["crs"], tr30, sim30.shape, landmarks)
         levels = []
         for res in cfg["levels"]:
             z, valid, tr, _ = read(assets[res])
-            levels.append(search_level(z, valid, tr, landmarks, radius, cfg["land_filter"], res == cfg["observed"]))
+            levels.append(search_level(z, valid, tr, landmarks, radius, cfg["land_filter"], res == cfg["observed"], ho))
         lm0 = landmarks[0]
         result["sites"][site] = {
             "nasadem_30m": {
@@ -348,6 +511,9 @@ def main(argv: list[str] | None = None) -> int:
                 },
             },
             "climate": fetch_power(site, lm0["lat"], lm0["lon"], args.refresh),
+            "holdout": [
+                {"osm_id": h["osm_id"], "name": h["name"], "x_m": h["x"] - tr30.c, "y_m": tr30.f - h["y"]} for h in ho
+            ],
             "search": {
                 "spacing_m": SPACING_M,
                 "radius_m": radius,
@@ -373,9 +539,12 @@ def main(argv: list[str] | None = None) -> int:
         for lv in s["search"]["levels"]:
             print(
                 f"  {lv['resolution_m']:g} m: thr={lv['threshold_m']} recovered {lv['landmarks_recovered']}/"
-                f"{lv['landmark_count']} chance={lv['random_recovered_fraction']} candidates={len(lv['candidates'])}"
+                f"{lv['landmark_count']} chance={lv['random_recovered_fraction']} candidates={len(lv['candidates'])} "
+                f"holdout {lv['holdout_recovered']}/{lv['holdout_count']} near={lv['candidates_near_holdout']}"
             )
         print(f"  climate {s['climate']['t2m_min_c']} .. {s['climate']['t2m_max_c']} C ({s['climate']['period']})")
+    dv = result["diviner"]
+    print(f"diviner bin ({dv['bin_center_lat']}, {dv['bin_center_lon']}): {dv['tbol_min_k']}..{dv['tbol_max_k']} K")
     print(f"wrote {OUT.relative_to(REPO_ROOT)}; gate {result['gate']['status']}")
     return 0 if result["gate"]["status"] == "pass" else 1
 
