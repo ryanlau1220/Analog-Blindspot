@@ -24,6 +24,8 @@ pnpm build          # static site in apps/web/dist; BASE_PATH=/sub/ pnpm build f
 ```
 
 The app reads only `apps/web/public/data` (9.4 MB, committed) and makes no remote API calls at runtime.
+The optional ambient soundtrack is synthesized locally, starts only when the sound control is selected, and
+stops when the tab is hidden or the experience is closed. The story remains usable without audio.
 
 ## Cloudflare deployment
 

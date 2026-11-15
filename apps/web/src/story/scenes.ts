@@ -209,7 +209,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     },
     {
       id: "decision",
-      chapter: "The Discovery",
+      chapter: "Field Decision",
       headline: "Choose the test. Then choose the site.",
       sub: "Two known candidate environments, two measurement questions, and one crucial unknown.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",

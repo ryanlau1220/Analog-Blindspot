@@ -15,8 +15,12 @@ try {
   for (const [name, viewport] of [
     ["desktop", { width: 1366, height: 768 }],
     ["mobile", { width: 390, height: 844 }],
+    ["small mobile", { width: 320, height: 844 }],
   ]) {
-    const page = await browser.newPage({ viewport });
+    const page = await browser.newPage({
+      viewport,
+      reducedMotion: name === "small mobile" ? "reduce" : "no-preference",
+    });
     page.on("pageerror", (error) => failures.push(`${name}: ${error.message}`));
     page.on("console", (message) => {
       if (message.type() === "error") failures.push(`${name}: ${message.text()}`);
@@ -28,10 +32,21 @@ try {
     try {
       await page.goto(`${base}?test=1#scene=experiment`, { waitUntil: "networkidle" });
       await page.waitForFunction(() => window.__ab?.readyKey === "earth/10m", null, { timeout: 60000 });
+      const sound = page.getByTestId("ambient-toggle");
+      const soundBounds = await sound.boundingBox();
+      if (!soundBounds || soundBounds.x < 0 || soundBounds.x + soundBounds.width > viewport.width)
+        throw new Error(`${name}: sound control is outside the viewport`);
+      if ((await sound.getAttribute("aria-label")) !== "Turn ambient sound on")
+        throw new Error("Sound was not off initially");
+      await sound.click();
+      await page.getByRole("button", { name: "Turn ambient sound off" }).waitFor();
+      await sound.click();
+      await page.getByRole("button", { name: "Turn ambient sound on" }).waitFor();
       await page.getByTestId("exp-site-lanzarote").click();
       await page.getByTestId("variant-30m").click();
       await page.waitForFunction(() => window.__ab?.readyKey === "lanzarote/30m", null, { timeout: 60000 });
       await page.getByText("Not measurable at 30 m", { exact: false }).first().waitFor();
+      if (name === "desktop") await page.getByText("30 m grid: too few cells", { exact: false }).waitFor();
       await page.getByRole("button", { name: "Evidence", exact: true }).click();
       await page.getByTestId("evidence-drawer").waitFor();
       await page.goto(`${base}#brief`, { waitUntil: "networkidle" });

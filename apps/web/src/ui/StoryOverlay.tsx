@@ -1,5 +1,6 @@
 import gsap from "gsap";
 import { type Dispatch, type ReactNode, useLayoutEffect, useRef } from "react";
+import { AmbientSound } from "../audio/AmbientSound";
 import type { Site, SitesIndex, Variant } from "../data/types";
 import type { SceneAction, SceneState } from "../scene/state";
 import type { StoryScene } from "../story/scenes";
@@ -34,8 +35,8 @@ export function TopBar({
   const inStory = story.mode === "story";
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-10 grid grid-cols-[1fr_auto] items-start gap-x-3 gap-y-2 p-3 sm:p-6">
-      <p className="pointer-events-auto self-center text-[10px] font-semibold tracking-[0.3em] whitespace-nowrap text-zinc-100 sm:text-[11px] sm:tracking-[0.35em]">
-        ANALOG BLINDSPOT
+      <p className="pointer-events-auto self-center text-[9px] font-semibold tracking-[0.18em] whitespace-nowrap text-zinc-100 sm:text-[11px] sm:tracking-[0.35em]">
+        <span className="max-[360px]:hidden">ANALOG </span>BLINDSPOT
         <span className="ml-3 hidden font-normal tracking-normal text-zinc-400 lg:inline">
           Discover what planetary maps cannot tell us.
         </span>
@@ -44,6 +45,7 @@ export function TopBar({
         {inStory ? (
           <IconButton
             testId="play-toggle"
+            label={story.playing ? "Pause guided tour" : "Play guided tour"}
             onClick={() => storyDispatch({ type: story.playing ? "pause" : "play" })}
           >
             {story.playing ? "❚❚" : "▶"}
@@ -62,6 +64,7 @@ export function TopBar({
         <IconButton testId="evidence-toggle" onClick={onEvidence}>
           Evidence
         </IconButton>
+        <AmbientSound />
       </div>
       <div className="pointer-events-auto col-span-2 min-w-0 sm:col-span-1">
         <DataChip site={site} variant={variant} exaggeration={state.exaggeration} onOpen={onEvidence} />
@@ -105,17 +108,20 @@ function IconButton({
   children,
   onClick,
   testId,
+  label,
 }: {
   children: ReactNode;
   onClick: () => void;
   testId: string;
+  label?: string;
 }) {
   return (
     <button
       type="button"
       data-testid={testId}
+      aria-label={label}
       onClick={onClick}
-      className="rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[11px] text-zinc-200 backdrop-blur hover:bg-white/10"
+      className="rounded-full border border-white/15 bg-black/40 px-2 py-1 text-[11px] text-zinc-200 backdrop-blur hover:bg-white/10 sm:px-3"
     >
       {children}
     </button>
@@ -205,6 +211,18 @@ export function StoryOverlay({
   // Interactive chapters: on small screens the panel replaces the supporting lines.
   const dense = scene.panel === "lab" || scene.panel === "destinations" || scene.panel === "decision";
   const lgOnly = dense ? "hidden lg:block" : "";
+  const selectedExperiment = index.sites.find((site) => site.id === sceneState.site)?.experiment;
+  const selectedVariant = index.sites
+    .find((site) => site.id === sceneState.site)
+    ?.variants.find((variant) => variant.id === sceneState.variantId);
+  const selectedLevel = selectedExperiment?.levels.find(
+    (level) => level.resolution_m === selectedVariant?.resolution_m,
+  );
+  const labTakeaway = selectedLevel
+    ? selectedLevel.landmark_relief_median_m === null || selectedLevel.background_relief_median_m === null
+      ? `${selectedVariant?.resolution_m} m grid: too few cells to measure relief with this method.`
+      : `${sceneState.site === "lanzarote" ? "Lanzarote" : "Lava Beds"}: median point relief ${selectedLevel.landmark_relief_median_m.toFixed(1)} m; sampled background median ${selectedLevel.background_relief_median_m.toFixed(1)} m.`
+    : scene.takeaway;
 
   return (
     <div
@@ -212,8 +230,12 @@ export function StoryOverlay({
       data-testid="story-panel"
       className="pointer-events-none absolute inset-x-0 bottom-0 z-10 grid max-h-[66dvh] grid-cols-1 items-end gap-x-8 gap-y-4 overflow-y-auto bg-gradient-to-t from-[#090d16] via-[#090d16]/85 to-transparent px-4 pt-16 pb-4 sm:px-8 sm:pb-8 lg:max-h-none lg:grid-cols-[minmax(0,36rem)_1fr] lg:overflow-visible lg:from-[#090d16]/90 lg:via-transparent"
     >
-      <div className="pointer-events-auto" aria-live="polite">
-        <p data-anim className="text-[11px] uppercase tracking-[0.3em] text-teal-300/90">
+      <div
+        className="pointer-events-auto rounded-lg bg-[#090d16]/85 p-3 lg:bg-transparent lg:p-0"
+        aria-live="polite"
+      >
+        <p data-anim className="ab-chapter-label text-[11px] uppercase tracking-[0.3em] text-teal-300/90">
+          <span aria-hidden="true" className="ab-chapter-mark" />
           {pad(story.scene)} · {scene.chapter}
         </p>
         <h1
@@ -227,9 +249,10 @@ export function StoryOverlay({
         </p>
         <p
           data-anim
-          className={`mt-3 max-w-md border-l-2 border-teal-300/60 pl-3 text-sm text-zinc-200 ${scene.panel === "lab" ? lgOnly : ""}`}
+          className={`ab-takeaway mt-3 max-w-md text-sm text-zinc-200 ${scene.panel === "lab" ? lgOnly : ""}`}
         >
-          {scene.takeaway}
+          <span className="ab-takeaway-label">{scene.panel === "lab" ? "CURRENT VIEW" : "FIELD NOTE"}</span>
+          {scene.panel === "lab" ? labTakeaway : scene.takeaway}
         </p>
         {scene.panel === "legend" && (
           <div data-anim className="mt-3">
@@ -251,7 +274,7 @@ export function StoryOverlay({
           type="button"
           data-testid="primary-action"
           onClick={act}
-          className="rounded-full bg-[#d5b293] px-5 py-2.5 text-sm font-medium text-[#090d16] shadow-lg transition hover:bg-[#e4c6aa]"
+          className="ab-primary-action rounded-full bg-[#d5b293] px-5 py-2.5 text-sm font-medium text-[#090d16] shadow-lg transition hover:bg-[#e4c6aa]"
         >
           {scene.action.label} →
         </button>
