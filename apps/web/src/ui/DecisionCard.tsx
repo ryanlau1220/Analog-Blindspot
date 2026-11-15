@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import type { SitesIndex } from "../data/types";
 import { buildFindings } from "../story/findings";
@@ -34,7 +35,8 @@ export function DecisionCard({ index }: { index: SitesIndex }) {
         href="#brief"
         className="mt-3 inline-block rounded border border-amber-300/40 px-2 py-1 text-xs text-amber-100 hover:bg-amber-300/10"
       >
-        Open the printable field validation brief →
+        Open the printable field validation brief{" "}
+        <ArrowRight size={14} aria-hidden="true" className="inline" />
       </a>
     </div>
   );

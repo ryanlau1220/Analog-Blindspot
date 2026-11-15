@@ -77,6 +77,16 @@ try {
     });
     try {
       await page.goto(`${base}?test=1#scene=experiment`, { waitUntil: "networkidle" });
+      const copyToggle = page.getByTestId("copy-toggle");
+      await copyToggle.click();
+      if ((await copyToggle.getAttribute("aria-expanded")) !== "false")
+        throw new Error("Story did not collapse");
+      await copyToggle.click();
+      const panelToggle = page.getByTestId("panel-toggle");
+      await panelToggle.click();
+      if ((await panelToggle.getAttribute("aria-expanded")) !== "false")
+        throw new Error("Chapter panel did not collapse");
+      await panelToggle.click();
       await page.getByLabel("No, at or below").check();
       await page.getByTestId("prediction-reveal").click();
       await page.waitForFunction(() => window.__ab?.readyKey === "earth/10m", null, { timeout: 60000 });

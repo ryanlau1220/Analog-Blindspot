@@ -1,4 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
+import { MoveHorizontal } from "lucide-react";
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { AnomalyCandidate, Site, Variant } from "../data/types";
@@ -315,7 +316,7 @@ function SplitHandle({
           }}
           className="pointer-events-auto absolute top-1/2 -left-4 flex h-8 w-8 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-white/80 bg-black/70 text-xs text-white"
         >
-          ⇆
+          <MoveHorizontal size={16} aria-hidden="true" />
         </button>
       </div>
     </div>

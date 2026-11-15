@@ -1,3 +1,4 @@
+import { ArrowDownLeft, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 import type { AnomalySearch, AnomalySearchLevel, NasaReference, SiteId, SitesIndex } from "../data/types";
 import type { SceneState } from "../scene/state";
@@ -88,7 +89,15 @@ export function ResolutionLab({
           onClick={onFocus}
           className="ab-small-button"
         >
-          {focused ? "Exit focus ↙" : "Focus experiment ↗"}
+          {focused ? (
+            <>
+              Exit focus <ArrowDownLeft size={14} aria-hidden="true" className="inline" />
+            </>
+          ) : (
+            <>
+              Focus experiment <ArrowUpRight size={14} aria-hidden="true" className="inline" />
+            </>
+          )}
         </button>
       </div>
       {sites.length > 1 && (
@@ -204,7 +213,8 @@ export function ResolutionLab({
           onClick={onReference}
           className="mt-2 w-full rounded-lg border border-sky-300/40 bg-sky-950/30 px-3 py-1.5 text-left text-xs text-sky-100 hover:bg-sky-900/40"
         >
-          Check the simulation against real NASA data: {ref.product_id} {ref.resolution_m} m →
+          Check the simulation against real NASA data: {ref.product_id} {ref.resolution_m} m{" "}
+          <ArrowRight size={14} aria-hidden="true" className="inline" />
         </button>
       )}
       {isRef && (
@@ -213,7 +223,8 @@ export function ResolutionLab({
           onClick={() => onVariant(v.id)}
           className="mt-2 text-xs text-zinc-300 underline hover:text-white"
         >
-          ← Back to the simulated {v.resolution_m} m grid
+          <ArrowLeft size={14} aria-hidden="true" className="inline" /> Back to the simulated {v.resolution_m}{" "}
+          m grid
         </button>
       )}
 

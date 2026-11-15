@@ -1,3 +1,4 @@
+import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 /** A quiet, original synthesized ambient bed; audio starts only on request. */
@@ -107,7 +108,7 @@ export function AmbientSound() {
         className={`ab-sound-toggle ${playing ? "is-playing" : ""}`}
       >
         <span aria-hidden="true" className="ab-sound-icon">
-          {playing ? "♫" : "♪"}
+          {playing ? <Volume2 size={15} /> : <VolumeX size={15} />}
         </span>
         <span className="hidden sm:inline">{playing ? "Sound on" : "Enable sound"}</span>
       </button>

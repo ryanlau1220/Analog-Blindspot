@@ -1,4 +1,5 @@
-import { type Dispatch, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { ArrowDown, ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Pause, Play } from "lucide-react";
+import { type Dispatch, type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AmbientSound } from "../audio/AmbientSound";
 import type { ExperimentLevel, Site, SitesIndex, Variant } from "../data/types";
 import type { SceneAction, SceneState } from "../scene/state";
@@ -52,12 +53,12 @@ export function TopBar({
             label={story.playing ? "Pause guided tour" : "Play guided tour"}
             onClick={() => storyDispatch({ type: story.playing ? "pause" : "play" })}
           >
-            {story.playing ? "❚❚" : "▶"}
+            {story.playing ? <Pause size={13} aria-hidden="true" /> : <Play size={13} aria-hidden="true" />}
             <span className="hidden sm:inline">{story.playing ? " Pause" : " Guided tour"}</span>
           </IconButton>
         ) : (
           <IconButton testId="story-toggle" onClick={() => storyDispatch({ type: "story" })}>
-            ← Story
+            <ArrowLeft size={13} aria-hidden="true" /> Story
           </IconButton>
         )}
         {inStory && (
@@ -85,7 +86,8 @@ export function TopBar({
             onClick={onScrollJourney}
             className="mb-1 text-[11px] text-teal-200 min-h-6"
           >
-            {scrollJourney ? "↓ Scroll journey on" : "↓ Try scroll journey"}
+            <ArrowDown size={13} aria-hidden="true" className="inline" />{" "}
+            {scrollJourney ? "Scroll journey on" : "Try scroll journey"}
           </button>
           <ol className="flex gap-1">
             {scenes.map((s, i) => (
@@ -134,7 +136,7 @@ function IconButton({
       data-testid={testId}
       aria-label={label}
       onClick={onClick}
-      className="rounded-full border border-white/15 bg-black/40 px-2 py-1 text-[11px] text-zinc-200 backdrop-blur hover:bg-white/10 sm:px-3"
+      className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-2 py-1 text-[11px] text-zinc-200 backdrop-blur hover:bg-white/10 sm:px-3"
     >
       {children}
     </button>
@@ -196,6 +198,8 @@ export function StoryOverlay({
   const root = useRef<HTMLDivElement>(null);
   const [prediction, setPrediction] = useState<"above" | "below" | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [copyOpen, setCopyOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(true);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: animate on chapter change only
   useLayoutEffect(() => {
@@ -293,7 +297,7 @@ export function StoryOverlay({
             });
           }}
         >
-          Reveal the measured result →
+          Reveal the measured result <ArrowRight size={14} aria-hidden="true" className="inline" />
         </button>
         <p className="mt-3 text-xs text-zinc-400">
           This compares sampled surface relief, not cave detection.
@@ -370,32 +374,49 @@ export function StoryOverlay({
           <span aria-hidden="true" className="ab-chapter-mark" />
           {pad(story.scene)} · {scene.chapter}
         </p>
-        <h1
-          data-anim
-          className="mt-2 text-[1.75rem] leading-[1.08] font-light tracking-tight text-white sm:text-5xl lg:text-[3.4rem]"
+        <button
+          type="button"
+          data-testid="copy-toggle"
+          aria-expanded={copyOpen}
+          aria-controls="story-copy-content"
+          onClick={() => setCopyOpen(!copyOpen)}
+          className="ab-small-button mt-2 inline-flex items-center gap-1"
         >
-          {scene.headline}
-        </h1>
-        <p data-anim className={`mt-3 max-w-md text-[15px] leading-relaxed text-zinc-300 ${lgOnly}`}>
-          {scene.sub}
-        </p>
-        <p
-          data-anim
-          className={`ab-takeaway mt-3 max-w-md text-sm text-zinc-200 ${scene.panel === "lab" ? lgOnly : ""}`}
-        >
-          <span className="ab-takeaway-label">{scene.panel === "lab" ? "CURRENT VIEW" : "FIELD NOTE"}</span>
-          {scene.panel === "lab"
-            ? revealed || !target
-              ? labTakeaway
-              : "Make a prediction before inspecting the measured result."
-            : scene.takeaway}
-        </p>
-        {scene.panel === "legend" && (
-          <div data-anim className="mt-3">
-            <Legend />
-          </div>
-        )}
-        {step.caption && <p className="mt-2 text-xs text-amber-200/90">{step.caption}</p>}
+          {copyOpen ? (
+            <ChevronDown size={14} aria-hidden="true" />
+          ) : (
+            <ChevronUp size={14} aria-hidden="true" />
+          )}{" "}
+          {copyOpen ? "Hide story" : "Show story"}
+        </button>
+        <div id="story-copy-content" hidden={!copyOpen}>
+          <h1
+            data-anim
+            className="mt-2 text-[1.75rem] leading-[1.08] font-light tracking-tight text-white sm:text-5xl lg:text-[3.4rem]"
+          >
+            <TypedHeadline key={scene.id} text={scene.headline} />
+          </h1>
+          <p data-anim className={`mt-3 max-w-md text-[15px] leading-relaxed text-zinc-300 ${lgOnly}`}>
+            {scene.sub}
+          </p>
+          <p
+            data-anim
+            className={`ab-takeaway mt-3 max-w-md text-sm text-zinc-200 ${scene.panel === "lab" ? lgOnly : ""}`}
+          >
+            <span className="ab-takeaway-label">{scene.panel === "lab" ? "CURRENT VIEW" : "FIELD NOTE"}</span>
+            {scene.panel === "lab"
+              ? revealed || !target
+                ? labTakeaway
+                : "Make a prediction before inspecting the measured result."
+              : scene.takeaway}
+          </p>
+          {scene.panel === "legend" && (
+            <div data-anim className="mt-3">
+              <Legend />
+            </div>
+          )}
+          {step.caption && <p className="mt-2 text-xs text-amber-200/90">{step.caption}</p>}
+        </div>
       </div>
       {panel && (
         <div
@@ -403,7 +424,24 @@ export function StoryOverlay({
           data-anim="controls"
           className={`ab-panel-scroll pointer-events-auto w-full lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-10rem)] lg:justify-self-end lg:overflow-y-auto ${panelWidth}`}
         >
-          {panel}
+          <button
+            type="button"
+            data-testid="panel-toggle"
+            aria-expanded={panelOpen}
+            aria-controls="chapter-details"
+            onClick={() => setPanelOpen(!panelOpen)}
+            className="ab-small-button mb-2 inline-flex items-center gap-1"
+          >
+            {panelOpen ? (
+              <ChevronDown size={14} aria-hidden="true" />
+            ) : (
+              <ChevronUp size={14} aria-hidden="true" />
+            )}{" "}
+            {panelOpen ? "Hide chapter panel" : "Show chapter panel"}
+          </button>
+          <div id="chapter-details" hidden={!panelOpen}>
+            {panel}
+          </div>
         </div>
       )}
       <div
@@ -417,7 +455,7 @@ export function StoryOverlay({
             onClick={act}
             className="ab-primary-action rounded-full bg-[#d5b293] px-5 py-2.5 text-sm font-medium text-[#090d16] shadow-lg transition hover:bg-[#e4c6aa]"
           >
-            {scene.action.label} →
+            {scene.action.label} <ArrowRight size={14} aria-hidden="true" className="inline" />
           </button>
         )}
         {story.scene > 0 && (
@@ -426,7 +464,7 @@ export function StoryOverlay({
             onClick={() => storyDispatch({ type: "goTo", scene: story.scene - 1 })}
             className="text-xs text-zinc-400 hover:text-white"
           >
-            ← Previous
+            <ArrowLeft size={14} aria-hidden="true" className="inline" /> Previous
           </button>
         )}
         <button
@@ -464,5 +502,37 @@ function PredictionResult({
       {matched ? "Your prediction matched the measurement." : "The measurement differs from your prediction."}{" "}
       This is not a detection test.
     </p>
+  );
+}
+
+/** Screen readers receive the complete heading once; only the visual copy types in. */
+function TypedHeadline({ text }: { text: string }) {
+  const [length, setLength] = useState(() => (reducedMotion() ? text.length : 0));
+  useEffect(() => {
+    if (reducedMotion()) {
+      setLength(text.length);
+      return;
+    }
+    const start = performance.now();
+    let frame = 0;
+    const tick = () => {
+      const next = Math.min(
+        text.length,
+        Math.floor((performance.now() - start) / Math.min(24, 1400 / text.length)),
+      );
+      setLength(next);
+      if (next < text.length) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [text]);
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {text.slice(0, length)}
+        <span className="invisible">{text.slice(length)}</span>
+      </span>
+    </>
   );
 }

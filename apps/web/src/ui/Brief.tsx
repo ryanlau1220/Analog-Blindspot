@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Site, SitesIndex } from "../data/types";
 import { CITATIONS } from "../story/analogy";
@@ -15,7 +16,7 @@ export function Brief({ index }: { index: SitesIndex }) {
     <div className="min-h-dvh bg-zinc-200 py-6 text-zinc-900 print:bg-white print:py-0">
       <div className="mx-auto mb-3 flex max-w-[210mm] justify-between px-2 print:hidden">
         <a href="#scene=decision" className="text-sm text-zinc-700 underline">
-          ← Back to the story
+          <ArrowLeft size={14} aria-hidden="true" className="inline" /> Back to the story
         </a>
         <button
           type="button"
@@ -188,7 +189,7 @@ export function Brief({ index }: { index: SitesIndex }) {
 
         <footer className="mt-3 border-t border-zinc-300 pt-1 text-[7pt] text-zinc-500">
           Coarsened grids are simulations derived from the observed terrain models; they are not LROC or other
-          observations. Gazetteer points are approximate. Reproduce: scientific/ → uv run fetch-sources,
+          observations. Gazetteer points are approximate. Reproduce: scientific/: uv run fetch-sources,
           fetch-landmarks, fetch-landmarks-es, phase-a, phase-d, phase-e, export-web.
         </footer>
       </article>

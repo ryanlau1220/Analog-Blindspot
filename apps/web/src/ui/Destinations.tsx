@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import { DATA_ROOT } from "../data/load";
 import type { SiteId, SitesIndex } from "../data/types";
 import { CANDIDATE_SITE, candidatePoint, formatLatLon, LocatorMap, type LocatorPoint } from "./LocatorMap";
@@ -82,12 +83,13 @@ export function Destinations({
                 <p className="flex gap-3">
                   {c.url && (
                     <a className="text-sky-300 underline" href={c.url} target="_blank" rel="noreferrer">
-                      {mars ? "HiRISE observation ↗" : "Source ↗"}
+                      {mars ? "HiRISE observation" : "Source"}{" "}
+                      <ArrowUpRight size={13} aria-hidden="true" className="inline" />
                     </a>
                   )}
                   {map && (
                     <a className="text-sky-300 underline" href={map} target="_blank" rel="noreferrer">
-                      Open locator map ↗
+                      Open locator map <ArrowUpRight size={13} aria-hidden="true" className="inline" />
                     </a>
                   )}
                 </p>
@@ -134,7 +136,7 @@ export function Destinations({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open locator map ↗
+                  Open locator map <ArrowUpRight size={13} aria-hidden="true" className="inline" />
                 </a>
               )}
             </li>
