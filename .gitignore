@@ -16,3 +16,4 @@ dist/
 # Perf smoke screenshots/report (regenerate with pnpm perf)
 apps/web/perf-results/
 *.tsbuildinfo
+tmp/
