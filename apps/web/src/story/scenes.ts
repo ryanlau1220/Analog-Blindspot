@@ -253,10 +253,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
     {
       id: "decision",
       chapter: "Field Decision",
-      headline:
-        kept !== null
-          ? `At Lava Beds, sampled point relief remains above background through the tested ${kept} m grid.`
-          : "One Moon. Two Earth sites. Different questions.",
+      headline: "Find the clues. Verify what matters.",
       sub: "Choose the investigation. Compare the sampled relief at the computed grids.",
       takeaway: "Every statement below is backed by the datasets in this app; hypotheses are marked as such.",
       action: { label: "View Field Validation Brief", kind: "brief" },

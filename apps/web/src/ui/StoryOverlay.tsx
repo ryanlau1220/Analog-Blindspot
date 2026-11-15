@@ -27,6 +27,7 @@ export function TopBar({
   onEvidence,
   scrollJourney,
   onScrollJourney,
+  onJudge,
 }: {
   site: Site;
   variant: Variant;
@@ -37,6 +38,7 @@ export function TopBar({
   onEvidence: () => void;
   scrollJourney: boolean;
   onScrollJourney: () => void;
+  onJudge: () => void;
 }) {
   const inStory = story.mode === "story";
   return (
@@ -56,6 +58,10 @@ export function TopBar({
         </span>
       </p>
       <div className="pointer-events-auto flex items-center gap-1 justify-self-end">
+        <IconButton testId="judge-toggle" label="Open judge presentation" onClick={onJudge}>
+          <span className="hidden sm:inline">Judge presentation</span>
+          <span className="sm:hidden">Judge</span>
+        </IconButton>
         {inStory ? (
           <IconButton
             testId="play-toggle"

@@ -16,6 +16,7 @@ import { Brief } from "./ui/Brief";
 import { ControlPanel } from "./ui/ControlPanel";
 import { EvidenceCard } from "./ui/EvidenceCard";
 import { EvidenceDrawer } from "./ui/EvidenceDrawer";
+import { JudgePresentation } from "./ui/JudgePresentation";
 import { StoryOverlay, TopBar } from "./ui/StoryOverlay";
 
 export function App() {
@@ -56,6 +57,7 @@ function Experience({ index }: { index: SitesIndex }) {
   const [drawer, setDrawer] = useState(false);
   const [scrollJourney, setScrollJourney] = useState(false);
   const [focusLab, setFocusLab] = useState(false);
+  const [judge, setJudge] = useState(false);
   const journey = useRef<HTMLDivElement>(null);
   const scrolling = scrollJourney && story.mode === "story" && !focusLab;
   useEffect(() => {
@@ -129,21 +131,38 @@ function Experience({ index }: { index: SitesIndex }) {
               anomalies={anomalies}
             />
           </div>
-          <TopBar
-            site={site}
-            variant={variant}
-            state={state}
-            scenes={scenes}
-            story={story}
-            storyDispatch={storyDispatch}
-            onEvidence={openEvidence}
-            scrollJourney={scrollJourney}
-            onScrollJourney={() => {
-              storyDispatch({ type: "pause" });
-              setScrollJourney(!scrollJourney);
-            }}
-          />
-          {inStory ? (
+          {!judge && (
+            <TopBar
+              site={site}
+              variant={variant}
+              state={state}
+              scenes={scenes}
+              story={story}
+              storyDispatch={storyDispatch}
+              onEvidence={openEvidence}
+              scrollJourney={scrollJourney}
+              onScrollJourney={() => {
+                storyDispatch({ type: "pause" });
+                setScrollJourney(!scrollJourney);
+              }}
+              onJudge={() => {
+                storyDispatch({ type: "explore" });
+                setScrollJourney(false);
+                setFocusLab(false);
+                setJudge(true);
+              }}
+            />
+          )}
+          {judge ? (
+            <JudgePresentation
+              index={index}
+              apply={(preset) => dispatch({ type: "applyPreset", preset })}
+              onExit={() => {
+                setJudge(false);
+                storyDispatch({ type: "story" });
+              }}
+            />
+          ) : inStory ? (
             <StoryOverlay
               index={index}
               scenes={scenes}

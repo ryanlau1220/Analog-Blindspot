@@ -12,10 +12,16 @@ The Earth sites are established analogs, and the anomalies are leads requiring v
 
 ## Deliverables
 
-- `Analog-Blindspot_Demo-Video.mp4` — 30-second product demonstration with English captions, animated overlays, and original synthesized music, mixed for audibility. No narration.
+- `Analog-Blindspot_Demo-Video.mp4` — a short product demonstration with synthesized spoken narration and music.
 - `Analog-Blindspot_Pitch-Deck.pdf` — seven-slide presentation with independent explanatory graphics and an Archify data-flow diagram.
 - Live prototype: https://analog-blindspot.ryanlau1220.workers.dev/
 - Source code: https://github.com/ryanlau1220/Analog-Blindspot
+
+## Demo narration
+
+“I am Ryan Lau, from Machine Not Learning. Could a lunar pit shelter future explorers? Analog Blindspot shows what maps cannot see. We compare real Earth terrain with a coarser simulation, then search for terrain clues. At Lava Beds, our analysis flags twenty four unverified clusters. These are research leads, not confirmed caves. The next step: verify promising sites on the ground.”
+
+The visuals show the lunar pit and its missing elevation, a split terrain comparison, and the highlighted Lava Beds search leads. Instrumental music plays underneath.
 
 ## Sources and credits
 

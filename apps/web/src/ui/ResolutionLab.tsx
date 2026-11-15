@@ -273,8 +273,8 @@ function ReferencePanel({ ref_ }: { ref_: NasaReference }) {
       <p className="mt-1.5 text-xs leading-snug text-zinc-300" data-testid="nasa-reference-stats">
         Against our simulated {ref_.resolution_m} m grid, cell by cell ({c.cells.toLocaleString()} cells): r ={" "}
         {c.pearson_r.toFixed(3)}, RMSE {c.rmse_m.toFixed(1)} m ({c.rmse_detrended_m.toFixed(1)} m after
-        removing the {Math.abs(c.bias_m).toFixed(1)} m mean offset). Block averaging reproduces a real 30 m
-        terrain model closely, so the simulated grids are a fair stand-in at this scale.
+        removing the {Math.abs(c.bias_m).toFixed(1)} m mean offset). The simulated grid agrees closely in
+        overall elevation; equivalence for individual features remains unverified.
       </p>
       <p className="mt-1 text-[10px] text-zinc-500">
         {c.note} {ref_.citation}

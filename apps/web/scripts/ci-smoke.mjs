@@ -193,6 +193,14 @@ try {
       if ((await page.evaluate(() => window.__ab.story.scene)) !== 4)
         throw new Error("Radio arrow key navigated away from the decision");
       if ((await radios.count()) < 2) throw new Error("Missing grid choices");
+      await page.getByTestId("judge-toggle").click();
+      await page.getByRole("button", { name: "Pause", exact: true }).click();
+      for (let step = 0; step < 3; step++)
+        await page.getByRole("button", { name: "Next", exact: true }).click();
+      await page.getByText("A lead, not a discovery.").waitFor();
+      await page.getByText(/24 unverified clusters/).waitFor();
+      await page.getByRole("button", { name: "Exit", exact: true }).click();
+      await page.getByTestId("decision-view").waitFor();
       await page.getByRole("button", { name: "Evidence", exact: true }).click();
       await page.getByTestId("evidence-drawer").waitFor();
       await page.goto(`${base}#brief`, { waitUntil: "networkidle" });

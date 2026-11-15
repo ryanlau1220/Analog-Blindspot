@@ -5,7 +5,7 @@ import type { Site, SiteId, SitesIndex, Variant } from "../data/types";
  * site's first landmark (the pit) or the centroid of all landmarks; "section"
  * looks north at the cutaway face.
  */
-export const VIEWS = ["overview", "hero", "landmark", "section"] as const;
+export const VIEWS = ["overview", "hero", "landmark", "section", "anomaly"] as const;
 export type View = (typeof VIEWS)[number];
 
 /** Discrete, serialisable scene state. Every field is valid for every site. */
@@ -194,6 +194,17 @@ export function cameraPreset(
   // Screen-right for a camera looking from the south-east is roughly (+x, -z).
   const shift = (k: number): [number, number] => (wide ? [-k * 0.82 * e, k * 0.57 * e] : [0, 0]);
   switch (state.view) {
+    case "anomaly": {
+      const candidate = site.experiment?.search?.levels.find((l) => l.observed)?.candidates[2];
+      if (!candidate)
+        return { position: [0.62 * e, 0.42 * e + relief, 0.78 * e], target: [0, relief * 0.25, 0] };
+      const x = candidate.x_m - half;
+      const z = candidate.y_m - half;
+      return {
+        position: [x + 0.12 * e, focus.y + 0.14 * e, z + 0.18 * e],
+        target: [x, focus.y, z],
+      };
+    }
     case "hero": {
       // Close oblique look at the focus (the pit): ~0.28 extent away, ~28 deg above the horizon.
       const [sx, sz] = shift(0.07);
