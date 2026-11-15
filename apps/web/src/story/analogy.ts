@@ -87,7 +87,7 @@ export function analogyRows(index: SitesIndex, site: Site): AnalogyRow[] {
     {
       dimension: "Surface temperature swing",
       moon: dv
-        ? `${c0(night)} to ${c0(day[0] ?? 0)} across the lunar day (Diviner, ${dv.bin_size_deg}° bin around the pit)`
+        ? `${c0(night)} to ${c0(day[0] ?? 0)} (Diviner, ${dv.local_time_bins_with_data}/96 local-time bins, ${dv.bin_size_deg}° around the pit)`
         : `${c0(night)} before dawn to ${c0(day[0] ?? 0)}–${c0(day[1] ?? 0)} at noon (equatorial surface)`,
       earth: clim
         ? `${c0(clim.t2m_min_c)} to ${c0(clim.t2m_max_c)} air temperature (${clim.period})`

@@ -1,7 +1,11 @@
+import hashlib
+
 import numpy as np
+import pytest
 from affine import Affine
 
-from analog_blindspot_science.phase_e import SPACING_M, clusters, compare, lattice, search_level
+from analog_blindspot_science import phase_e
+from analog_blindspot_science.phase_e import SPACING_M, clusters, compare, lattice, search_level, verify_nasadem
 
 
 def test_lattice_stays_radius_inside_roi():
@@ -51,3 +55,13 @@ def test_holdout_points_far_from_gazetteer_are_scored():
     lv = search_level(z, np.isfinite(z), tr, lm, 30.0, False, True, ho)
     assert lv["holdout_count"] == 1 and lv["holdout_recovered"] == 1
     assert lv["candidates_near_holdout"] >= 1
+
+
+def test_nasadem_verification_rejects_same_size_corruption(tmp_path, monkeypatch):
+    raster = tmp_path / "tile.tif"
+    raster.write_bytes(b"original")
+    monkeypatch.setitem(phase_e.NASADEM_SHA256, "test", hashlib.sha256(b"original").hexdigest())
+    assert verify_nasadem(raster, "test") == hashlib.sha256(b"original").hexdigest()
+    raster.write_bytes(b"tampered")
+    with pytest.raises(RuntimeError, match="checksum mismatch"):
+        verify_nasadem(raster, "test")

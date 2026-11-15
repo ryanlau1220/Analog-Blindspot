@@ -126,7 +126,7 @@ export function buildScenes(index: SitesIndex): StoryScene[] {
         `Kaguya (SELENE) found this opening in 2009 and it may be a skylight into a lava tube (${CITATIONS.haruyama2009}).`,
         `Why it matters for a base: ${
           f.diviner
-            ? `in the Diviner bin around the pit (${f.diviner.bin_size_deg}°, about 15 km), the surface swings from ${f.diviner.tbol_min_k.toFixed(0)} K (${kToC(f.diviner.tbol_min_k).toFixed(0)} °C) to ${f.diviner.tbol_max_k.toFixed(0)} K (${kToC(f.diviner.tbol_max_k).toFixed(0)} °C) over a lunar day (${CITATIONS.diviner_gcp}).`
+            ? `in the Diviner bin around the pit (${f.diviner.bin_size_deg}°, about 15 km), bolometric brightness temperatures in ${f.diviner.local_time_bins_with_data} of 96 local-time bins range from ${f.diviner.tbol_min_k.toFixed(1)} K (${kToC(f.diviner.tbol_min_k).toFixed(0)} °C) to ${f.diviner.tbol_max_k.toFixed(1)} K (${kToC(f.diviner.tbol_max_k).toFixed(0)} °C) (${CITATIONS.diviner_gcp}).`
             : `Diviner shows the equatorial surface swings from about ${LUNAR_THERMAL.surface_predawn_k} K before dawn to ${LUNAR_THERMAL.surface_day_k[0]}–${LUNAR_THERMAL.surface_day_k[1]} K at noon (${CITATIONS.williams2017}).`
         } Models built on Diviner observations of other lunar pits put shadowed cave interiors near ${LUNAR_THERMAL.shadowed_cave_k} K, about ${kToC(LUNAR_THERMAL.shadowed_cave_k).toFixed(0)} °C, all lunar day (${CITATIONS.horvath2022}). Whether this pit leads to such a cave is unknown.`,
         "You are looking at the real LROC NAC terrain model at true vertical scale, draped with the verified 4 m LROC orthophoto. The magenta outline marks where measured elevation stops.",

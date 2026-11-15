@@ -1,7 +1,7 @@
 {
   "manifest_version": 1,
   "pipeline_version": "phase-a-1",
-  "generated_utc": "2026-11-15T04:53:53+00:00",
+  "generated_utc": "2026-11-15T08:44:52+00:00",
   "generator": "scientific/: uv run fetch-sources && uv run fetch-landmarks && uv run phase-a",
   "software": {
     "python": "3.12.3",
@@ -2829,7 +2829,7 @@
     }
   ],
   "phase_d": {
-    "generated_utc": "2026-11-15T04:53:58+00:00",
+    "generated_utc": "2026-11-15T08:45:00+00:00",
     "pipeline_version": "phase-d-1",
     "gate": {
       "status": "pass",

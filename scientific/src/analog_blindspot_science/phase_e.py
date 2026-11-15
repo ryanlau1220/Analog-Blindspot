@@ -410,6 +410,15 @@ def fetch_power(site: str, lat: float, lon: float, refresh: bool) -> dict:
     }
 
 
+def verify_nasadem(path, tile: str) -> str:
+    """Hash the actual raster, including cached files, before using it."""
+    actual = sha256_file(path)
+    expected = NASADEM_SHA256[tile]
+    if actual != expected:
+        raise RuntimeError(f"NASADEM {tile} checksum mismatch: expected {expected}, got {actual}")
+    return actual
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--refresh", action="store_true", help="re-fetch NASA POWER, OSM and Diviner inputs")
@@ -451,11 +460,12 @@ def main(argv: list[str] | None = None) -> int:
         tile = cfg["tile"]
         dest = RAW_DIR / "nasadem" / f"NASADEM_HGT_{tile}.tif"
         rec = fetch(NASADEM_URL.format(tile=tile), dest, expected_size=NASADEM_SIZES[tile])
+        actual_sha256 = verify_nasadem(dest, tile)
         checks.append(
             {
                 "id": f"{site}:nasadem_sha256_pinned",
-                "passed": rec.sha256 == NASADEM_SHA256[tile],
-                "detail": rec.sha256,
+                "passed": True,
+                "detail": actual_sha256,
             }
         )
         result["nasadem"]["tiles"].append(
@@ -463,7 +473,7 @@ def main(argv: list[str] | None = None) -> int:
                 "tile": tile,
                 "url": rec.url,
                 "bytes": rec.size_bytes,
-                "sha256": rec.sha256,
+                "sha256": actual_sha256,
                 "path": str(dest.relative_to(REPO_ROOT)),
             }
         )

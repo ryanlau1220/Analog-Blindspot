@@ -1,7 +1,7 @@
 {
   "asset_version": "phase-b-1",
-  "manifest_generated_utc": "2026-11-15T04:53:53+00:00",
-  "manifest_sha256": "157b3705d06bfbbe494850726ad13195e5ed228be4db3ca0c90bf98afa579842",
+  "manifest_generated_utc": "2026-11-15T08:44:52+00:00",
+  "manifest_sha256": "321f26a03e0da7b75ba077963947cc541b0ffcc1fe3c696169d066c2634af8df",
   "axes": "X east, Y up, Z south; local metres from the ROI north-west corner; heights in metres",
   "sites": [
     {
