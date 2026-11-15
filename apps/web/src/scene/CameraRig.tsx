@@ -14,7 +14,18 @@ const reducedMotion = () =>
  * starts from wherever the camera actually is, so states can be visited in any
  * order without a stale or broken camera.
  */
-export function CameraRig({ pose, poseKey, far }: { pose: CameraPose; poseKey: string; far: number }) {
+export function CameraRig({
+  pose,
+  poseKey,
+  far,
+  intro = false,
+}: {
+  pose: CameraPose;
+  poseKey: string;
+  far: number;
+  /** first frame: start 60 % further out and settle in slowly (an establishing dolly) */
+  intro?: boolean;
+}) {
   const camera = useThree((s) => s.camera);
   const controls = useRef<ComponentRef<typeof OrbitControls>>(null);
   const tween = useRef<gsap.core.Timeline | null>(null);
@@ -31,24 +42,30 @@ export function CameraRig({ pose, poseKey, far }: { pose: CameraPose; poseKey: s
     const c = controls.current;
     if (!c) return;
     tween.current?.kill();
-    if (first.current || reducedMotion()) {
-      first.current = false;
+    const isFirst = first.current;
+    first.current = false;
+    if (reducedMotion() || (isFirst && !intro)) {
       camera.position.set(...pose.position);
       c.target.set(...pose.target);
       c.update();
       return;
     }
+    if (isFirst) {
+      const [tx, ty, tz] = pose.target;
+      const [px, py, pz] = pose.position;
+      camera.position.set(tx + (px - tx) * 1.6, ty + (py - ty) * 1.9, tz + (pz - tz) * 1.6);
+      c.target.set(...pose.target);
+      c.update();
+    }
+    const dur = isFirst ? 2.4 : 1.6;
+    const ease = isFirst ? "power3.out" : "power2.inOut";
     const tl = gsap.timeline({ onUpdate: () => c.update() });
     tl.to(
       camera.position,
-      { x: pose.position[0], y: pose.position[1], z: pose.position[2], duration: 1.6, ease: "power2.inOut" },
+      { x: pose.position[0], y: pose.position[1], z: pose.position[2], duration: dur, ease },
       0,
     );
-    tl.to(
-      c.target,
-      { x: pose.target[0], y: pose.target[1], z: pose.target[2], duration: 1.6, ease: "power2.inOut" },
-      0,
-    );
+    tl.to(c.target, { x: pose.target[0], y: pose.target[1], z: pose.target[2], duration: dur, ease }, 0);
     tween.current = tl;
     return () => {
       tl.kill();

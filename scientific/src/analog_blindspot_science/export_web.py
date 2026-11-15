@@ -135,7 +135,10 @@ def export_moon(man: dict, out: Path) -> dict:
         refl = np.where(dn != o.nodata, dn * o.scales[0] + o.offsets[0], np.nan)
     v = refl[np.isfinite(refl)]
     lo, hi = np.percentile(v, [1, 99])
-    g = np.clip((np.nan_to_num(refl, nan=lo) - lo) / (hi - lo), 0, 1)
+    # Pixels with no image data are a flat neutral grey (alpha 0), not black, so they
+    # do not read as a shadowed void around the DTM's own no-data gap.
+    g = np.clip((refl - lo) / (hi - lo), 0, 1)
+    g = np.where(np.isfinite(g), g, 0.42)
     rgba = np.dstack([g, g, g, np.isfinite(refl).astype(float)])
     Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").save(out / "ortho.png", optimize=True)
 
@@ -210,6 +213,18 @@ def export_moon(man: dict, out: Path) -> dict:
             ),
         },
     }
+
+
+def write_thumb(z: np.ndarray, cell: float, path: Path) -> dict:
+    """Hillshade (az 315, alt 45) of the observed display grid: a preview, not analysis data."""
+    from .terrain import hillshade
+
+    hs = hillshade(z, cell)
+    v = hs[np.isfinite(hs)]
+    lo, hi = np.percentile(v, [2, 98]) if v.size else (0.0, 1.0)
+    g = (np.nan_to_num(np.clip((hs - lo) / max(hi - lo, 1e-6), 0, 1), nan=0.0) * 255).astype(np.uint8)
+    Image.fromarray(g, "L").save(path, "WEBP", quality=82, method=6)
+    return {"file": path.name, "px": z.shape[1], "basis": "hillshade of the observed display grid (preview only)"}
 
 
 def export_variants(
@@ -341,6 +356,7 @@ def export_earth(man: dict, out: Path) -> dict:
         "provenance": provenance(ds),
         "variants": variants,
         "drape": None,
+        "thumb": write_thumb(native, extent / DISPLAY_N, out / "thumb.webp"),
         "landmarks": landmarks,
         "subsurface": "not measured",
         "experiment": experiment_block(
@@ -433,6 +449,7 @@ def export_lanzarote(rec: dict, out: Path) -> dict:
         },
         "variants": variants,
         "drape": None,
+        "thumb": write_thumb(native, extent / DISPLAY_N, out / "thumb.webp"),
         "landmarks": landmarks,
         "subsurface": "not measured",
         "experiment": experiment_block(

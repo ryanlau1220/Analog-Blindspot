@@ -11,10 +11,10 @@ export function unmeasuredTexture(): THREE.CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas unavailable");
-  ctx.fillStyle = "#101014";
+  ctx.fillStyle = "#0d121c";
   ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = "#3a3a46";
-  ctx.lineWidth = 6;
+  ctx.strokeStyle = "#1f2838";
+  ctx.lineWidth = 7;
   for (let k = -size; k <= size * 2; k += size / 2) {
     ctx.beginPath();
     ctx.moveTo(k, 0);
@@ -25,6 +25,7 @@ export function unmeasuredTexture(): THREE.CanvasTexture {
   hatch.wrapS = THREE.RepeatWrapping;
   hatch.wrapT = THREE.RepeatWrapping;
   hatch.colorSpace = THREE.SRGBColorSpace;
+  hatch.anisotropy = 8;
   return hatch;
 }
 
@@ -39,10 +40,10 @@ export function noDataTexture(): THREE.CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("2D canvas unavailable");
-  ctx.fillStyle = "#1a0b1a";
+  ctx.fillStyle = "#3a0f36";
   ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = "#a8329a";
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#e040c8";
+  ctx.lineWidth = 6;
   for (let k = -size; k <= size * 2; k += size / 2) {
     for (const [y0, y1] of [
       [0, size],
@@ -58,5 +59,6 @@ export function noDataTexture(): THREE.CanvasTexture {
   nodata.wrapS = THREE.RepeatWrapping;
   nodata.wrapT = THREE.RepeatWrapping;
   nodata.colorSpace = THREE.SRGBColorSpace;
+  nodata.anisotropy = 8;
   return nodata;
 }

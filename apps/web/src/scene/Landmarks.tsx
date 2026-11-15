@@ -63,8 +63,8 @@ export function Landmarks({
       {anchors.map(({ lm, base }: { lm: Landmark; base: THREE.Vector3 }) =>
         cutZ !== null && base.z > cutZ ? null : (
           <mesh key={lm.id} position={[base.x, base.y + lift / 2, base.z]}>
-            <cylinderGeometry args={[site.extent_m * 0.0012, site.extent_m * 0.0012, lift, 6]} />
-            <meshBasicMaterial color={selected === lm.id ? "#ffe08a" : "#f5b942"} />
+            <cylinderGeometry args={[site.extent_m * 0.0005, site.extent_m * 0.0005, lift, 6]} />
+            <meshBasicMaterial color={selected === lm.id ? "#ffffff" : "#d5b293"} />
           </mesh>
         ),
       )}

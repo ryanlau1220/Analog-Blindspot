@@ -68,6 +68,8 @@ export interface Site {
   provenance: Provenance;
   variants: Variant[];
   drape: { file: string; px: number; m_per_px: number; label: string } | null;
+  /** preview hillshade of the observed grid (Earth sites) */
+  thumb?: { file: string; px: number; basis: string };
   landmarks: Landmark[];
   subsurface: "not measured";
   facts?: MoonFacts;

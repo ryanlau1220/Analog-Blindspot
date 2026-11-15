@@ -18,7 +18,7 @@ The app opens in **story mode**: five chapters drive the 3D scene. **Explore** s
   chapters 4 and 5 is computed by `lossResolution` / `lastVisibleResolution`, not typed in.
 - **Chapters are deterministic.** Each chapter's first step pins every scene field, and steps apply cumulatively,
   so a chapter looks the same whether it is reached by replay, arrows, a dot or a deep link (tested).
-- **Visual vocabulary.** The yellow line is the measured section profile. Grey hatching means below the surface,
+- **Visual vocabulary** (Phase C; see the redesign colours below). The section profile line, yellow in Phase C and cyan now, is the measured surface. Grey hatching means below the surface,
   not measured. Magenta cross-hatch means no elevation data (the pit interior). A green badge means observed
   data; a magenta badge means `SIMULATED COARSENING`.
 - **Unverified sites stay unverified.** Lanzarote and Harrat Khaybar appear in chapter 3 with dashed borders,
@@ -66,3 +66,61 @@ Not in Phase C: the printable Field Validation Brief (Phase E) and new sites (Ph
   - source limitations and citations.
 
   "Print / save as PDF" uses the browser's print dialog, with `@page` set to A4 and 10 mm margins.
+
+## Cinematic redesign (from `tmp/TODO.md`)
+
+The scientific data, numbers and conclusions are unchanged. Only presentation changed.
+
+| # | Chapter | Headline | Primary action | Context panel |
+|---|---|---|---|---|
+| 1 | The Mystery | We mapped the surface. Not what lies beneath. | Reveal the blind spot | legend |
+| 2 | The Blindspot | A visible opening doesn't reveal what lies beneath. | Search Earth for clues | legend |
+| 3 | Search Earth | Earth holds clues to landscapes we cannot fully explore. | Run the resolution experiment | destinations |
+| 4 | Resolution | Reduce the resolution. Watch the evidence fade. | See what we can conclude | lab |
+| 5 | The Discovery | The next discovery begins where our observations end. | View Field Validation Brief | decision |
+
+### Layers (progressive disclosure)
+
+1. **Cinematic view:** the terrain, one headline, one supporting line, one primary action (`StoryOverlay`).
+   The top bar (`TopBar`) holds the title, the chapter progress and the Guided tour / Explore / Evidence buttons.
+2. **Context:** `DataChip` (observed or simulated, product, grid, exaggeration; the ⓘ explains it), the
+   takeaway line, and the chapter panel (`Legend`, `Destinations`, `ResolutionLab`, `DecisionView`).
+3. **Detailed record:** `EvidenceDrawer` ("How do we know?" / Evidence) holds each chapter's `body` text,
+   sources, licences and citations, plus the experiment table and candidate list.
+
+### Camera and motion
+
+- A `hero` view opens chapter 1 with a 2.4 s dolly-in. Wide screens (≥ 760 px and landscape) shift the pit right
+  of centre to leave room for text. Narrow screens keep it centred.
+- Chapter 2 arrives on the intact surface, and a `followUp` preset opens the cut 1.5 s later. Under
+  `prefers-reduced-motion` the cut applies immediately.
+- Site changes fade through the background colour (`ab-site-fade`).
+
+### Colour meaning
+
+- Cyan `#5eead4`: measured surface (section line, observed badge).
+- Magenta `#e040c8`: no elevation data. The pit outline and, in the section, the band between neighbouring
+  measured posts.
+- Dark hatch: below the surface, not measured.
+- Amber: uncertain, hypothesis, or not verified.
+- Violet dashed: simulated coarsening.
+- Base palette: `#090D16` background, `#303A4A` surfaces, `#D5B293` primary action.
+
+### Chapter 4: resolution comparison
+
+The left half shows the observed grid and the right half the selected simulated grid. Clipping planes in screen
+space split one scene, and the split handle can be dragged. The scrubber snaps only to grids that were
+actually computed (observed, 4, 10, 30 m). Intermediate resolutions are never interpolated. The panel says "on
+this relief measure" and does not claim that the features are proven to disappear.
+
+### Chapter 5: decision
+
+Four tiles: established, where each Earth site helps, still uncertain (hypothesis), and the observation that
+would resolve it. The text comes from `findings.ts`. There are no scores or rankings.
+
+### Screenshots
+
+- Before: `docs/screenshots/before/` (1366×768, 390×844).
+- After: `docs/screenshots/after/` (1366×768, 1920×1080, 390×844).
+- To regenerate: in `apps/web`, run `pnpm build && SETTLE_MS=3200 node scripts/screens.mjs <outdir> 1366x768
+  1920x1080 390x844`. The script uses the `?test=1` hooks and SwiftShader.

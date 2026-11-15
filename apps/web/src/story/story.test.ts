@@ -16,9 +16,11 @@ const scenes = buildScenes(index);
 function stateAt(scene: number, step: number, from: SceneState = initialState(index)): SceneState {
   const sc = scenes[scene];
   if (!sc) throw new Error("no scene");
-  return sc.steps
-    .slice(0, step + 1)
-    .reduce((s, st) => reduce(index, s, { type: "applyPreset", preset: st.preset }), from);
+  // End state of the step, including its delayed follow-up preset.
+  return sc.steps.slice(0, step + 1).reduce((s, st) => {
+    const a = reduce(index, s, { type: "applyPreset", preset: st.preset });
+    return st.followUp ? reduce(index, a, { type: "applyPreset", preset: st.followUp.preset }) : a;
+  }, from);
 }
 
 describe("scenes", () => {
@@ -59,7 +61,7 @@ describe("scenes", () => {
 
   it("quotes numbers from the exported facts, not typed-in values", () => {
     const f = index.sites.find((s) => s.id === "moon")?.facts;
-    const text = scenes.map((s) => s.body.join(" ")).join(" ");
+    const text = scenes.map((s) => [s.headline, s.sub, s.takeaway, ...s.body].join(" ")).join(" ");
     expect(text).toContain(`${f?.depression_lower_bound_m.toFixed(1)} m`);
     expect(text).toContain(`${f?.atlas_depth_m.toFixed(0)} m`);
     const exp = index.sites.find((s) => s.id === "earth")?.experiment;
@@ -135,6 +137,25 @@ describe("story navigation", () => {
       expect(() => currentStep(scenes, s)).not.toThrow();
       if (s.mode === "explore") expect(s.playing).toBe(false);
     }
+  });
+
+  it("opens on the pit in close-up with one action, and ends on the brief", () => {
+    const first = stateAt(0, 0);
+    expect(first).toMatchObject({ site: "moon", view: "hero", cutaway: { enabled: false } });
+    expect(scenes[0]?.action.label).toBe("Reveal the blind spot");
+    expect(scenes[4]?.action.kind).toBe("brief");
+    // chapter 2 enters without the cut; the cut opens after the camera move
+    expect(scenes[1]?.steps[0]?.preset.cutaway).toBe(false);
+    expect(scenes[1]?.steps[0]?.followUp?.preset.cutaway).toBe(true);
+  });
+
+  it("chapter 4 opens on a split comparison against a simulated grid", () => {
+    const s = stateAt(3, 0);
+    expect(s.compare).toBe(true);
+    expect(
+      index.sites.find((x) => x.id === s.site)?.variants.find((v) => v.id === s.variantId)?.observed,
+    ).toBe(false);
+    expect(stateAt(4, 0).compare).toBe(false);
   });
 
   it("parses #scene= deep links", () => {

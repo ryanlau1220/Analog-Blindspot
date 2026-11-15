@@ -15,7 +15,7 @@ export function EvidenceCard({
   return (
     <aside
       data-testid="evidence-card"
-      className="absolute right-4 top-4 w-80 max-w-[calc(100%-2rem)] rounded-lg border border-amber-300/30 bg-zinc-950/90 p-4 text-sm text-zinc-200 shadow-2xl backdrop-blur sm:right-6 sm:top-6"
+      className="absolute right-4 top-28 z-20 w-80 max-w-[calc(100%-2rem)] rounded-lg border border-amber-300/30 bg-zinc-950/90 p-4 text-sm text-zinc-200 shadow-2xl backdrop-blur sm:right-6 sm:top-32"
     >
       <div className="flex items-start justify-between gap-3">
         <div>

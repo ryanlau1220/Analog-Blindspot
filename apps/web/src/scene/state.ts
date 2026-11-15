@@ -5,7 +5,7 @@ import type { Site, SiteId, SitesIndex } from "../data/types";
  * site's first landmark (the pit) or the centroid of all landmarks; "section"
  * looks north at the cutaway face.
  */
-export const VIEWS = ["overview", "landmark", "section"] as const;
+export const VIEWS = ["overview", "hero", "landmark", "section"] as const;
 export type View = (typeof VIEWS)[number];
 
 /** Discrete, serialisable scene state. Every field is valid for every site. */
@@ -16,6 +16,8 @@ export interface SceneState {
   cutaway: { enabled: boolean /** 0 = north edge, 1 = south edge */; position: number };
   drape: "relief" | "orthophoto";
   view: View;
+  /** split-screen comparison of the shown variant against the site's observed grid */
+  compare: boolean;
 }
 
 export const EXAGGERATIONS = [1, 2, 4] as const;
@@ -30,6 +32,7 @@ export type SceneAction =
   | { type: "setCutPosition"; position: number }
   | { type: "setDrape"; drape: SceneState["drape"] }
   | { type: "setView"; view: View }
+  | { type: "setCompare"; enabled: boolean }
   | { type: "applyPreset"; preset: ScenePreset };
 
 /** A partial target state, e.g. one story step. Applied field by field through the reducer. */
@@ -42,6 +45,7 @@ export interface ScenePreset {
   cutPosition?: number | "landmark";
   drape?: SceneState["drape"];
   view?: View;
+  compare?: boolean;
 }
 
 export function findSite(index: SitesIndex, id: SiteId): Site {
@@ -70,6 +74,7 @@ export function initialState(index: SitesIndex, site: SiteId = "moon"): SceneSta
     cutaway: { enabled: false, position: 0.5 },
     drape: "relief",
     view: "overview",
+    compare: false,
   };
 }
 
@@ -90,6 +95,7 @@ function presetActions(index: SitesIndex, state: SceneState, p: ScenePreset): Sc
   }
   if (p.drape) out.push({ type: "setDrape", drape: p.drape });
   if (p.view) out.push({ type: "setView", view: p.view });
+  if (p.compare !== undefined) out.push({ type: "setCompare", enabled: p.compare });
   return out;
 }
 
@@ -132,6 +138,8 @@ export function reduce(index: SitesIndex, state: SceneState, action: SceneAction
       return { ...state, drape: action.drape };
     case "setView":
       return (VIEWS as readonly string[]).includes(action.view) ? { ...state, view: action.view } : state;
+    case "setCompare":
+      return state.compare === action.enabled ? state : { ...state, compare: action.enabled };
     case "applyPreset":
       return presetActions(index, state, action.preset).reduce((s, a) => reduce(index, s, a), state);
   }
@@ -142,10 +150,15 @@ export interface CameraPose {
   target: [number, number, number];
 }
 
-/** Camera pose for a state. Positions scale with the site extent. */
+/**
+ * Camera pose for a state. Positions scale with the site extent. ``wide`` (landscape
+ * screens) shifts the subject right of centre so the headline on the left never
+ * covers it; on narrow screens the subject stays centred.
+ */
 export function cameraPreset(
   site: Site,
   state: Pick<SceneState, "exaggeration" | "view" | "cutaway">,
+  wide = true,
 ): CameraPose {
   const e = site.extent_m;
   const ex = state.exaggeration;
@@ -164,20 +177,32 @@ export function cameraPreset(
       z: pick.reduce((a, l) => a + l.y_m - half, 0) / n,
     };
   })();
+  // Screen-right for a camera looking from the south-east is roughly (+x, -z).
+  const shift = (k: number): [number, number] => (wide ? [-k * 0.82 * e, k * 0.57 * e] : [0, 0]);
   switch (state.view) {
-    case "landmark": {
-      // Aim a little east of the focus so it sits left of centre, clear of the story panel.
-      const dx = 0.08 * e;
+    case "hero": {
+      // Close oblique look at the focus (the pit): ~0.28 extent away, ~28 deg above the horizon.
+      const [sx, sz] = shift(0.07);
       return {
-        position: [focus.x + 0.2 * e + dx, focus.y + 0.16 * e, focus.z + 0.3 * e],
-        target: [focus.x + dx, focus.y, focus.z],
+        position: [focus.x + 0.14 * e + sx, focus.y + 0.13 * e, focus.z + 0.2 * e + sz],
+        target: [focus.x + sx, focus.y, focus.z + sz],
+      };
+    }
+    case "landmark": {
+      const [sx, sz] = shift(0.08);
+      return {
+        // Aim slightly below the subject so it sits in the upper half, clear of the panels.
+        position: [focus.x + 0.2 * e + sx, focus.y + 0.16 * e, focus.z + 0.3 * e + sz],
+        target: [focus.x + sx, focus.y - 0.05 * e, focus.z + sz],
       };
     }
     case "section": {
+      // Face the cut from the south, close enough that the section dominates the frame.
       const zc = -half + state.cutaway.position * e;
+      const sx = wide ? -0.09 * e : 0;
       return {
-        position: [focus.x + 0.12 * e, focus.y + 0.1 * e, zc + 0.5 * e],
-        target: [focus.x, focus.y - 0.04 * e, zc],
+        position: [focus.x + 0.06 * e + sx, focus.y + 0.07 * e, zc + 0.3 * e],
+        target: [focus.x + sx, focus.y - 0.035 * e, zc],
       };
     }
     default:
@@ -185,7 +210,7 @@ export function cameraPreset(
   }
 }
 
-export function poseKey(state: SceneState): string {
+export function poseKey(state: SceneState, wide = true): string {
   const cut = state.view === "section" ? state.cutaway.position.toFixed(3) : "";
-  return `${state.site}:${state.exaggeration}:${state.view}:${cut}`;
+  return `${state.site}:${state.exaggeration}:${state.view}:${cut}:${wide ? "w" : "n"}`;
 }

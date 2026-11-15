@@ -15,8 +15,8 @@ import {
 import { Brief } from "./ui/Brief";
 import { ControlPanel } from "./ui/ControlPanel";
 import { EvidenceCard } from "./ui/EvidenceCard";
-import { SourcePanel } from "./ui/SourcePanel";
-import { StoryPanel } from "./ui/StoryPanel";
+import { EvidenceDrawer } from "./ui/EvidenceDrawer";
+import { StoryOverlay, TopBar } from "./ui/StoryOverlay";
 
 export function App() {
   const [index, setIndex] = useState<SitesIndex | null>(null);
@@ -53,6 +53,9 @@ function Experience({ index }: { index: SitesIndex }) {
     (sc) => ({ ...initialStory, scene: sceneFromHash(sc, window.location.hash) ?? 0 }),
   );
   const [selected, setSelected] = useState<string | null>(null);
+  const [drawer, setDrawer] = useState(false);
+  // Establishing dolly only when the experience opens on chapter 1.
+  const [intro] = useState(() => story.scene === 0);
 
   useStoryDriver(scenes, story, storyDispatch, dispatch);
   useTestHooks(state, dispatch, story, storyDispatch);
@@ -65,36 +68,64 @@ function Experience({ index }: { index: SitesIndex }) {
     return <FullScreenMessage title="Invalid scene state" body={JSON.stringify(state)} />;
   const landmark = site.landmarks.find((l) => l.id === selected) ?? null;
   const inStory = story.mode === "story";
+  const observed = site.variants.find((v) => v.observed) ?? null;
+  const compareVariant = state.compare && !variant.observed ? observed : null;
+  const scene = inStory ? (scenes[story.scene] ?? null) : null;
+  const openEvidence = () => {
+    storyDispatch({ type: "pause" });
+    setDrawer(true);
+  };
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-black text-zinc-100">
+    <div className="relative h-dvh w-full overflow-hidden bg-[#090d16] text-zinc-100">
       <div className="absolute inset-0" onPointerDownCapture={() => storyDispatch({ type: "pause" })}>
-        <Viewer site={site} variant={variant} state={state} selected={selected} onSelect={setSelected} />
+        <Viewer
+          site={site}
+          variant={variant}
+          compareVariant={compareVariant}
+          state={state}
+          selected={selected}
+          onSelect={setSelected}
+          intro={intro}
+        />
       </div>
-      <SourcePanel site={site} variant={variant} state={state} compact={inStory} />
+      <TopBar
+        site={site}
+        variant={variant}
+        state={state}
+        scenes={scenes}
+        story={story}
+        storyDispatch={storyDispatch}
+        onEvidence={openEvidence}
+      />
       {inStory ? (
-        <StoryPanel
+        <StoryOverlay
           index={index}
           scenes={scenes}
           story={story}
           storyDispatch={storyDispatch}
           scene={state}
           sceneDispatch={dispatch}
+          onEvidence={openEvidence}
         />
       ) : (
-        <>
-          <ControlPanel sites={index.sites} site={site} state={state} dispatch={dispatch} />
-          <button
-            type="button"
-            data-testid="story-toggle"
-            onClick={() => storyDispatch({ type: "story" })}
-            className="absolute right-3 top-3 rounded-full border border-amber-300/40 bg-black/70 px-3 py-1 text-xs text-amber-100 hover:bg-black sm:right-6 sm:top-6"
-          >
-            ← Back to the story
-          </button>
-        </>
+        <ControlPanel sites={index.sites} site={site} state={state} dispatch={dispatch} />
       )}
       {landmark && <EvidenceCard site={site} landmark={landmark} onClose={() => setSelected(null)} />}
+      {drawer && (
+        <EvidenceDrawer
+          index={index}
+          site={site}
+          variant={variant}
+          state={state}
+          scene={scene}
+          onClose={() => setDrawer(false)}
+          onVariant={(variantId) => dispatch({ type: "selectVariant", variantId })}
+          onSite={(s) =>
+            dispatch({ type: "applyPreset", preset: { site: s, exaggeration: 2, view: "landmark" } })
+          }
+        />
+      )}
     </div>
   );
 }
@@ -115,9 +146,26 @@ function useStoryDriver(
   useEffect(() => {
     if (mode !== "story") return;
     const { scene } = currentStep(scenes, { ...initialStory, scene: sceneIdx, step: stepIdx });
-    for (const st of scene.steps.slice(0, stepIdx + 1)) dispatch({ type: "applyPreset", preset: st.preset });
+    const steps = scene.steps.slice(0, stepIdx + 1);
+    // Earlier steps' delayed presets apply at once; the current step's after its delay.
+    for (const st of steps.slice(0, -1)) {
+      dispatch({ type: "applyPreset", preset: st.preset });
+      if (st.followUp) dispatch({ type: "applyPreset", preset: st.followUp.preset });
+    }
+    const cur = steps[steps.length - 1];
+    if (cur) dispatch({ type: "applyPreset", preset: cur.preset });
     const hash = `#scene=${scene.id}`;
     if (window.location.hash !== hash) history.replaceState(null, "", hash);
+    const then = cur?.followUp;
+    if (!then) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      dispatch({ type: "applyPreset", preset: then.preset });
+      return;
+    }
+    // Cancelled if the user navigates away before it fires.
+    const t = window.setTimeout(() => dispatch({ type: "applyPreset", preset: then.preset }), then.afterMs);
+    return () => window.clearTimeout(t);
   }, [scenes, mode, sceneIdx, stepIdx, dispatch]);
 
   useEffect(() => {

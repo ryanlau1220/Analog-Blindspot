@@ -196,11 +196,24 @@ export function buildCap(
       (v): v is number => v !== undefined && Number.isFinite(v),
     );
     if (tops.length) {
+      // Magenta band: between the highest and lowest measured posts bounding the gap, i.e.
+      // where the surface height itself is unknown. Below it, the ordinary "not measured"
+      // hatch continues (appended to the cap), so no-data never claims the whole column.
       const top = Math.max(...tops) - datum;
-      const base = gp.length / 3;
-      gp.push(x0, top, zCut, x1, top, zCut, x1, baseY, zCut, x0, baseY, zCut);
-      gu.push(0, (top - baseY) / 20, (x1 - x0) / 20, (top - baseY) / 20, (x1 - x0) / 20, 0, 0, 0);
-      gi.push(base, base + 3, base + 1, base + 1, base + 3, base + 2);
+      const bot = Math.min(...tops) - datum;
+      const u1 = (x1 - x0) / 20;
+      if (top > bot) {
+        const base = gp.length / 3;
+        gp.push(x0, top, zCut, x1, top, zCut, x1, bot, zCut, x0, bot, zCut);
+        gu.push(0, (top - bot) / 20, u1, (top - bot) / 20, u1, 0, 0, 0);
+        gi.push(base, base + 3, base + 1, base + 1, base + 3, base + 2);
+      }
+      const base = pos.length / 3;
+      const ua = (x0 + width / 2) / 20;
+      const ub = (x1 + width / 2) / 20;
+      pos.push(x0, bot, zCut, x1, bot, zCut, x1, baseY, zCut, x0, baseY, zCut);
+      uv.push(ua, (bot - baseY) / 20, ub, (bot - baseY) / 20, ub, 0, ua, 0);
+      idx.push(base, base + 3, base + 1, base + 1, base + 3, base + 2);
     }
     k = b;
   }
@@ -227,4 +240,43 @@ export function sampleHeight(g: Grid, x: number, z: number): number {
   const top = at(r0, c0) * (1 - tc) + at(r0, c0 + 1) * tc;
   const bot = at(r0 + 1, c0) * (1 - tc) + at(r0 + 1, c0 + 1) * tc;
   return top * (1 - tr) + bot * tr;
+}
+
+/**
+ * Outline of the nodata region on the surface: grid lines separating a cell
+ * whose four posts are all valid from a cell that touches a NaN post. Returned
+ * as flat segment pairs (x0,y0,z0,x1,y1,z1,...) on the measured posts, so the
+ * line marks exactly where measured elevation stops. Empty if there is no gap.
+ */
+export function noDataOutline(g: Grid, datum: number, lift = 0): Float32Array {
+  const { rows, cols, heights } = g;
+  const ok = (r: number, c: number) => Number.isFinite(heights[r * cols + c]);
+  const cellOk = (r: number, c: number) =>
+    r >= 0 &&
+    c >= 0 &&
+    r < rows - 1 &&
+    c < cols - 1 &&
+    ok(r, c) &&
+    ok(r + 1, c) &&
+    ok(r, c + 1) &&
+    ok(r + 1, c + 1);
+  const cellBad = (r: number, c: number) => r >= 0 && c >= 0 && r < rows - 1 && c < cols - 1 && !cellOk(r, c);
+  const out: number[] = [];
+  const p = (r: number, c: number) => {
+    out.push(vertexX(g, c), (heights[r * cols + c] as number) - datum + lift, vertexZ(g, r));
+  };
+  const seg = (r0: number, c0: number, r1: number, c1: number) => {
+    p(r0, c0);
+    p(r1, c1);
+  };
+  for (let r = 0; r < rows - 1; r++) {
+    for (let c = 0; c < cols - 1; c++) {
+      if (!cellOk(r, c)) continue;
+      if (cellBad(r, c + 1)) seg(r, c + 1, r + 1, c + 1);
+      if (cellBad(r, c - 1)) seg(r, c, r + 1, c);
+      if (cellBad(r + 1, c)) seg(r + 1, c, r + 1, c + 1);
+      if (cellBad(r - 1, c)) seg(r, c, r, c + 1);
+    }
+  }
+  return new Float32Array(out);
 }

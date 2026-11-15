@@ -1,5 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { type PointerEvent, useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 import type { Site, Variant } from "../data/types";
 import { TerrainBlock } from "../terrain/TerrainBlock";
 import { useVariantAssets } from "../terrain/useVariantAssets";
@@ -7,33 +8,63 @@ import { CameraRig } from "./CameraRig";
 import { type LabelRegistry, LandmarkLabels, Landmarks } from "./Landmarks";
 import { cameraPreset, poseKey, type SceneState, siteDatum } from "./state";
 
-const SURFACE: Record<Site["id"], string> = { moon: "#b9b4aa", earth: "#a99b86", lanzarote: "#8f8a84" };
+const SURFACE: Record<Site["id"], string> = { moon: "#bdb6ab", earth: "#a99b86", lanzarote: "#948c84" };
+export const BG = "#090d16";
 
 export function cutZ(site: Site, position: number): number {
   return -site.extent_m / 2 + position * site.extent_m;
 }
 
+/** Landscape screens frame the subject right of centre; portrait keeps it centred. */
+export function useWideLayout(): boolean {
+  const q = "(min-width: 760px) and (min-aspect-ratio: 1/1)";
+  const [wide, setWide] = useState(() => window.matchMedia?.(q).matches ?? true);
+  useEffect(() => {
+    const m = window.matchMedia?.(q);
+    if (!m) return;
+    const on = () => setWide(m.matches);
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, []);
+  return wide;
+}
+
 export function Viewer({
   site,
   variant,
+  compareVariant,
   state,
   selected,
   onSelect,
+  intro,
 }: {
   site: Site;
   variant: Variant;
+  /** observed variant shown on the left of a draggable split (comparison mode) */
+  compareVariant?: Variant | null;
   state: SceneState;
   selected: string | null;
   onSelect: (id: string | null) => void;
+  /** establishing dolly on first load */
+  intro?: boolean;
 }) {
+  const wide = useWideLayout();
   const { assets, loading, error } = useVariantAssets(site, variant);
+  const cmpVariant = compareVariant ?? variant;
+  const cmp = useVariantAssets(site, cmpVariant);
   const [labels] = useState<LabelRegistry>(() => new Map());
+  const [split, setSplit] = useState(0.5);
   const datum = siteDatum(site);
   const depth = site.extent_m * 0.12;
   const z = cutZ(site, state.cutaway.position);
-  // Only render assets that belong to the current site (the previous variant of
-  // the same site may stay on screen while the next one streams in).
   const shown = assets?.key.startsWith(`${site.id}/`) ? assets : null;
+  const comparing = !!compareVariant && compareVariant.id !== variant.id;
+  const cmpShown = comparing && cmp.assets?.key === `${site.id}/${compareVariant.id}` ? cmp.assets : null;
+  const planes = useMemo(() => ({ left: new THREE.Plane(), right: new THREE.Plane() }), []);
+  const leftClip = useMemo(() => [planes.left], [planes]);
+  const rightClip = useMemo(() => [planes.right], [planes]);
+  const moon = site.id === "moon";
+  const ready = shown && !loading && (!comparing || cmpShown) ? shown.key : null;
 
   return (
     <>
@@ -41,13 +72,18 @@ export function Viewer({
         className="absolute inset-0"
         dpr={[1, 2]}
         gl={{ antialias: true, localClippingEnabled: true }}
-        camera={{ fov: 40, position: [0, 500, 1000] }}
+        camera={{ fov: 38, position: [0, 500, 1000] }}
         onPointerMissed={() => onSelect(null)}
+        fallback={<WebGLMissing />}
       >
-        <color attach="background" args={[site.id === "moon" ? "#050507" : "#0b0d10"]} />
-        {/* fixed sun: azimuth 315 deg, altitude 35 deg (matches the reference hillshades' direction) */}
-        <directionalLight position={[-0.58, 0.57, -0.58]} intensity={site.id === "moon" ? 3.2 : 2.6} />
-        <hemisphereLight args={["#cfd8e6", "#20201c", site.id === "moon" ? 0.25 : 0.6]} />
+        <color attach="background" args={[BG]} />
+        {/* Moon: low sun from the west-north-west (~20 deg) so the funnel rim casts shadow.
+            Earth: 315 deg azimuth, ~35 deg, matching the reference hillshades. */}
+        <directionalLight
+          position={moon ? [-0.85, 0.33, -0.42] : [-0.58, 0.57, -0.58]}
+          intensity={moon ? 3.6 : 2.6}
+        />
+        <hemisphereLight args={["#cfd8e6", "#141820", moon ? 0.14 : 0.55]} />
         {shown && (
           <TerrainBlock
             assets={shown}
@@ -57,8 +93,22 @@ export function Viewer({
             drape={state.drape === "orthophoto"}
             cut={{ enabled: state.cutaway.enabled, z }}
             surfaceColor={SURFACE[site.id]}
+            clip={cmpShown ? rightClip : undefined}
           />
         )}
+        {cmpShown && (
+          <TerrainBlock
+            assets={cmpShown}
+            datum={datum}
+            depth={depth}
+            exaggeration={state.exaggeration}
+            drape={state.drape === "orthophoto"}
+            cut={{ enabled: state.cutaway.enabled, z }}
+            surfaceColor={SURFACE[site.id]}
+            clip={leftClip}
+          />
+        )}
+        {cmpShown && <SplitPlanes split={split} left={planes.left} right={planes.right} />}
         <Landmarks
           site={site}
           datum={datum}
@@ -67,10 +117,31 @@ export function Viewer({
           selected={selected}
           labels={labels}
         />
-        <CameraRig pose={cameraPreset(site, state)} poseKey={poseKey(state)} far={site.extent_m * 20} />
-        <ReadySignal readyKey={shown && !loading ? shown.key : null} />
+        <CameraRig
+          pose={cameraPreset(site, state, wide)}
+          poseKey={poseKey(state, wide)}
+          far={site.extent_m * 20}
+          intro={intro}
+        />
+        <ReadySignal readyKey={ready} />
       </Canvas>
+      {/* Compositional depth: darken the frame edges so the block's rectangle recedes. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse 75% 70% at ${wide ? "62%" : "50%"} 48%, transparent 45%, ${BG}cc 85%, ${BG} 100%)`,
+        }}
+      />
       <LandmarkLabels site={site} selected={selected} onSelect={onSelect} labels={labels} />
+      {cmpShown && compareVariant && (
+        <SplitHandle split={split} onSplit={setSplit} left={compareVariant} right={variant} />
+      )}
+      <div
+        key={site.id}
+        aria-hidden
+        className="ab-site-fade pointer-events-none absolute inset-0 bg-[#090d16]"
+      />
       {(loading || error) && (
         <div className="pointer-events-none absolute inset-x-0 top-1/2 text-center text-sm text-zinc-300">
           {error ? `Failed to load ${variant.id}: ${error}` : `Loading ${variant.label.split(".")[0]}…`}
@@ -80,7 +151,85 @@ export function Viewer({
   );
 }
 
-/** Publishes the rendered variant to the perf smoke test after two drawn frames. */
+function WebGLMissing() {
+  return (
+    <div className="flex h-full items-center justify-center p-8 text-center text-sm text-zinc-300">
+      This experience needs WebGL. Your browser or device has it disabled; the printable brief (#brief) still
+      works.
+    </div>
+  );
+}
+
+/**
+ * Screen-space vertical split: a plane through the camera and the screen line
+ * x = split. The observed grid keeps the left side, the simulated grid the
+ * right. Planes are updated in place every frame (no material recompiles).
+ */
+function SplitPlanes({ split, left, right }: { split: number; left: THREE.Plane; right: THREE.Plane }) {
+  const v = useMemo(() => ({ a: new THREE.Vector3(), b: new THREE.Vector3(), r: new THREE.Vector3() }), []);
+  useFrame(({ camera }) => {
+    const x = split * 2 - 1;
+    const c = camera.position;
+    v.a.set(x, 1, 0.5).unproject(camera).sub(c);
+    v.b.set(x, -1, 0.5).unproject(camera).sub(c);
+    const n = v.a.clone().cross(v.b).normalize();
+    right.setFromNormalAndCoplanarPoint(n, c);
+    v.r.set(Math.min(x + 0.2, 1), 0, 0.5).unproject(camera);
+    if (right.distanceToPoint(v.r) < 0) right.negate();
+    left.copy(right).negate();
+  });
+  return null;
+}
+
+function SplitHandle({
+  split,
+  onSplit,
+  left,
+  right,
+}: {
+  split: number;
+  onSplit: (v: number) => void;
+  left: Variant;
+  right: Variant;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const move = (e: PointerEvent) => {
+    const r = box.current?.getBoundingClientRect();
+    if (r) onSplit(Math.min(Math.max((e.clientX - r.left) / r.width, 0.05), 0.95));
+  };
+  return (
+    <div ref={box} className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-y-0 w-px bg-white/70" style={{ left: `${split * 100}%` }}>
+        <span className="absolute top-[18%] right-3 whitespace-nowrap rounded bg-teal-950/80 px-2 py-0.5 text-[11px] text-teal-100">
+          ◀ observed {left.resolution_m} m
+        </span>
+        <span className="absolute top-[18%] left-3 whitespace-nowrap rounded border border-dashed border-violet-300/70 bg-violet-950/80 px-2 py-0.5 text-[11px] text-violet-100">
+          simulated {right.resolution_m} m ▶
+        </span>
+        <button
+          type="button"
+          role="slider"
+          aria-label="Comparison split, observed left and simulated right"
+          aria-valuemin={5}
+          aria-valuemax={95}
+          aria-valuenow={Math.round(split * 100)}
+          data-testid="split-handle"
+          onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)}
+          onPointerMove={(e) => e.buttons && move(e)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") onSplit(Math.max(split - 0.05, 0.05));
+            if (e.key === "ArrowRight") onSplit(Math.min(split + 0.05, 0.95));
+          }}
+          className="pointer-events-auto absolute top-1/2 -left-4 flex h-8 w-8 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-white/80 bg-black/70 text-xs text-white"
+        >
+          ⇆
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Publishes the rendered variant to the test hooks after two drawn frames. */
 function ReadySignal({ readyKey }: { readyKey: string | null }) {
   const frames = useRef(0);
   const last = useRef<string | null>(null);

@@ -285,6 +285,11 @@
         }
       ],
       "drape": null,
+      "thumb": {
+        "file": "thumb.webp",
+        "px": 257,
+        "basis": "hillshade of the observed display grid (preview only)"
+      },
       "landmarks": [
         {
           "id": "gnis_1657771",
@@ -610,6 +615,11 @@
         }
       ],
       "drape": null,
+      "thumb": {
+        "file": "thumb.webp",
+        "px": 257,
+        "basis": "hillshade of the observed display grid (preview only)"
+      },
       "landmarks": [
         {
           "id": "ngbe_2629323",

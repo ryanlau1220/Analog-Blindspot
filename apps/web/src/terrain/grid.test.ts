@@ -4,6 +4,7 @@ import {
   buildSkirts,
   buildSurface,
   type Grid,
+  noDataOutline,
   profileAtZ,
   sampleHeight,
   vertexX,
@@ -69,24 +70,46 @@ describe("skirts and cap", () => {
   });
 
   it("interpolates the profile between rows and reports nodata gaps", () => {
-    const g = grid(3, 4, (r, c) => (r === 1 && c === 1 ? Number.NaN : r * 10));
+    const g = grid(3, 4, (r, c) => (r === 1 && c === 1 ? Number.NaN : r * 10 + (c === 2 ? 4 : 0)));
     const mid = (vertexZ(g, 0) + vertexZ(g, 1)) / 2;
     const { hs } = profileAtZ(g, mid);
     expect(hs[0]).toBeCloseTo(5);
+    expect(hs[2]).toBeCloseTo(9);
     expect(Number.isNaN(hs[1])).toBe(true);
     const cap = buildCap(g, 0, -20, mid);
     expect(cap.gapCount).toBe(1);
-    expect(cap.indices.length / 6).toBe(1); // only columns 2-3; nothing bridges the gap
+    // columns 2-3 measured, plus one "not measured" quad below the gap
+    expect(cap.indices.length / 6).toBe(2);
     expect(cap.line.length).toBe(1);
-    // the gap is closed by a separate no-data quad up to the higher neighbouring edge, not by surface
+    // the no-data band spans only the unknown surface height: between the neighbouring posts (5 and 9)
     expect(cap.gaps.indices.length / 6).toBe(1);
     const gy = Array.from(cap.gaps.positions.filter((_, i) => i % 3 === 1));
-    expect(Math.max(...gy)).toBeCloseTo(5);
+    expect(Math.max(...gy)).toBeCloseTo(9);
+    expect(Math.min(...gy)).toBeCloseTo(5);
   });
 
   it("samples heights bilinearly", () => {
     const g = grid(3, 3, (_r, c) => c * 2);
     expect(sampleHeight(g, 0, 0)).toBeCloseTo(2);
     expect(sampleHeight(g, 1, 0)).toBeCloseTo(3);
+  });
+});
+
+describe("noDataOutline", () => {
+  it("rings a nodata post with segments on measured posts only", () => {
+    const g = grid(5, 5, (r, c) => (r === 2 && c === 2 ? Number.NaN : 1));
+    const out = noDataOutline(g, 0);
+    expect(out.length % 6).toBe(0);
+    expect(out.length / 6).toBeGreaterThan(0);
+    expect(Array.from(out).every(Number.isFinite)).toBe(true);
+  });
+
+  it("is empty when every post is measured", () => {
+    expect(
+      noDataOutline(
+        grid(4, 4, () => 2),
+        0,
+      ).length,
+    ).toBe(0);
   });
 });
