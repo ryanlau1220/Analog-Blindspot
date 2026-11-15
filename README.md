@@ -1,115 +1,190 @@
 # Analog Blindspot
 
-A five-chapter, visual-first story about what orbital terrain models measure at Marius Hills Pit (Moon), and how
-relief around known surface features changes as Earth terrain grids are coarsened. The terrain comparisons use checked elevation products and explicitly labelled simulated coarsening.
-Published planetary context and climatology are separately attributed. Nothing in it shows subsurface geometry as measured.
+<p align="center">
+  <img src="apps/web/public/favicon.svg" alt="Analog Blindspot logo" width="120" />
+</p>
 
-**Decision:** use Lava Beds to investigate smaller surface clues, and Lanzarote to investigate larger collapse
-features. These are known sites chosen for different test questions, not newly discovered analogs or proven lunar
-matches. The statistics compare median local relief at named points with a sampled background; they do not measure
-detection rates. Field access and subsurface correspondence remain unverified.
+<p align ="center">
+  <img src="https://img.shields.io/badge/NASA_Space_Apps-2026-0B3D91" alt="NASA Space Apps 2026" />
+  <img src="https://img.shields.io/badge/React-19-149ECA?logo=react&amp;logoColor=white" alt="React 19" />
+  <img src="https://img.shields.io/badge/Three.js-3D_terrain-000000?logo=threedotjs" alt="Three.js 3D terrain" />
+  <img src="https://img.shields.io/badge/Python-scientific_pipeline-3776AB?logo=python&amp;logoColor=white" alt="Python scientific pipeline" />
+  <img src="https://github.com/ryanlau1220/Analog-Blindspot/actions/workflows/ci-deploy.yml/badge.svg" alt="CI and Cloudflare deployment status" />
+</p>
 
-- **Moon:** LROC NAC DTM `NAC_DTM_MARIUSPIT01` (4 m). The pit interior has no elevation data and is shown as a
-  hole.
-- **Earth 1:** Lava Beds, California, NCALM airborne LiDAR (0.5 m), doi:10.5069/G9ST7N19.
-- **Earth 2:** Lanzarote, Malpaís de La Corona, CNIG PNOA-LiDAR MDT02 (2 m), tile 1080-4.
-- **Not verified:** Harrat Khaybar (shown only as a candidate, with no measurements).
+**Analog Blindspot** turns lunar and Earth terrain data into an interactive investigation of what orbital maps miss and where researchers could look next.
 
-## What the prototype does
+- **Deployed Project:** [analog-blindspot.ryanlau1220.workers.dev](https://analog-blindspot.ryanlau1220.workers.dev/)
+- **Live Demo:** [Watch the demo video on YouTube](https://youtu.be/QeMeyhgntPg)
+- **Pitch Deck:** [View the seven-slide PDF](submission/Analog-Blindspot_Pitch-Deck.pdf)
+- **Submission materials:** [Video, transcript and sources](submission/SUBMISSION.md)
 
-Follow the lunar pit from an orbital image to the gap in the elevation model, examine two established
-Earth analog sites, predict a sampled relief comparison, and choose a field investigation. A lattice
-search highlights unverified relief anomalies and compares proximity to named points and a separate
-OpenStreetMap entrance set. These are leads for further checking, not newly validated analog sites.
-The printable brief and evidence drawer document sources, methods, and uncertainty.
+<p align="center">
+  <a href="https://youtu.be/QeMeyhgntPg">
+    <img src="https://img.youtube.com/vi/QeMeyhgntPg/hqdefault.jpg" alt="Watch the Analog Blindspot demo video on YouTube" width="560" />
+  </a>
+  <br />
+  <a href="https://youtu.be/QeMeyhgntPg">Watch the demo video on YouTube</a>
+</p>
 
-Earth LiDAR is block-averaged to simulate coarser grids. A difference between sampled landmark and
-background medians is **not** a detection rate, a resolution requirement, or proof of lunar or
-Martian subsurface geometry. NASADEM is a separate real observation, not a simulated grid.
-Diviner's 0.5° bin describes the pit's surroundings, not its interior; Mars grid comparisons are
-context, not an analysis of Martian terrain or a validated base recommendation. Field access,
-candidate anomalies, and underground correspondence still require investigation.
+**Team:** Machine Not Learning · **Team member:** Ryan Lau Jun Hong
 
-## Run
+**Challenge:** [Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/)
 
-```sh
-pnpm install
-pnpm dev            # http://localhost:5173  (#scene=<id> deep links, #brief = printable brief)
-pnpm build          # static site in apps/web/dist; BASE_PATH=/sub/ pnpm build for subpath hosting
+> This is a research and education prototype. Its highlighted terrain anomalies are **unverified leads**, not confirmed caves or newly validated analog sites. It does not measure subsurface geometry, establish habitability, analyze Martian elevation, or recommend a validated Moon or Mars base site.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Installation & Setup](#installation--setup)
+- [Project Structure](#project-structure)
+- [System Architecture](#system-architecture)
+- [Tech Stack](#tech-stack)
+- [Core Features](#core-features)
+- [Essential Commands](#essential-commands)
+- [Data, Findings & Limitations](#data-findings--limitations)
+- [References](#references)
+
+## Project Overview
+
+Marius Hills Pit is visible in lunar imagery, but a visible opening is not a map of what lies beneath it. Analog Blindspot starts with the missing elevation in a real lunar terrain model, then uses two established volcanic regions on Earth to explore how terrain resolution changes the evidence available to a researcher.
+
+1. **Observe the blind spot:** inspect the measured surface and the missing-elevation region at Marius Hills Pit.
+2. **Investigate Earth analogs:** compare observed LiDAR and simulated coarser terrain at Lava Beds and Lanzarote.
+3. **Explore research leads:** examine a terrain-relief search and its independent mapped-entrance cross-check.
+4. **Plan verification:** review the evidence and produce a printable Field Validation Brief.
+
+The Earth sites are already known analog environments; the new anomaly flags require field or other independent verification. See [Data, Findings & Limitations](#data-findings--limitations) before interpreting the results.
+
+## Installation & Setup
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) **24.14.0**, as pinned in [`.node-version`](.node-version), and [pnpm](https://pnpm.io/) **12.16.1**, as pinned in [`package.json`](package.json).
+- A WebGL-capable browser. Chrome or Chromium is required for the browser smoke and performance scripts.
+- Optional for rebuilding the scientific data: Python **3.12 or later** and [`uv`](https://docs.astral.sh/uv/).
+
+### Run the application
+
+```bash
+git clone https://github.com/ryanlau1220/Analog-Blindspot.git
+cd Analog-Blindspot
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-The app reads only `apps/web/public/data` (committed) and makes no remote API calls at runtime.
-The optional ambient soundtrack is synthesized locally, starts only when the sound control is selected, and
-stops when the tab is hidden or the experience is closed. The story remains usable without audio.
+Open [http://localhost:5173](http://localhost:5173). The application uses the committed assets in `apps/web/public/data/`; running it requires neither API keys nor the original large rasters. A WebGL-capable device is needed for the 3D view. Open `/#brief` for the printable brief.
 
-## Cloudflare deployment
+### Rebuild scientific assets
 
-This is a static-only Cloudflare Worker; no Worker code or backend is required. The GitHub Actions workflow
-`.github/workflows/ci-deploy.yml` validates pull requests and pushes to `main`, and deploys a validated `main`
-commit to Cloudflare. It also supports manual runs on `main`. The workflow runs a desktop and mobile browser
-smoke test, scientific tests that do not require the ignored raw rasters, and compares key production files to
-the validated build after deploying. A stale run skips deployment if a newer commit is already on `main`.
+The reproducible pipeline requires the source rasters, additional disk space and network access for inputs not already cached. The Lanzarote CNIG tile requires a manual download and licence step. See [Science notes: reproduction](docs/science.md#reproduction) for the exact order, expected path, caching and limitations.
 
-Configure the repository's **Settings → Secrets and variables → Actions → Repository secrets**:
+### Deployment
 
-- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID that owns the Worker.
-- `CLOUDFLARE_API_TOKEN`: a Cloudflare API token scoped to that account with the **Edit Cloudflare Workers**
-  template. Never commit the token or paste it into an issue.
+The static build is deployed to Cloudflare Workers using [`wrangler.jsonc`](wrangler.jsonc). [GitHub Actions](.github/workflows/ci-deploy.yml) validates pull requests and `main` pushes; an eligible current `main` run deploys and checks production files. Configure `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as GitHub Actions repository secrets. They are needed for deployment, not local app use. Avoid running a second automatic Cloudflare Git deployment for the same Worker.
 
-Use `.node-version` and the `packageManager` field for the tested Node and pnpm versions. Leave `BASE_PATH` unset
-for the production domain root. To verify locally without deploying, run `pnpm install --frozen-lockfile`,
-`pnpm test`, `pnpm check`, `pnpm build`, `pnpm --filter web smoke` (requires Chrome), and
-`pnpm exec wrangler deploy --dry-run`. Do not also enable automatic Cloudflare Git builds for this Worker unless
-you deliberately want two deployment systems.
+## Project Structure
 
-## Rebuild the data
-
-```sh
-cd scientific
-uv sync
-uv run fetch-sources        # LROC + OpenTopography products, size and SHA-256 checked (~1.1 GB, git-ignored)
-uv run fetch-landmarks      # USGS GNIS (Lava Beds)
-uv run fetch-landmarks-es   # IGN NGBE (Lanzarote)
-uv run phase-a              # Moon + Lava Beds gate -> datasets/manifest.json
-# Lanzarote tile: manual browser download (CNIG uses reCAPTCHA), see docs/science.md
-uv run phase-d              # Lanzarote gate -> datasets/manifest_phase_d.json
-uv run phase-e              # NASADEM, climate, lattice search, OSM hold-out and Diviner -> manifest_phase_e.json
-                            # add --refresh to refetch POWER, OSM and Diviner inputs
-uv run export-web           # -> apps/web/public/data
-uv run pytest
+```text
+Analog-Blindspot/
+├── apps/web/
+│   ├── public/data/        # Committed browser-ready terrain and site data
+│   ├── src/                # React UI, story, 3D scene, terrain and audio
+│   └── scripts/            # Browser smoke, performance and screenshot tools
+├── scientific/
+│   ├── config/             # Source definitions, cached inputs and landmarks
+│   ├── src/                # Data acquisition, analysis and web export
+│   └── tests/              # Scientific pipeline tests
+├── datasets/
+│   ├── manifest*.json      # Provenance, analysis results and gate checks
+│   └── previews/           # Committed reference images
+├── docs/                   # Science and interaction documentation
+├── submission/             # Demo video, pitch deck and submission notes
+├── .github/workflows/      # Validation and deployment workflow
+└── wrangler.jsonc          # Cloudflare static asset configuration
 ```
 
-## Docs
+Large raw inputs and derived rasters under `datasets/raw/` and `datasets/derived/` are ignored by Git; the application-ready data and manifests are committed.
 
-- `docs/science.md`: terrain validation, measured values, methods and limitations.
-- `datasets/manifest_phase_e.json`: NASADEM, climate, search and hold-out results.
-- `docs/storytelling.md`: chapters, interaction rules, the printable brief.
-- `datasets/manifest.json`: provenance, licences, checksums and gate results.
+## System Architecture
 
-## Credits and licences
+```mermaid
+flowchart LR
+    Moon["LROC lunar terrain + orthophoto"] --> Pipeline["Scientific pipeline<br/>validate · crop · analyze"]
+    Earth["Lava Beds + Lanzarote LiDAR"] --> Pipeline
+    Context["NASADEM · Diviner · NASA POWER<br/>gazetteers · OpenStreetMap"] --> Pipeline
+    Pipeline --> Records["Manifests + analysis results"]
+    Pipeline --> Assets["Browser-ready terrain + sites.json"]
+    Records --> Assets
+    Assets --> Hosting["Cloudflare Workers<br/>static assets"]
+    Hosting --> App["Browser: 3D story · comparison<br/>anomaly search · evidence"]
+    App --> Brief["Printable Field Validation Brief"]
+    App --> Visitor["Visitor / researcher"]
+    Brief --> Visitor
+```
 
-- LROC data: NASA/GSFC/Arizona State University, public domain (PDS).
-- Lava Beds LiDAR: Williams, E. (2024), NCALM / OpenTopography, CC BY 4.0, NSF EAR-2324629.
-- Lanzarote: Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es.
-- Gazetteers: USGS GNIS (public domain); IGN NGBE (CC BY 4.0); LROC Pits Atlas.
-- OpenStreetMap contributors: cave entrance points, ODbL. NASA POWER, NASADEM and LRO Diviner: NASA data; see the evidence drawer and Phase E manifest for provenance.
+Data processing happens before deployment. The browser reads the exported files from the same origin; it does not query the source agencies or a project backend at runtime. NASADEM is an independent observed comparison, while the coarsened Earth grids are simulations.
 
-### Presentation controls
+## Tech Stack
 
-- **Try scroll journey** pins the 3D stage while native scrolling advances through the five chapters.
-  Chapter buttons, Previous/Next, deep links, and the guided tour remain available. Turn it off to orbit
-  and zoom the terrain manually. Touch scrolling works over the terrain on mobile.
-- In **Resolution**, select **Focus experiment** to clear the headline and supporting copy from the stage.
-  **Reveal the difference** sweeps the existing observed/simulated split across the same ground in 3.6 seconds.
-  Stop it at any time or drag the split yourself; arrow keys adjust the split without changing chapter.
-  The sweep never interpolates scientific measurements or generates intermediate resolutions.
-- **Enable sound** (♪ on narrow screens) starts the original synthesized ambience at 35% volume.
-  The volume slider appears while playing. Sound stops when the tab is hidden; it never autoplays.
-  The higher register and richer harmonics are intended to be more audible on small speakers.
-- Reduced-motion preferences replace the sweep with a static midpoint comparison and disable spatial
-  presentation transitions. All results remain accessible without motion or audio.
-- **How this experiment works** expands the four-step data-to-decision explanation and scientific limitations.
+| Area | Technology | Purpose |
+| --- | --- | --- |
+| Interface | React, TypeScript, Vite, Tailwind CSS | Application, controls and responsive layout |
+| 3D and motion | Three.js, React Three Fiber, Drei, GSAP | Terrain rendering, camera and presentation motion |
+| Scientific processing | Python, NumPy, Rasterio, pyproj, Shapely | Raster processing, coordinate transforms and terrain analysis |
+| Data and delivery | JSON, binary height grids, WebP, Cloudflare Workers | Browser-ready assets and static hosting |
+| Quality and automation | Vitest, Biome, Playwright, pytest, GitHub Actions | Checks, browser tests and deployment |
 
-Suggested judging sequence: lunar question → blindspot → Earth candidates → focused resolution reveal →
-field decision and validation brief. The application still makes no claim to have measured the subsurface
-or validated a new lunar/Mars base location.
+## Core Features
+
+- **Interactive lunar terrain:** explore the LROC model and see where elevation data ends; the hatched subsurface is unmeasured.
+- **Judge presentation:** an approximately 90-second, six-stage flow from the lunar question through the resolution experiment, search region, featured lead and next investigation. Pause, navigate or exit to the full experience.
+- **Guided story and exploration:** five chapters, a scroll journey, interactive terrain controls, site selection and deep links.
+- **Resolution experiment:** compare observed Earth LiDAR with computed, block-averaged grids using a draggable split and a reveal sweep. Results are relief statistics, not cave-detection rates.
+- **Anomaly investigation:** show high-relief clusters and a separate OpenStreetMap cave-entrance proximity check. The featured Lava Beds lead is tied to its recorded coordinates and remains unverified.
+- **Evidence and field decision:** inspect source links, limitations and statistics, compare the two Earth sites, and print or save the Field Validation Brief.
+- **Accessible presentation controls:** collapsible story and chapter panels, keyboard-operable controls, reduced-motion support and optional locally synthesized ambient audio that starts only when requested.
+
+See [Story and interaction guide](docs/storytelling.md) for controls and [Science notes](docs/science.md) for methods and provenance.
+
+## Essential Commands
+
+Run from the repository root unless stated otherwise.
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm install --frozen-lockfile` | Install the pinned JavaScript dependencies |
+| `pnpm dev` | Start the local Vite server |
+| `pnpm test` | Run web unit tests |
+| `pnpm check` | Run Biome and TypeScript checks |
+| `pnpm build` | Build static assets into `apps/web/dist/` |
+| `pnpm --filter web smoke` | Run desktop, mobile and slow-frame browser smoke tests against the build |
+| `pnpm perf` | Run the browser performance smoke test |
+| `pnpm exec wrangler deploy --dry-run` | Validate the Cloudflare deployment configuration without deploying |
+| `cd scientific && uv sync && uv run pytest` | Install Python dependencies and run scientific tests; data-dependent tests require the raw inputs |
+
+The smoke and performance scripts default to `/usr/bin/google-chrome`; set `CHROME=/path/to/chrome` if needed. For hosting under a subpath, set `BASE_PATH`, for example `BASE_PATH=/analog-blindspot/ pnpm build`.
+
+## Data, Findings & Limitations
+
+| Input / result | What it contributes | Important boundary |
+| --- | --- | --- |
+| LROC NAC DTM, Marius Hills Pit | A 4 m lunar terrain model and observed pit surroundings | The pit interior contains missing elevation; the model does not map a cave or its safety. |
+| Lava Beds LiDAR | Observed 0.5 m Earth terrain and eight approximate GNIS natural-bridge points | At simulated 10 m, point median relief is about 4.3 m versus 4.7 m for sampled background; this is not a detection benchmark. |
+| Lanzarote CNIG MDT02 | Observed 2 m terrain and six approximate jameo/cave points | The site is a known analog; the land-filtered background and coarse-grid limits matter. |
+| Lattice search and OpenStreetMap | At observed Lava Beds resolution: 3,364 sampled locations, 169 top-relief points, and 24 unverified clusters away from named points | Five of 16 mapped cave entrances are within 45 m of a flagged point, versus about 15% of seeded random positions. This preliminary proximity check does not establish cave-detection accuracy. |
+| NASADEM and Diviner | An independent 30 m Earth elevation comparison and lunar thermal context | Broad-terrain agreement does not establish feature-level equivalence. The Diviner bin includes the pit's surroundings, not its interior. |
+| Mars literature | Context for published Arsia Mons skylight candidate sizes | The prototype does not analyze Martian elevation data. |
+
+The featured anomaly has 17.51 m local relief within a 30 m radius in the observed Lava Beds grid. High relief can also arise from roads, scarps, cliffs or other surface features. A field survey and independent imagery would be needed to assess it. See [Science notes](docs/science.md) and the [Phase E manifest](datasets/manifest_phase_e.json) for the method, checks and uncertainty.
+
+## References
+
+- **Lunar terrain:** [LROC NAC DTM MARIUSPIT01](https://data.lroc.im-ldi.com/lroc/view_rdr_product/NAC_DTM_MARIUSPIT01), NASA/GSFC/Arizona State University.
+- **Lava Beds LiDAR:** Williams (2024), NCALM / OpenTopography, [doi:10.5069/G9ST7N19](https://doi.org/10.5069/G9ST7N19), CC BY 4.0; NSF EAR-2324629.
+- **Lanzarote terrain:** [CNIG MDT02, second coverage](https://centrodedescargas.cnig.es/CentroDescargas/catalogo.do?Serie=MDT02). Attribution: Obra derivada de MDT02-cob2 2015-2021 CC-BY 4.0 scne.es.
+- **NASADEM:** NASA JPL (2020), [NASADEM Merged DEM Global 1 arc second V001](https://doi.org/10.5067/MEaSUREs/NASADEM/NASADEM_HGT.001).
+- **Lunar temperature context:** LRO Diviner Global Cumulative Product and Williams et al. (2017), [doi:10.1016/j.icarus.2016.08.012](https://doi.org/10.1016/j.icarus.2016.08.012).
+- **Earth locations and context:** USGS GNIS, IGN NGBE, [OpenStreetMap contributors](https://www.openstreetmap.org/copyright) (ODbL), and [NASA POWER](https://power.larc.nasa.gov/).
+- **Mars context:** Cushing et al. (2007), [doi:10.1029/2007GL030709](https://doi.org/10.1029/2007GL030709).
+- **Project records:** [Phase A manifest](datasets/manifest.json), [Phase D manifest](datasets/manifest_phase_d.json), [Phase E manifest](datasets/manifest_phase_e.json), and the application evidence drawer.

@@ -12,10 +12,13 @@ The Earth sites are established analogs, and the anomalies are leads requiring v
 
 ## Deliverables
 
-- `Analog-Blindspot_Demo-Video.mp4` — a short product demonstration with synthesized spoken narration and music.
-- `Analog-Blindspot_Pitch-Deck.pdf` — seven-slide presentation with independent explanatory graphics and an Archify data-flow diagram.
-- Live prototype: https://analog-blindspot.ryanlau1220.workers.dev/
-- Source code: https://github.com/ryanlau1220/Analog-Blindspot
+- [Local demo video](Analog-Blindspot_Demo-Video.mp4) — a 27.6-second product demonstration with synthesized spoken narration and music.
+- [YouTube demo](https://youtu.be/QeMeyhgntPg) — the video link supplied by the team.
+- [Pitch deck](Analog-Blindspot_Pitch-Deck.pdf) — seven slides with explanatory graphics and a data-flow diagram.
+- [Deployed project](https://analog-blindspot.ryanlau1220.workers.dev/)
+- [Source code](https://github.com/ryanlau1220/Analog-Blindspot)
+
+The local video and the YouTube upload are separate files. Check the upload before submission if the local video has been revised since it was published.
 
 ## Demo narration
 
