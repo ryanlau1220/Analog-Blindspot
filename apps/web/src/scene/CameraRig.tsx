@@ -5,6 +5,10 @@ import { type ComponentRef, useEffect, useRef } from "react";
 
 import type { CameraPose } from "./state";
 
+// Camera moves must finish on elapsed time even on software-rendered devices.
+// GSAP's default lag smoothing otherwise stretches each >500 ms frame to 33 ms.
+gsap.ticker.lagSmoothing(0);
+
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 

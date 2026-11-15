@@ -15,6 +15,7 @@ const failures = [];
 await mkdir("../../tmp/motion-review", { recursive: true });
 try {
   for (const [name, viewport] of [
+    ["slow frames", { width: 1366, height: 768 }],
     ["desktop", { width: 1366, height: 768 }],
     ["mobile", { width: 390, height: 844 }],
     ["small mobile", { width: 320, height: 844 }],
@@ -24,6 +25,35 @@ try {
       reducedMotion: name === "small mobile" ? "reduce" : "no-preference",
     });
     page.setDefaultTimeout(20000);
+    if (name === "slow frames") {
+      // Exercise real application motion with rAF gaps above GSAP's 500 ms
+      // lag threshold; do not disable animation or bypass click actionability.
+      await page.addInitScript(() => {
+        const request = window.requestAnimationFrame.bind(window);
+        const cancel = window.cancelAnimationFrame.bind(window);
+        const pending = new Map();
+        let nextId = 0;
+        window.requestAnimationFrame = (callback) => {
+          const id = ++nextId;
+          const job = { timer: 0, frame: 0 };
+          job.timer = window.setTimeout(() => {
+            job.frame = request((time) => {
+              pending.delete(id);
+              callback(time);
+            });
+          }, 650);
+          pending.set(id, job);
+          return id;
+        };
+        window.cancelAnimationFrame = (id) => {
+          const job = pending.get(id);
+          if (!job) return;
+          clearTimeout(job.timer);
+          cancel(job.frame);
+          pending.delete(id);
+        };
+      });
+    }
     await page.addInitScript(() => {
       const connect = AudioNode.prototype.connect;
       AudioNode.prototype.connect = function (destination, ...rest) {

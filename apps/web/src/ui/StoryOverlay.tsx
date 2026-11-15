@@ -1,4 +1,3 @@
-import gsap from "gsap";
 import { type Dispatch, type ReactNode, useLayoutEffect, useRef } from "react";
 import { AmbientSound } from "../audio/AmbientSound";
 import type { Site, SitesIndex, Variant } from "../data/types";
@@ -170,17 +169,23 @@ export function StoryOverlay({
   // biome-ignore lint/correctness/useExhaustiveDependencies: animate on chapter change only
   useLayoutEffect(() => {
     if (!root.current || reducedMotion()) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-anim]", {
-        y: 18,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power3.out",
-        delay: 0.15,
-      });
-    }, root);
-    return () => ctx.revert();
+    // Native animations use the document clock, independent of WebGL frame rate.
+    // Controls fade without changing position, so they remain stable click targets.
+    const animations = Array.from(root.current.querySelectorAll<HTMLElement>("[data-anim]")).map(
+      (element, i) =>
+        element.animate(
+          element.dataset.anim === "controls"
+            ? [{ opacity: 0 }, { opacity: 1 }]
+            : [
+                { opacity: 0, transform: "translateY(18px)" },
+                { opacity: 1, transform: "none" },
+              ],
+          { duration: 800, delay: 150 + i * 120, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "backwards" },
+        ),
+    );
+    return () => {
+      for (const animation of animations) animation.cancel();
+    };
   }, [story.scene]);
 
   if (!scene || !step) return null;
@@ -282,14 +287,14 @@ export function StoryOverlay({
       </div>
       {panel && (
         <div
-          data-anim
+          data-anim="controls"
           className={`pointer-events-auto w-full lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:justify-self-end ${panelWidth}`}
         >
           {panel}
         </div>
       )}
       <div
-        data-anim
+        data-anim="controls"
         className={`pointer-events-auto flex flex-wrap items-center gap-3 lg:col-start-1 ${focusLab ? "hidden" : ""}`}
       >
         <button
